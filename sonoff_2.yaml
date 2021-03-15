@@ -1,0 +1,87 @@
+esphome:
+  name: sonoff_2
+  platform: ESP8266
+  board: esp01_1m
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Sonoff 2 Fallback Hotspot"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+ota:
+  password: !secret ota_password
+
+# Serveur Web
+web_server:
+  port: 80
+
+# Définition du bouton physique
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "Sonoff2 button"
+    on_press:
+      - switch.toggle: relayandled
+
+# Témoin de fonctionnement
+output:
+  - platform: esp8266_pwm
+    id: sonoff2_green_led
+    pin:
+      number: GPIO13
+      inverted: True
+
+light:
+  - platform: monochromatic
+    name: "Sonoff2 LED verte"
+    output: sonoff2_green_led
+    id: led
+
+# Définition de l'action sur le relais
+# et sur la LED
+switch:
+  - platform: gpio
+    pin: GPIO12
+    id: relay
+  - platform: template
+    name: "Sonoff2 relay"
+    optimistic: true
+    id: relayandled
+    turn_on_action:
+    - switch.turn_on: relay
+    - light.turn_on: led
+    turn_off_action:
+    - switch.turn_off: relay
+    - light.turn_off: led
+
+# On récupère la force du signal Wi-Fi
+sensor:
+  - platform: wifi_signal
+    name: "Sonoff2 WiFi signal"
+    update_interval: 60s
+
+# On récupère le temps de fonctionnement
+  - platform: uptime
+    name: "Sonoff2 uptime"
+
+# On récupère la version de firmware
+text_sensor:
+  - platform: version
+    name: "Sonoff2 ESPHome version"
+    

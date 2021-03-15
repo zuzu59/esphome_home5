@@ -1,0 +1,98 @@
+#zf21020.1646
+
+esphome:
+  name: th-fsd58
+  platform: ESP8266
+  board: nodemcuv2
+
+# Configuration WIFI
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "th-fsd58 Fallback Hotspot"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+#    level: VERBOSE
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+ota:
+  password: !secret ota_password
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "th-fsd58 LED"
+    inverted: True
+    id: led
+    pin: D4
+
+  - platform: restart
+    name: "th-fsd58 Restart"
+
+# Définition du bouton physique
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D3
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "th-fsd58 button"
+    on_press:
+      - switch.toggle: led
+
+# WEB Server
+web_server:
+  port: 80
+
+# MQTT server
+mqtt:
+  broker:  !secret mqtt_server_dev
+  port:  !secret mqtt_port_dev
+  username:  !secret mqtt_user_dev
+  password:  !secret mqtt_password_dev
+
+
+
+# I2C conf
+i2c:
+  sda: D5
+  scl: D6
+
+# Sensors
+sensor:
+  - platform: wifi_signal
+    name: "th-fsd58 Signal Wi-Fi"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "th-fsd58 uptime"
+    update_interval: 60s
+
+  - platform: htu21d
+    temperature:
+      name: "th-fsd58 Température"
+    humidity:
+      name: "th-fsd58 Humidité"
+    update_interval: 5s
+
+######### juste là pour changer l'harmonique du CPU qui interagit avec le WIFI sur mes NodeMCU lowcost :-(
+  - platform: homeassistant
+    name: "th8 Temp"
+    entity_id: sensor.th8_temperature
+#    id: th8_th
+    internal: true
+#########
+
+
+
+
