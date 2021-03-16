@@ -5,6 +5,26 @@ globals:
      type: int
 #     restore_value: no
      initial_value: '0'
+   - id: ota_timeout
+     type: int
+#     restore_value: no
+     initial_value: '0'
+
+
+interval:
+  - interval: 1s
+    then:
+      if:
+        condition:
+          mqtt.connected:
+        then:
+          - logger.log: Ah, mqtt est connecté !
+          - lambda: |-
+              id(ota_timeout) += 1;
+        else:
+          - logger.log: Y'a rien qui se passe !
+
+
 
 # Configuration ESPhome
 esphome:
