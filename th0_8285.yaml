@@ -1,4 +1,4 @@
-#zf210316.1833
+#zf210316.1930
 
 # Configuration ESPhome
 esphome:
@@ -6,18 +6,21 @@ esphome:
   platform: ESP8266
   board: esp8285
   on_boot:
+    - switch.turn_on: led
+#    - delay: 60s
+#    - logger.log: J'ai un problème, je dois dormir !
+#    - deep_sleep.enter: deep_sleep_1
+    - wait_until: mqtt.connected 
+    - logger.log: Ah je crois que mqtt est connecté !
+    - logger.log: Je suis connected et envoie la sauce !
+    - delay: 2s
+    - logger.log: Je vais dormir !
+    - deep_sleep.enter: deep_sleep_1
+
+#    on_shutdown:
 #    then:
-#      - switch.turn_on: led
-      - logger.log: J'ai un problème, je dois dormir !
-#      - delay: 60s
-#      - deep_sleep.enter: deep_sleep_1
-    - wait_until:
-        mqtt.connected: 
-                - logger.log: Ah je crois que mqtt est connecté !
-    on_shutdown:
-    then:
-      - logger.log: Je m'arrête !
-      - delay: 4s
+#      - logger.log: Je m'arrête !
+#      - delay: 4s
 
 # Configuration WIFI
 wifi:
@@ -117,23 +120,15 @@ sensor:
   - platform: wifi_signal
     name: "th0_8285 Signal Wi-Fi"
     update_interval: 3s
-    on_value:
-      if:
-        condition:
-          mqtt.connected:
-        then:
-          - logger.log: Je suis connected et envoie la sauce !
-          - delay: 2s
-          if:
-            condition:
-                on_message:
-                - topic: th0_8285/ota/state
-                  payload: 'ON'
-                  then:
-                    - logger.log: Je reste réveillé !
-                  else:
-                    - logger.log: Je vais dormir !
-                    - deep_sleep.enter: deep_sleep_1
+#    on_value:
+#      if:
+#        condition:
+#          mqtt.connected:
+#        then:
+#          - logger.log: Je suis connected et envoie la sauce !
+#          - delay: 2s
+#          - logger.log: Je vais dormir !
+#          - deep_sleep.enter: deep_sleep_1
   - platform: uptime
     name: "th0_8285 uptime"
     update_interval: 3s
