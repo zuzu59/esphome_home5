@@ -1,15 +1,12 @@
-#zf210317.0031
+#zf210317.0127
 
 globals:
    - id: ota_state
      type: int
-#     restore_value: no
      initial_value: '0'
    - id: ota_timeout
      type: int
-#     restore_value: no
      initial_value: '0'
-
 
 interval:
   - interval: 1s
@@ -18,11 +15,38 @@ interval:
         condition:
           mqtt.connected:
         then:
-          - logger.log: Ah, mqtt est connecté !
+          - logger.log: MQTT est connecté !
+          - if:
+              condition:
+                lambda: 'return id(ota_state) == 1;'
+              then:
+                - logger.log: OTA est demandé !
+                - logger.log: J'arrête le desleep !
+                - deep_sleep.prevent: deep_sleep_1
+              else:
+                - logger.log: Je suis connected et envoie la sauce !
+                - logger.log: Je vais dormir !
+                - delay: 0.5s
+                - deep_sleep.enter: deep_sleep_1
           - lambda: |-
               id(ota_timeout) += 1;
+          - if:
+              condition:
+                lambda: 'return id(ota_timeout) > 12;'
+              then:
+                - logger.log: On est en ota timeout !
+                - mqtt.publish:
+                    topic: th0_8285/ota/state
+                    payload: 'OFF'
+                    retain: true
+                - logger.log: J'ai mis state OTA à OFF !
+                - logger.log: J'ai un problème, je dois dormir !
+                - delay: 0.5s
+                - deep_sleep.enter: deep_sleep_1
+              else:
+                - logger.log: On peut flasher !
         else:
-          - logger.log: Y'a rien qui se passe !
+          - logger.log: J'attends d'être connecté à MQTT !
 
 
 
@@ -40,21 +64,21 @@ esphome:
 
 
 
-    - wait_until: mqtt.connected 
-    - if:
-        condition:
-          lambda: 'return id(ota_state) == 1;'
-        then:
-          - logger.log: Je vois que OTA est demandé !
-          - mqtt.publish:
-              topic: th0_8285/ota/state
-              payload: 'OFF'
-              retain: true
-          - logger.log: J'ai mis state OTA à OFF !
+    # - wait_until: mqtt.connected 
+    # - if:
+    #     condition:
+    #       lambda: 'return id(ota_state) == 1;'
+    #     then:
+    #       - logger.log: Je vois que OTA est demandé !
+    #       - mqtt.publish:
+    #           topic: th0_8285/ota/state
+    #           payload: 'OFF'
+    #           retain: true
+    #       - logger.log: J'ai mis state OTA à OFF !
 
-        else:
-          - logger.log: tutu1 !
-    - logger.log: titi1 !
+    #     else:
+    #       - logger.log: tutu1 !
+    # - logger.log: titi1 !
     # - if:
     #     condition:
     #       mqtt.connected
