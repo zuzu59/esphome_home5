@@ -1,12 +1,20 @@
-#zf210313.2033
+#zf210317.1230
 
+# Configuration ESPhome
 esphome:
   name: th1_8285
   platform: ESP8266
   board: esp8285
   on_boot:
-  - switch.turn_on: led
-
+    - switch.turn_on: led
+    - delay: 25s
+    - logger.log: Y'a un problème, je dois dormir !
+    - mqtt.publish:
+        topic: th1_8285/ota/state
+        payload: 'OFF'
+        retain: true
+    - delay: 0.5s
+    - deep_sleep.enter: deep_sleep_1
 
 # Configuration WIFI
 wifi:
@@ -18,7 +26,6 @@ wifi:
   ap:
     ssid: "th1_8285 Fallback"
     password: !secret ap_wifi_password
-
 
 captive_portal:
 
@@ -45,18 +52,74 @@ logger:
     mqtt.client: INFO
     mqtt.switch: INFO
     mqtt.sensor: INFO
-    
-
-    
-    
 
 # Enable Home Assistant API
 #api:
 #  password: !secret api_password
 
-
 ota:
   password: !secret ota_password
+
+
+
+
+
+
+
+
+globals:
+   - id: ota_state
+     type: int
+     initial_value: '0'
+
+interval:
+  - interval: 1s
+    then:
+      if:
+        condition:
+          mqtt.connected:
+        then:
+          - logger.log: MQTT est connecté !
+          - if:
+              condition:
+                lambda: 'return id(ota_state) == 1;'
+              then:
+                - logger.log: OTA est demandé !
+                - mqtt.publish:
+                    topic: th1_8285/ota/command
+                    payload: 'OFF'
+                    retain: true
+                - mqtt.publish:
+                    topic: th1_8285/ota/state
+                    payload: 'ON'
+                    retain: true
+                - logger.log: J'arrête le desleep !
+                - deep_sleep.prevent: deep_sleep_1
+              else:
+                - logger.log: Je suis connected et envoie la sauce !
+                - logger.log: Je vais dormir !
+                - mqtt.publish:
+                    topic: th1_8285/ota/state
+                    payload: 'OFF'
+                    retain: true
+                - delay: 0.5s
+                - deep_sleep.enter: deep_sleep_1
+        else:
+          - logger.log: MQTT en attente d'être connecté !
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Définition des Switch's
 switch:
@@ -78,8 +141,14 @@ mqtt:
   port:  !secret mqtt_port_dev
   username:  !secret mqtt_user_dev
   password:  !secret mqtt_password_dev
-
-
+  on_message:
+    - topic: th1_8285/ota/command
+      payload: 'ON'
+      then:
+        - logger.log: Receive OTA command !
+        - globals.set:
+            id: ota_state
+            value: '1'
 
 # I2C conf
 i2c:
@@ -90,18 +159,6 @@ i2c:
 sensor:
   - platform: wifi_signal
     name: "th1_8285 Signal Wi-Fi"
-    on_value:
-      if:
-        condition:
-          mqtt.connected:
-        then:
-#            - delay: 2s
-          - logger.log: Je suis connected et envoie la sauce !
-          - delay: 2s
-          - logger.log: Je vais dormir !
-          - deep_sleep.enter: deep_sleep_1
-        else:
-          - logger.log: WiFi not Antoine connected!
     update_interval: 3s
   - platform: uptime
     name: "th1_8285 uptime"
@@ -123,6 +180,3 @@ deep_sleep:
   sleep_duration: 60s
   id: deep_sleep_1
   
-  
-
-
