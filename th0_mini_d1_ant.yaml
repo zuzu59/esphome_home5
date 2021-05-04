@@ -1,4 +1,4 @@
-#zf210323.1031
+#zf210323.1228
 
 # Configuration ESPhome
 esphome:
@@ -177,6 +177,6 @@ sensor:
 # Deep Sleep
 deep_sleep:
   run_duration: 10s
-  sleep_duration: 30s
+  sleep_duration: 300s
   id: deep_sleep_1
   
