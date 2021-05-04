@@ -1,5 +1,7 @@
-# zf210504.2348
-# sources: https://community.home-assistant.io/t/using-ttgo-epaper-display-with-esphome/168877
+# zf210505.0044
+# sources: 
+# https://community.home-assistant.io/t/using-ttgo-epaper-display-with-esphome/168877
+# https://github.com/esphome/issues/issues/1458
 
 esphome:
   name: elink_1
@@ -38,6 +40,10 @@ spi:
   clk_pin: 18
   mosi_pin: 23
 
+time:
+  - platform: sntp
+    id: sntp_time
+
 font:
   - file: "Ldfcomicsans-jj7l.ttf"
     id: font_cs
@@ -52,15 +58,18 @@ display:
     dc_pin: 17
     busy_pin: 4
     reset_pin: 16
+#    model: 2.90inv2    #ceci marche avec mon e-link zf210505.0002
     model: 2.90inv2
 
 #    rotation: 0°
     rotation: 90°
     full_update_every: 1
-    update_interval: 31s
+    update_interval: 60s
 
     lambda: |-
-      it.print(0, 0, id(font_cs), "Hello zuzu !");
+      it.print(0, 10, id(font_cs), "Hello zuzu 004459 !");
+      it.strftime(122, 50, id(font_cs), TextAlign::TOP_CENTER, "%H:%M:%S", id(sntp_time).now());
+      it.strftime(122, 98, id(font_cs), TextAlign::TOP_CENTER, "%A %B %d", id(sntp_time).now());
 
 
 
