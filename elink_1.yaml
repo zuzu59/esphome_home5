@@ -1,4 +1,4 @@
-# zf210505.0106
+# zf210505.0803
 # sources: 
 # https://community.home-assistant.io/t/using-ttgo-epaper-display-with-esphome/168877
 # https://github.com/esphome/issues/issues/1458
@@ -37,9 +37,6 @@ web_server:
   port: 80
 
 
-spi:
-  clk_pin: 18
-  mosi_pin: 23
 
 time:
   - platform: sntp
@@ -52,6 +49,10 @@ font:
   - file: "arial_th.ttf"
     id: font_arth
     size: 16
+
+spi:
+  clk_pin: 18
+  mosi_pin: 23
 
 display:
   - platform: waveshare_epaper
@@ -68,7 +69,7 @@ display:
     update_interval: 60s
 
     lambda: |-
-      it.print(0, 10, id(font_cs), "Hello zuzu 004459 !");
+      it.print(0, 10, id(font_cs), "Hello zuzu 080355 !");
       it.strftime(122, 50, id(font_cs), TextAlign::TOP_CENTER, "%H:%M:%S", id(sntp_time).now());
       it.strftime(122, 98, id(font_cs), TextAlign::TOP_CENTER, "%A %B %d", id(sntp_time).now());
 
