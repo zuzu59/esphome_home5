@@ -1,8 +1,10 @@
-# zf210505.0803
+# zf210510.1409
 # sources: 
 # https://community.home-assistant.io/t/using-ttgo-epaper-display-with-esphome/168877
 # https://github.com/esphome/issues/issues/1458
 # https://github.com/lewisxhe/Esp-badge/blob/3dcb646971/schematic/T5_V2.3.pdf
+# http://www.lilygo.cn/prod_view.aspx?TypeId=50031&Id=1149&FId=t3:50031:3
+
 
 esphome:
   name: elink_1
@@ -11,8 +13,17 @@ esphome:
 
 # Configuration WIFI
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
+  networks:
+  - ssid: !secret wifi_ssid
+  - password: !secret wifi_password
+  - ssid: !secret wifi_ssid2
+  - password: !secret wifi_password2
+  - ssid: !secret wifi_ssid3
+  - password: !secret wifi_password3
+  - ssid: !secret wifi_ssid4
+  - password: !secret wifi_password4
+  - ssid: !secret wifi_ssid5
+  - password: !secret wifi_password5
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
@@ -66,12 +77,12 @@ display:
 #    rotation: 0°
     rotation: 90°
     full_update_every: 1
-    update_interval: 60s
+    update_interval: 15s
 
     lambda: |-
-      it.print(0, 10, id(font_cs), "Hello zuzu 080355 !");
+      it.print(0, 10, id(font_cs), "Hello zuzu 135809 !");
       it.strftime(122, 50, id(font_cs), TextAlign::TOP_CENTER, "%H:%M:%S", id(sntp_time).now());
-      it.strftime(122, 98, id(font_cs), TextAlign::TOP_CENTER, "%A %B %d", id(sntp_time).now());
+      it.strftime(122, 105, id(font_cs), TextAlign::TOP_CENTER, "%A %B %d", id(sntp_time).now());
 
 
 
