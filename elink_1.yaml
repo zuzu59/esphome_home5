@@ -47,11 +47,35 @@ ota:
 web_server:
   port: 80
 
-
-
 time:
   - platform: sntp
     id: sntp_time
+
+
+
+sensor:
+  - platform: wifi_signal
+    name: "tst_d1_disp1 Signal Wi-Fi"
+    update_interval: 60s
+  - platform: uptime
+    name: "tst_d1_disp1 uptime"
+    update_interval: 60s
+  - platform: homeassistant
+    name: "tst_d1_disp1 Outside Temp"
+    id: outside_temperature
+    entity_id: sensor.weather_temp
+#    internal: true
+  - platform: homeassistant
+    name: "tst_d1_disp1 Inside Temp"
+    entity_id: sensor.th5_temperature
+    id: inside_temperature
+  - platform: homeassistant
+    name: "tst_d1_disp1 TVOC"
+    entity_id: sensor.co2_72_tvoc
+    id: tvoc
+
+
+
 
 font:
   - file: 'arialn.ttf'
@@ -85,28 +109,25 @@ display:
 
 #   J'ai comme résolution 250x122 !
     lambda: |-
-      it.print(0, 0, id(font2), TextAlign::TOP_LEFT, "Hello zuzu 154831 !");
+      it.print(0, 4, id(font2), TextAlign::TOP_LEFT, "Hello zuzu 154831 !");
       it.print(0, 130, id(font2), TextAlign::BOTTOM_LEFT, "ver 210510.160326");
       it.strftime(250, 130, id(font2), TextAlign::BOTTOM_RIGHT, "%A %d%B , %H:%M:%S", id(sntp_time).now());
 
+      // Print inside temperature (from homeassistant sensor)
+      it.printf(0, 15, id(font1), TextAlign::TOP_LEFT, "In side");
+      if (id(inside_temperature).has_state()) {
+        it.printf(64, 7, id(font1), TextAlign::BASELINE_RIGHT , "%.1f°C", id(inside_temperature).state);
+      }
 
 
 
 #      it.printf(32, 0, id(font1), TextAlign::TOP_CENTER, "Hello Zuzu");
-
-
-
 #      it.print(0, 10, id(font_cs), "Hello zuzu 135809 !");
 #      it.strftime(122, 105, id(font_cs), TextAlign::TOP_CENTER, "%A %B %d", id(sntp_time).now());
 #      it.strftime(122, 50, id(font_cs), TextAlign::TOP_CENTER, "%H:%M:%S", id(sntp_time).now());
-    
-    
-    
 #      it.print(0, 5, id(font2), "Hello zuzu 154831 !");
 #      it.printf(32, 0, id(font1), TextAlign::TOP_CENTER, "Hello Zuzu");
 #      it.print(0, 5, id(font2), TextAlign::TOP_LEFT, "Hello zuzu 154831 !");
 #      it.strftime(250, 130, id(font2), TextAlign::BOTTOM_RIGHT, "%A %d%B , %H:%M:%S", id(sntp_time).now());
 #      it.strftime(122, 105, id(font2), TextAlign::TOP_CENTER, "%A %B %d", id(sntp_time).now());
-
-
 
