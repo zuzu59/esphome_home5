@@ -1,4 +1,4 @@
-# zf210510.1535
+# zf210511.0101
 # sources: 
 # https://community.home-assistant.io/t/using-ttgo-epaper-display-with-esphome/168877
 # https://github.com/esphome/issues/issues/1458
@@ -56,6 +56,7 @@ time:
 sensor:
   - platform: wifi_signal
     name: "tst_d1_disp1 Signal Wi-Fi"
+    id: wifi_power
     update_interval: 60s
   - platform: uptime
     name: "tst_d1_disp1 uptime"
@@ -74,16 +75,23 @@ sensor:
     entity_id: sensor.co2_72_tvoc
     id: tvoc
 
-
-
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: ESP IP Address
+      id: wifi_ip
+    ssid:
+      name: ESP Connected SSID
+      id: wifi_ssid
 
 font:
   - file: 'arialn.ttf'
     id: font1
-    size: 10
+    size: 11
   - file: 'arialn.ttf'
     id: font2
     size: 13
+    glyphs: "+\"*ç%&/()=?'!$;:_,.-<>° 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzàâäéèêëïîôöùûüÿ"
   - file: "Ldfcomicsans-jj7l.ttf"
     id: font_cs
     size: 20
@@ -109,25 +117,14 @@ display:
 
 #   J'ai comme résolution 250x122 !
     lambda: |-
-      it.print(0, 4, id(font2), TextAlign::TOP_LEFT, "Hello zuzu 154831 !");
-      it.print(0, 130, id(font2), TextAlign::BOTTOM_LEFT, "ver 210510.160326");
-      it.strftime(250, 130, id(font2), TextAlign::BOTTOM_RIGHT, "%A %d%B , %H:%M:%S", id(sntp_time).now());
-
+      it.print(0, 4, id(font2), TextAlign::TOP_LEFT, "Une belle école !");
+      it.print(250, 4, id(font1), TextAlign::TOP_RIGHT, "210511.010108");
+      
       // Print inside temperature (from homeassistant sensor)
-      it.printf(0, 15, id(font1), TextAlign::TOP_LEFT, "In side");
+      it.printf(0, 30, id(font1), TextAlign::BOTTOM_LEFT, "In side");
       if (id(inside_temperature).has_state()) {
-        it.printf(64, 7, id(font1), TextAlign::BASELINE_RIGHT , "%.1f°C", id(inside_temperature).state);
+        it.printf(60, 30, id(font1), TextAlign::BOTTOM_RIGHT , "%.1f°C", id(inside_temperature).state);
       }
 
-
-
-#      it.printf(32, 0, id(font1), TextAlign::TOP_CENTER, "Hello Zuzu");
-#      it.print(0, 10, id(font_cs), "Hello zuzu 135809 !");
-#      it.strftime(122, 105, id(font_cs), TextAlign::TOP_CENTER, "%A %B %d", id(sntp_time).now());
-#      it.strftime(122, 50, id(font_cs), TextAlign::TOP_CENTER, "%H:%M:%S", id(sntp_time).now());
-#      it.print(0, 5, id(font2), "Hello zuzu 154831 !");
-#      it.printf(32, 0, id(font1), TextAlign::TOP_CENTER, "Hello Zuzu");
-#      it.print(0, 5, id(font2), TextAlign::TOP_LEFT, "Hello zuzu 154831 !");
-#      it.strftime(250, 130, id(font2), TextAlign::BOTTOM_RIGHT, "%A %d%B , %H:%M:%S", id(sntp_time).now());
-#      it.strftime(122, 105, id(font2), TextAlign::TOP_CENTER, "%A %B %d", id(sntp_time).now());
-
+      it.printf(0, 131, id(font1), TextAlign::BOTTOM_LEFT, "%s %.0f dB %s", id(wifi_ssid).state.c_str(), id(wifi_power).state, id(wifi_ip).state.c_str() );
+      it.strftime(250, 131, id(font1), TextAlign::BOTTOM_RIGHT, "%d-%m-%y %H:%M:%S", id(sntp_time).now());
