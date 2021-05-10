@@ -1,4 +1,4 @@
-# zf210510.1409
+# zf210510.1535
 # sources: 
 # https://community.home-assistant.io/t/using-ttgo-epaper-display-with-esphome/168877
 # https://github.com/esphome/issues/issues/1458
@@ -54,12 +54,18 @@ time:
     id: sntp_time
 
 font:
+  - file: 'arialn.ttf'
+    id: font1
+    size: 10
+  - file: 'arialn.ttf'
+    id: font2
+    size: 13
   - file: "Ldfcomicsans-jj7l.ttf"
     id: font_cs
     size: 20
-  - file: "arial_th.ttf"
-    id: font_arth
-    size: 16
+#  - file: "arial_th.ttf"
+#    id: font_arth
+#    size: 16
 
 spi:
   clk_pin: 18
@@ -71,18 +77,36 @@ display:
     dc_pin: 17
     busy_pin: 4
     reset_pin: 16
-#    model: 2.90inv2    #ceci marche avec mon e-link zf210505.0002
+#    model: 2.90inv2    #c'est ceci qui marche avec mon e-link zf210505.0002
     model: 2.90inv2
-
-#    rotation: 0°
     rotation: 90°
     full_update_every: 1
     update_interval: 15s
 
+#   J'ai comme résolution 250x122 !
     lambda: |-
-      it.print(0, 10, id(font_cs), "Hello zuzu 135809 !");
-      it.strftime(122, 50, id(font_cs), TextAlign::TOP_CENTER, "%H:%M:%S", id(sntp_time).now());
-      it.strftime(122, 105, id(font_cs), TextAlign::TOP_CENTER, "%A %B %d", id(sntp_time).now());
+      it.print(0, 0, id(font2), TextAlign::TOP_LEFT, "Hello zuzu 154831 !");
+      it.print(0, 130, id(font2), TextAlign::BOTTOM_LEFT, "ver 210510.160326");
+      it.strftime(250, 130, id(font2), TextAlign::BOTTOM_RIGHT, "%A %d%B , %H:%M:%S", id(sntp_time).now());
+
+
+
+
+#      it.printf(32, 0, id(font1), TextAlign::TOP_CENTER, "Hello Zuzu");
+
+
+
+#      it.print(0, 10, id(font_cs), "Hello zuzu 135809 !");
+#      it.strftime(122, 105, id(font_cs), TextAlign::TOP_CENTER, "%A %B %d", id(sntp_time).now());
+#      it.strftime(122, 50, id(font_cs), TextAlign::TOP_CENTER, "%H:%M:%S", id(sntp_time).now());
+    
+    
+    
+#      it.print(0, 5, id(font2), "Hello zuzu 154831 !");
+#      it.printf(32, 0, id(font1), TextAlign::TOP_CENTER, "Hello Zuzu");
+#      it.print(0, 5, id(font2), TextAlign::TOP_LEFT, "Hello zuzu 154831 !");
+#      it.strftime(250, 130, id(font2), TextAlign::BOTTOM_RIGHT, "%A %d%B , %H:%M:%S", id(sntp_time).now());
+#      it.strftime(122, 105, id(font2), TextAlign::TOP_CENTER, "%A %B %d", id(sntp_time).now());
 
 
 
