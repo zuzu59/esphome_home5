@@ -1,9 +1,15 @@
-# zf210511.0107
+# zf210511.1225
 # sources: 
 # https://community.home-assistant.io/t/using-ttgo-epaper-display-with-esphome/168877
 # https://github.com/esphome/issues/issues/1458
 # https://github.com/lewisxhe/Esp-badge/blob/3dcb646971/schematic/T5_V2.3.pdf
 # http://www.lilygo.cn/prod_view.aspx?TypeId=50031&Id=1149&FId=t3:50031:3
+# https://fr.aliexpress.com/item/32869729970.html
+# https://github.com/Xinyuan-LilyGO/LilyGo-T5-Epaper-Series?spm=a2g0o.detail.1000023.17.6b1d6399uhwyEP
+# https://github.com/lewisxhe/GxEPD/blob/master/src/GxDEPG0213BN/GxDEPG0213BN.h
+# https://www.e-paper-display.com/GDEH0213B72%20V1.1%20Specification4d82.pdf
+# https://www.good-display.com/product/218.html
+# https://esphome.io/components/binary_sensor/esp32_touch.html
 
 
 esphome:
@@ -66,10 +72,26 @@ sensor:
     id: outside_temperature
     entity_id: sensor.weather_temp
 #    internal: true
+
   - platform: homeassistant
     name: "tst_d1_disp1 Inside Temp"
     entity_id: sensor.th5_temperature
     id: inside_temperature
+    
+  - platform: homeassistant
+    name: "Boiler Temp"
+    entity_id: sensor.sonoff_10006d1001_temperature
+    id: boiler_temp
+
+
+  - platform: homeassistant
+    name: "PVS total power"
+    entity_id: sensor.powermon_totalsolar_kw
+    id: pvs_pwr_total
+
+
+
+
   - platform: homeassistant
     name: "tst_d1_disp1 TVOC"
     entity_id: sensor.co2_72_tvoc
@@ -104,27 +126,63 @@ spi:
   mosi_pin: 23
 
 display:
+#    model: 2.90inv2    #c'est ceci qui marche avec mon e-link TTGO T5 V2.3.1 _ 2.13 zf210505.0002
+#    https://github.com/lewisxhe/GxEPD/blob/master/src/GxDEPG0213BN/GxDEPG0213BN.h
+#   J'ai comme résolution utilisable: 250x122 !   note: 128*250, the visible number of display pixels is 122*250, see GDEH0213B72 V1.1 Specification.pdf
   - platform: waveshare_epaper
     cs_pin: 5
     dc_pin: 17
     busy_pin: 4
     reset_pin: 16
-#    model: 2.90inv2    #c'est ceci qui marche avec mon e-link zf210505.0002
     model: 2.90inv2
     rotation: 90°
     full_update_every: 1
     update_interval: 15s
 
-#   J'ai comme résolution 250x122 !
     lambda: |-
+      int label_x0 = 10;
+      int label_y0 = 40;
+      int label_with = 62;
+      int label_height = 30;
+      
       it.print(0, 4, id(font2), TextAlign::TOP_LEFT, "Une belle école !");
-      it.print(250, 4, id(font1), TextAlign::TOP_RIGHT, "210511.010748");
+      it.print(250, 4, id(font1), TextAlign::TOP_RIGHT, "210511.122533");
+
       
       // Print inside temperature (from homeassistant sensor)
+      it.rectangle(label_x0+0*label_with, label_y0+0*label_height, label_with-1, label_height-1, COLOR_ON);
       it.printf(0, 30, id(font1), TextAlign::BOTTOM_LEFT, "In side");
-      if (id(inside_temperature).has_state()) {
-        it.printf(60, 30, id(font1), TextAlign::BOTTOM_RIGHT , "%.1f°C", id(inside_temperature).state);
-      }
+      it.printf(100, 30, id(font1), TextAlign::BOTTOM_RIGHT , "%.1f°C", id(inside_temperature).state);
+
+      // Print outside temperature (from homeassistant sensor)
+      it.rectangle(label_x0+1*label_with, label_y0+0*label_height, label_with-1, label_height-1, COLOR_ON);
+      it.printf(0, 40, id(font1), TextAlign::BOTTOM_LEFT, "Out side");
+      it.printf(100, 40, id(font1), TextAlign::BOTTOM_RIGHT , "%.1f°C", id(outside_temperature).state);
+
+      // Print boiler temperature (from homeassistant sensor)
+      it.rectangle(label_x0+2*label_with, label_y0+0*label_height, label_with-1, label_height-1, COLOR_ON);
+      it.printf(0, 50, id(font1), TextAlign::BOTTOM_LEFT, "Boiler");
+      it.printf(100, 50, id(font1), TextAlign::BOTTOM_RIGHT , "%.1f°C", id(boiler_temp).state);
+
+      // Print xxx temperature (from homeassistant sensor)
+      it.rectangle(label_x0+3*label_with, label_y0+0*label_height, label_with-1, label_height-1, COLOR_ON);
+      //it.printf(0, 50, id(font1), TextAlign::BOTTOM_LEFT, "Boiler");
+      //it.printf(100, 50, id(font1), TextAlign::BOTTOM_RIGHT , "%.1f°C", id(boiler_temp).state);
+
+
+      // Print PVS power total (from homeassistant sensor)
+      int label_xid = 1;
+      int label_yid = 1;
+      
+      it.rectangle(label_x0+label_xid*label_with, label_y0+label_yid*label_height, label_with-1, label_height-1, COLOR_ON);
+      it.printf(label_x0+label_xid*label_with+label_with/2, label_y0+label_yid*label_height, id(font1), TextAlign::TOP_CENTER, "PVS PWR tot");
+      it.printf(label_x0+label_xid*label_with+label_with/2, label_y0+label_yid*label_height+10, id(font1), TextAlign::TOP_CENTER , "%.1fkW", id(pvs_pwr_total).state);
+
+      // Print xxx (from homeassistant sensor)
+      it.rectangle(label_x0+0*label_with, label_y0+2*label_height, label_with-1, label_height-1, COLOR_ON);
+      //it.printf(30, 50, id(font1), TextAlign::TOP_CENTER, "PVS PWR tot");
+      //it.printf(30, 60, id(font1), TextAlign::TOP_CENTER , "%.1fkW", id(pvs_pwr_total).state);
+
 
       it.printf(0, 131, id(font1), TextAlign::BOTTOM_LEFT, "%s %.0f dB %s", id(wifi_ssid).state.c_str(), id(wifi_power).state, id(wifi_ip).state.c_str() );
       it.strftime(250, 131, id(font1), TextAlign::BOTTOM_RIGHT, "%d-%m-%y %H:%M:%S", id(sntp_time).now());
