@@ -1,4 +1,4 @@
-#zf210317.1230
+#zf210511.1842
 
 # Configuration ESPhome
 esphome:
@@ -7,7 +7,8 @@ esphome:
   board: esp8285
   on_boot:
     - switch.turn_on: led
-    - delay: 25s
+    #- delay: 25s
+    - delay: 30s
     - logger.log: Y'a un problème, je dois dormir !
     - mqtt.publish:
         topic: th1_8285/ota/state
@@ -18,9 +19,21 @@ esphome:
 
 # Configuration WIFI
 wifi:
+  fast_connect: true
   ssid: !secret wifi_ssid
   password: !secret wifi_password
-  fast_connect: true
+
+#  networks:
+#  - ssid: !secret wifi_ssid
+#  - password: !secret wifi_password
+#  - ssid: !secret wifi_ssid2
+#  - password: !secret wifi_password2
+#  - ssid: !secret wifi_ssid3
+#  - password: !secret wifi_password3
+#  - ssid: !secret wifi_ssid4
+#  - password: !secret wifi_password4
+#  - ssid: !secret wifi_ssid5
+#  - password: !secret wifi_password5
   
 # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
@@ -97,6 +110,7 @@ interval:
                 - deep_sleep.prevent: deep_sleep_1
               else:
                 - logger.log: Je suis connected et envoie la sauce !
+                - delay: 1.5s
                 - logger.log: Je vais dormir !
                 - mqtt.publish:
                     topic: th1_8285/ota/state
@@ -141,6 +155,8 @@ mqtt:
   port:  !secret mqtt_port_dev
   username:  !secret mqtt_user_dev
   password:  !secret mqtt_password_dev
+  birth_message:
+  will_message:
   on_message:
     - topic: th1_8285/ota/command
       payload: 'ON'
@@ -173,6 +189,18 @@ sensor:
     pin: VCC
     name: "th1_8285 VCC Voltage"
     update_interval: 3s
+
+# Sensors text
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: th1_8285 IP Address
+      id: wifi_ip
+    ssid:
+      name: th1_8285 Connected SSID
+      id: wifi_ssid
+
+
 
 # Deep Sleep
 deep_sleep:
