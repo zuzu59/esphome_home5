@@ -1,4 +1,4 @@
-# zf210514.1733
+# zf210514.1744
 # sources: 
 # https://community.home-assistant.io/t/using-ttgo-epaper-display-with-esphome/168877
 # https://github.com/esphome/issues/issues/1458
@@ -91,6 +91,15 @@ sensor:
     entity_id: sensor.powermon_totalsolar_kw
     id: pvs_pwr_total
 
+  - platform: homeassistant
+    name: "PVS toit power"
+    entity_id: sensor.sonoff_1000645a68_power
+    id: pvs_pwr_toit
+
+  - platform: homeassistant
+    name: "PVS jardin power"
+    entity_id: sensor.sonoff_1000cd8a10_power
+    id: pvs_pwr_jardin
 
 
 
@@ -143,10 +152,10 @@ display:
 
     lambda: |-
       int label_x0 = 0;       int label_y0 = 20;
-      int label_with = 83;    int label_height = 30;
+      int label_with = 62;    int label_height = 30;
       int label_xidx = 1;     int label_yidx = 1;
       
-      it.print(0, 4, id(font2), TextAlign::TOP_LEFT, "Une belle école !");
+      it.print(0, 4, id(font2), TextAlign::TOP_LEFT, "Dashboard Crissier");
       it.print(250, 4, id(font1), TextAlign::TOP_RIGHT, "ver 210515.173322");
 
       
@@ -156,45 +165,36 @@ display:
       it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height, id(font1), TextAlign::TOP_CENTER, "In side");
       it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height+10, id(font1), TextAlign::TOP_CENTER , "%.1f°C", id(inside_temperature).state);
 
-      //it.rectangle(label_x0+0*label_with, label_y0+0*label_height, label_with-1, label_height-1, COLOR_ON);
-      //it.printf(0, 30, id(font1), TextAlign::BOTTOM_LEFT, "In side");
-      //it.printf(100, 30, id(font1), TextAlign::BOTTOM_RIGHT , "%.1f°C", id(inside_temperature).state);
-
-
       // Print outside temperature (from homeassistant sensor)
       label_xidx = 2;      label_yidx = 1;
       it.rectangle(label_x0+(label_xidx-1)*label_with, label_y0+(label_yidx-1)*label_height, label_with-1, label_height-1, COLOR_ON);
       it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height, id(font1), TextAlign::TOP_CENTER, "Out side");
       it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height+10, id(font1), TextAlign::TOP_CENTER , "%.1f°C", id(outside_temperature).state);
 
-      //it.rectangle(label_x0+1*label_with, label_y0+0*label_height, label_with-1, label_height-1, COLOR_ON);
-      //it.printf(0, 40, id(font1), TextAlign::BOTTOM_LEFT, "Out side");
-      //it.printf(100, 40, id(font1), TextAlign::BOTTOM_RIGHT , "%.1f°C", id(outside_temperature).state);
+      // Print PVS power total (from homeassistant sensor)
+      label_xidx = 1;      label_yidx = 2;
+      it.rectangle(label_x0+(label_xidx-1)*label_with, label_y0+(label_yidx-1)*label_height, label_with-1, label_height-1, COLOR_ON);
+      it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height, id(font1), TextAlign::TOP_CENTER, "PVS Ptot");
+      it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height+10, id(font1), TextAlign::TOP_CENTER , "%.1fkW", id(pvs_pwr_total).state);
 
+      // Print PVS power toit (from homeassistant sensor)
+      label_xidx = 2;      label_yidx = 2;
+      it.rectangle(label_x0+(label_xidx-1)*label_with, label_y0+(label_yidx-1)*label_height, label_with-1, label_height-1, COLOR_ON);
+      it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height, id(font1), TextAlign::TOP_CENTER, "PVS Ptoit");
+      it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height+10, id(font1), TextAlign::TOP_CENTER , "%.1fW", id(pvs_pwr_toit).state);
+
+      // Print PVS power jardin (from homeassistant sensor)
+      label_xidx = 3;      label_yidx = 2;
+      it.rectangle(label_x0+(label_xidx-1)*label_with, label_y0+(label_yidx-1)*label_height, label_with-1, label_height-1, COLOR_ON);
+      it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height, id(font1), TextAlign::TOP_CENTER, "PVS Pjard");
+      it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height+10, id(font1), TextAlign::TOP_CENTER , "%.1fW", id(pvs_pwr_jardin).state);
 
       // Print boiler temperature (from homeassistant sensor)
-      label_xidx = 3;      label_yidx = 1;
+      label_xidx = 4;      label_yidx = 2;
       it.rectangle(label_x0+(label_xidx-1)*label_with, label_y0+(label_yidx-1)*label_height, label_with-1, label_height-1, COLOR_ON);
       it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height, id(font1), TextAlign::TOP_CENTER, "Boiler");
       it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height+10, id(font1), TextAlign::TOP_CENTER , "%.1f°C", id(boiler_temp).state);
 
-      //it.rectangle(label_x0+2*label_with, label_y0+0*label_height, label_with-1, label_height-1, COLOR_ON);
-      //it.printf(0, 50, id(font1), TextAlign::BOTTOM_LEFT, "Boiler");
-      //it.printf(100, 50, id(font1), TextAlign::BOTTOM_RIGHT , "%.1f°C", id(boiler_temp).state);
-
-
-      // Print PVS power total (from homeassistant sensor)
-      label_xidx = 1;      label_yidx = 2;
-      it.rectangle(label_x0+(label_xidx-1)*label_with, label_y0+(label_yidx-1)*label_height, label_with-1, label_height-1, COLOR_ON);
-      it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height, id(font1), TextAlign::TOP_CENTER, "PVS PWR tot");
-      it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height+10, id(font1), TextAlign::TOP_CENTER , "%.1fkW", id(pvs_pwr_total).state);
-
-
-
-
       it.printf(0, 131, id(font1), TextAlign::BOTTOM_LEFT, "%s %.0f dB %s", id(wifi_ssid).state.c_str(), id(wifi_power).state, id(wifi_ip).state.c_str() );
       it.strftime(250, 131, id(font1), TextAlign::BOTTOM_RIGHT, "%d-%m-%y %H:%M:%S", id(sntp_time).now());
-
-
-
 
