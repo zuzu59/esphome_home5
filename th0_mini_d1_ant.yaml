@@ -1,4 +1,4 @@
-#zf210323.1228
+#zf210514.0831
 
 # Configuration ESPhome
 esphome:
@@ -7,7 +7,7 @@ esphome:
   board: d1_mini
   on_boot:
     - switch.turn_on: led
-    - delay: 25s
+    - delay: 30s
     - logger.log: Y'a un problème, je dois dormir !
     - mqtt.publish:
         topic: th0_mini_d1_ant/ota/state
@@ -97,6 +97,7 @@ interval:
                 - deep_sleep.prevent: deep_sleep_1
               else:
                 - logger.log: Je suis connected et envoie la sauce !
+                - delay: 1.5s
                 - logger.log: Je vais dormir !
                 - mqtt.publish:
                     topic: th0_mini_d1_ant/ota/state
@@ -141,6 +142,8 @@ mqtt:
   port:  !secret mqtt_port_dev
   username:  !secret mqtt_user_dev
   password:  !secret mqtt_password_dev
+  birth_message:
+  will_message:
   on_message:
     - topic: th0_mini_d1_ant/ota/command
       payload: 'ON'
