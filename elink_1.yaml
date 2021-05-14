@@ -1,4 +1,4 @@
-# zf210511.1225
+# zf210513.1506
 # sources: 
 # https://community.home-assistant.io/t/using-ttgo-epaper-display-with-esphome/168877
 # https://github.com/esphome/issues/issues/1458
@@ -146,7 +146,7 @@ display:
       int label_height = 30;
       
       it.print(0, 4, id(font2), TextAlign::TOP_LEFT, "Une belle école !");
-      it.print(250, 4, id(font1), TextAlign::TOP_RIGHT, "210511.122533");
+      it.print(250, 4, id(font1), TextAlign::TOP_RIGHT, "ver 210513.150819");
 
       
       // Print inside temperature (from homeassistant sensor)
@@ -171,12 +171,13 @@ display:
 
 
       // Print PVS power total (from homeassistant sensor)
-      int label_xid = 1;
-      int label_yid = 1;
+      int label_xidx = 3;
+      int label_yidx = 2;
       
-      it.rectangle(label_x0+label_xid*label_with, label_y0+label_yid*label_height, label_with-1, label_height-1, COLOR_ON);
-      it.printf(label_x0+label_xid*label_with+label_with/2, label_y0+label_yid*label_height, id(font1), TextAlign::TOP_CENTER, "PVS PWR tot");
-      it.printf(label_x0+label_xid*label_with+label_with/2, label_y0+label_yid*label_height+10, id(font1), TextAlign::TOP_CENTER , "%.1fkW", id(pvs_pwr_total).state);
+      it.rectangle(label_x0+(label_xidx-1)*label_with, label_y0+(label_yidx-1)*label_height, label_with-1, label_height-1, COLOR_ON);
+      it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height, id(font1), TextAlign::TOP_CENTER, "PVS PWR tot");
+      it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height+10, id(font1), TextAlign::TOP_CENTER , "%.1fkW", id(pvs_pwr_total).state);
+
 
       // Print xxx (from homeassistant sensor)
       it.rectangle(label_x0+0*label_with, label_y0+2*label_height, label_with-1, label_height-1, COLOR_ON);
