@@ -1,4 +1,4 @@
-# zf210514.1744
+# zf210515.1605
 # sources: 
 # https://community.home-assistant.io/t/using-ttgo-epaper-display-with-esphome/168877
 # https://github.com/esphome/issues/issues/1458
@@ -117,6 +117,29 @@ text_sensor:
       name: ESP Connected SSID
       id: wifi_ssid
 
+
+# Définition du bouton physique
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO39
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "btn e-link refresh"
+    on_press:
+      - component.update: z_elink
+
+
+switch:
+  - platform: template
+    name: "switch e-link refresh"
+    turn_on_action:
+      - component.update: z_elink
+    
+
+
+
+
 font:
   - file: 'arialn.ttf'
     id: font1
@@ -146,9 +169,10 @@ display:
     busy_pin: 4
     reset_pin: 16
     model: 2.90inv2
+    id: z_elink
     rotation: 90°
     full_update_every: 1
-    update_interval: 15s
+    update_interval: 300s
 
     lambda: |-
       int label_x0 = 0;       int label_y0 = 20;
@@ -156,7 +180,7 @@ display:
       int label_xidx = 1;     int label_yidx = 1;
       
       it.print(0, 4, id(font2), TextAlign::TOP_LEFT, "Dashboard Crissier");
-      it.print(250, 4, id(font1), TextAlign::TOP_RIGHT, "ver 210515.173322");
+      it.print(250, 4, id(font1), TextAlign::TOP_RIGHT, "ver 210515.160525");
 
       
       // Print inside temperature (from homeassistant sensor)
