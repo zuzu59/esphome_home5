@@ -1,4 +1,4 @@
-# zf210515.1605
+# zf210515.1615
 # sources: 
 # https://community.home-assistant.io/t/using-ttgo-epaper-display-with-esphome/168877
 # https://github.com/esphome/issues/issues/1458
@@ -48,6 +48,7 @@ logger:
 api:
   password: !secret api_password
 
+# Enable OTA
 ota:
   password: !secret ota_password
 
@@ -55,12 +56,12 @@ ota:
 web_server:
   port: 80
 
+# Serveur date et heure
 time:
   - platform: sntp
     id: sntp_time
 
-
-
+# Définition des sensors
 sensor:
   - platform: wifi_signal
     name: "tst_d1_disp1 Signal Wi-Fi"
@@ -74,40 +75,32 @@ sensor:
     id: outside_temperature
     entity_id: sensor.weather_temp
 #    internal: true
-
   - platform: homeassistant
     name: "tst_d1_disp1 Inside Temp"
     entity_id: sensor.th5_temperature
     id: inside_temperature
-    
   - platform: homeassistant
     name: "Boiler Temp"
     entity_id: sensor.sonoff_10006d1001_temperature
     id: boiler_temp
-
-
   - platform: homeassistant
     name: "PVS total power"
     entity_id: sensor.powermon_totalsolar_kw
     id: pvs_pwr_total
-
   - platform: homeassistant
     name: "PVS toit power"
     entity_id: sensor.sonoff_1000645a68_power
     id: pvs_pwr_toit
-
   - platform: homeassistant
     name: "PVS jardin power"
     entity_id: sensor.sonoff_1000cd8a10_power
     id: pvs_pwr_jardin
-
-
-
   - platform: homeassistant
     name: "tst_d1_disp1 TVOC"
     entity_id: sensor.co2_72_tvoc
     id: tvoc
 
+# Définitions des texts sensors
 text_sensor:
   - platform: wifi_info
     ip_address:
@@ -116,7 +109,6 @@ text_sensor:
     ssid:
       name: ESP Connected SSID
       id: wifi_ssid
-
 
 # Définition du bouton physique
 binary_sensor:
@@ -129,17 +121,14 @@ binary_sensor:
     on_press:
       - component.update: z_elink
 
-
+# Définition du bouton virtuel
 switch:
   - platform: template
     name: "switch e-link refresh"
     turn_on_action:
       - component.update: z_elink
     
-
-
-
-
+# Définition des polices de caractères
 font:
   - file: 'arialn.ttf'
     id: font1
@@ -147,6 +136,7 @@ font:
   - file: 'arialn.ttf'
     id: font2
     size: 13
+    # caractères français
     glyphs: "+\"*ç%&/()=?'!$;:_,.-<>° 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzàâäéèêëïîôöùûüÿ"
   - file: "Ldfcomicsans-jj7l.ttf"
     id: font_cs
@@ -155,6 +145,7 @@ font:
 #    id: font_arth
 #    size: 16
 
+# Définition du display e-link
 spi:
   clk_pin: 18
   mosi_pin: 23
@@ -179,10 +170,10 @@ display:
       int label_with = 62;    int label_height = 30;
       int label_xidx = 1;     int label_yidx = 1;
       
+      // Print header, title and version
       it.print(0, 4, id(font2), TextAlign::TOP_LEFT, "Dashboard Crissier");
-      it.print(250, 4, id(font1), TextAlign::TOP_RIGHT, "ver 210515.160525");
+      it.print(250, 4, id(font1), TextAlign::TOP_RIGHT, "ver 210515.161508");
 
-      
       // Print inside temperature (from homeassistant sensor)
       label_xidx = 1;      label_yidx = 1;
       it.rectangle(label_x0+(label_xidx-1)*label_with, label_y0+(label_yidx-1)*label_height, label_with-1, label_height-1, COLOR_ON);
@@ -219,6 +210,7 @@ display:
       it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height, id(font1), TextAlign::TOP_CENTER, "Boiler");
       it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height+10, id(font1), TextAlign::TOP_CENTER , "%.1f°C", id(boiler_temp).state);
 
+      // Print footer, WIFI SSID, signal, adrs ip, date, time
       it.printf(0, 131, id(font1), TextAlign::BOTTOM_LEFT, "%s %.0f dB %s", id(wifi_ssid).state.c_str(), id(wifi_power).state, id(wifi_ip).state.c_str() );
       it.strftime(250, 131, id(font1), TextAlign::BOTTOM_RIGHT, "%d-%m-%y %H:%M:%S", id(sntp_time).now());
 
