@@ -1,4 +1,4 @@
-# zf210517.1658
+# zf210517.1836
 # sources: 
 # https://community.home-assistant.io/t/using-ttgo-epaper-display-with-esphome/168877
 # https://github.com/esphome/issues/issues/1458
@@ -200,28 +200,33 @@ display:
 
 #   http://www.linux-france.org/prj/embedded/sdcc/sdcc_course.formatted_io.html, pour se souvenir le formatage de printf ;-)
     lambda: |-
-      int label_x0 = 0;       int label_y0 = 25;
-      int label_with = 62;    int label_height = 30;
-      int label_xidx = 1;     int label_yidx = 1;
+      int label_x0 = 0;         int label_y0 = 25;
+      int label_with = 62;      int label_height = 30;
+      int label_xidx = 1;       int label_yidx = 1;
       
-      int label_level = 1;    int label_level_height = 5;
+      int label_level = 1;      int label_level_height = 5;
       int label_level_y = label_height-label_level_height-2;
+      int label_level_min = 1;  int label_level_max = 1;
       
       // Print header, title and version
       it.print(0, 4, id(font2), TextAlign::TOP_LEFT, "Mini dashboard Crissier");
-      it.print(250, 4, id(font1), TextAlign::TOP_RIGHT, "ver 210517.161145");
+      it.print(250, 4, id(font1), TextAlign::TOP_RIGHT, "ver 210517.182826");
 
 
 
       // Print inside temperature
       label_xidx = 1;      label_yidx = 1;
-      
       it.rectangle(label_x0+(label_xidx-1)*label_with, label_y0+(label_yidx-1)*label_height, label_with-1, label_height-1, COLOR_ON);
       it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height, id(font1), TextAlign::TOP_CENTER, "In temp");
       it.printf(label_x0+(label_xidx-1)*label_with+label_with/2, label_y0+(label_yidx-1)*label_height+10, id(font1), TextAlign::TOP_CENTER , "%.1f°C", id(inside_temperature).state);
       
-      label_level = label_with * 0.33;
-      it.filled_rectangle(label_x0+(label_xidx-1)*label_with, label_y0+(label_yidx-1)*label_height+label_level_y, label_level, label_level_height);
+      label_level_min = 0;   label_level_max = 50;
+      label_level = label_with * ((id(inside_temperature).state-label_level_min)/(label_level_max-label_level_min));
+      if (id(inside_temperature).has_state()) {
+        it.filled_rectangle(label_x0+(label_xidx-1)*label_with, label_y0+(label_yidx-1)*label_height+label_level_y, label_level, label_level_height);
+      }      
+      
+      
       
       
 
