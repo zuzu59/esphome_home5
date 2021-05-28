@@ -1,0 +1,109 @@
+
+# zf210528.2153
+# sources: 
+# https://esphome.io/components/sensor/dallas.html
+
+esphome:
+  name: 1w_th_ext_sud
+  platform: ESP8266
+  board: nodemcuv2
+
+# Configuration WIFI
+wifi:
+  networks:
+  - ssid: !secret wifi_ssid
+  - password: !secret wifi_password
+  - ssid: !secret wifi_ssid2
+  - password: !secret wifi_password2
+  - ssid: !secret wifi_ssid3
+  - password: !secret wifi_password3
+  - ssid: !secret wifi_ssid4
+  - password: !secret wifi_password4
+  - ssid: !secret wifi_ssid5
+  - password: !secret wifi_password5
+  - ssid: !secret wifi_ssid6
+  - password: !secret wifi_password6
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "1w_th_ext_sud Fallback Hotspot"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+#    level: VERBOSE
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+# Enable OTA
+ota:
+  password: !secret ota_password
+
+# WEB Server
+web_server:
+  port: 80
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "1-w_th-ext_sud LED"
+    inverted: True
+    id: led
+    pin: D4
+
+  - platform: restart
+    name: "1w_th_ext_sud Restart"
+
+# Définition du bouton physique
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D3
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "1w_th_ext_sud button"
+    on_press:
+      - switch.toggle: led
+
+
+
+# Example configuration entry
+dallas:
+  - pin: D3
+    update_interval: 10s
+
+# Note you don't have to add any sensors at this point
+
+
+
+# Sensors
+sensor:
+
+######### juste là pour changer l'harmonique du CPU qui interagit avec le WIFI sur mes NodeMCU lowcost :-(
+  - platform: homeassistant
+    name: "th8 Temp"
+    entity_id: sensor.th8_temperature
+#    id: th8_th
+    internal: true
+#########
+
+  - platform: wifi_signal
+    name: "1w_th_ext_sud Signal Wi-Fi"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "1w_th_ext_sud uptime"
+    update_interval: 60s
+
+
+
+  - platform: dallas
+    address: 0x23000005662C1E28
+    name: "1w_th_ext_sud temp"
+
+
+
