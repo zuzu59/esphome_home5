@@ -1,5 +1,5 @@
 
-# zf210601.1158
+# zf210601.1635
 # sources: 
 # https://esphome.io/components/sensor/dallas.html
 
@@ -94,11 +94,11 @@ dallas:
 sensor:
 
 ######### juste là pour changer l'harmonique du CPU qui interagit avec le WIFI sur mes NodeMCU lowcost :-(
-  - platform: homeassistant
-    name: "th8 Temp"
-    entity_id: sensor.th8_temperature
-#    id: th8_th
-    internal: true
+#   - platform: homeassistant
+#     name: "th8 Temp"
+#     entity_id: sensor.th8_temperature
+# #    id: th8_th
+#     internal: true
 #########
 
   - platform: wifi_signal
@@ -112,8 +112,18 @@ sensor:
 
 
   - platform: dallas
-    address: 0x23000005662C1E28
-    name: "1w_th_solar temp"
+    address: 0x4A0000003D6D8928
+    name: "1w_th_solar aller"
+
+  - platform: dallas
+    address: 0xA20000003DC5F528
+    name: "1w_th_solar retour"
+
+  - platform: dallas
+    address: 0xBD0000003DCD5928
+    name: "1w_th_solar boiler"
+
+
 
 
 
