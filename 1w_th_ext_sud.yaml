@@ -1,5 +1,5 @@
 
-# zf210528.2153
+# zf210601.1158
 # sources: 
 # https://esphome.io/components/sensor/dallas.html
 
@@ -70,13 +70,23 @@ binary_sensor:
       - switch.toggle: led
 
 
+# Définitions des texts sensors
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: 1w_th_ext_sud IP Address
+      id: wifi_ip
+    ssid:
+      name: 1w_th_ext_sud Connected SSID
+      id: wifi_ssid
+
+
 
 # Example configuration entry
 dallas:
   - pin: D3
     update_interval: 10s
 
-# Note you don't have to add any sensors at this point
 
 
 
