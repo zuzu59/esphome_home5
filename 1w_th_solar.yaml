@@ -1,5 +1,5 @@
 
-# zf210601.1635
+# zf210607.1715
 # sources: 
 # https://esphome.io/components/sensor/dallas.html
 
@@ -50,7 +50,7 @@ web_server:
 # Définition des Switch's
 switch:
   - platform: gpio
-    name: "1-w_th-ext_sud LED"
+    name: "1w_th_solar LED"
     inverted: True
     id: led
     pin: D4
@@ -84,7 +84,7 @@ text_sensor:
 
 # Example configuration entry
 dallas:
-  - pin: D3
+  - pin: D2
     update_interval: 10s
 
 
@@ -110,20 +110,32 @@ sensor:
     update_interval: 60s
 
 
-
   - platform: dallas
-    address: 0x4A0000003D6D8928
+    address: 0x7E0300A279AFA028
     name: "1w_th_solar aller"
 
   - platform: dallas
-    address: 0xA20000003DC5F528
+    address: 0x860301A279FFE428
     name: "1w_th_solar retour"
 
   - platform: dallas
-    address: 0xBD0000003DCD5928
-    name: "1w_th_solar boiler"
+    address: 0x710301A279230C28
+    name: "1w_th_solar boiler2"
 
+  - platform: dallas
+    address: 0xD80301A279E37228
+    name: "1w_th_solar boiler1"
 
+  - platform: dallas
+    address: 0xCC0301A2793FD328
+    name: "1w_th_solar consigne"
 
+  - platform: dallas
+    address: 0xEE0301A27920E728
+    name: "1w_th_solar froid"
+
+  - platform: dallas
+    address: 0xA40301A279F37228
+    name: "1w_th_solar ext sud"
 
 
