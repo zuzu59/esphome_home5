@@ -1,5 +1,5 @@
 
-# zf210607.1725
+# zf210608.1832
 # sources: 
 # 
 
@@ -48,6 +48,8 @@ web_server:
   port: 80
 
 
+
+
 # Définition des Switch's
 switch:
   - platform: gpio
@@ -63,11 +65,16 @@ switch:
 # Définition des binary_sensor
 binary_sensor:
   - platform: gpio
+    name: "solar_debit reed"
     pin:
-      number: D2
+      number: D1
       mode: INPUT_PULLUP
       inverted: True
-    name: "solar_debit pulse"
+    on_press:
+      - script.execute: watchdog_debit_minute
+      - switch.turn_on: led
+      - delay: 2s
+      - switch.turn_off: led
 
 
 # Définitions des texts sensors
@@ -81,14 +88,47 @@ text_sensor:
       id: wifi_ssid
 
 
-# Sensors
+# Définitions des Sensors
 sensor:
   - platform: wifi_signal
     name: "solar_debit Signal Wi-Fi"
     update_interval: 60s
 
   - platform: uptime
-    name: "solar_debit uptime"
+    name: "solar_debit Uptime"
     update_interval: 60s
+
+  - platform: pulse_counter
+    name: 'solar_debit Pulse'
+    pin: D2
+    unit_of_measurement: 'l/'
+    update_interval: 60s
+    id: my_flow_meter
+#    count_mode:
+#      rising_edge: DISABLE
+#      falling_edge: INCREMENT
+#    filters:
+#     - multiply: 0.1
+
+  - platform: integration
+    name: "solar_debit Débit"
+    sensor: my_flow_meter
+    time_unit: min
+    id: my_integration_sensor
+    filters:
+      - sliding_window_moving_average:
+          window_size: 5
+#          send_every: 5
+
+# Définitions des Scripts
+script:
+  - id: watchdog_debit_minute
+    mode: restart     # Fait office de watchdog
+    then:
+      - sensor.integration.reset:  my_integration_sensor
+      - delay: 60s
+      - logger.log: On reset l'intégrateur !
+      - sensor.integration.reset:  my_integration_sensor
+  
 
 
