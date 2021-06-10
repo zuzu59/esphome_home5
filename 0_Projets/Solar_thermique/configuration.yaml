@@ -1,0 +1,22 @@
+zf210610.1230
+il faut ajouter ceci dans le fichier configuration.yaml de Home Assistant, 
+afin de pouvoir calculer le delta temp ainsi que la puissance produite à 
+l'instant t de l'installation solaire
+
+
+sensor:
+...
+
+  - platform: template
+    sensors:
+      solar_th_delta_temp:
+        friendly_name: "Solar TH Delta Temp"
+        unit_of_measurement: "°C"
+        value_template: "{{ ((states('sensor.1w_th_solar_retour') | float - states('sensor.1w_th_solar_aller') | float) / 1)  | round(3) }}"
+
+  - platform: template
+    sensors:
+      solar_th_power:
+        friendly_name: "Solar TH Power"
+        unit_of_measurement: "kW"
+        value_template: "{{ ((states('sensor.solar_th_delta_temp') | float * states('sensor.solar_debit_flow') | float) / 60 * 4.187)  | round(3) }}"
