@@ -1,5 +1,5 @@
 
-# zf210609.0729
+# zf210611.1419
 # sources: 
 # 
 # IMPORTANT: il faut ponter les pin D1 et D2 afin de pouvoir bénéficier de la pull up interne de D1 pour D2,
@@ -103,10 +103,10 @@ sensor:
     name: 'solar_debit Flow'
     id: my_flow_meter
     pin: D2
-    unit_of_measurement: 'l/min'
+    unit_of_measurement: 'l/mn'
     update_interval: 60s    # Très important car c'est ici que l'on intègre sur une minute !
     filters:
-      - multiply: 0.5       # Facteur de conversion durée impulsion / litres minutes
+      - multiply: 0.35       # Facteur de conversion durée impulsion / litres minutes
       - sliding_window_moving_average:
           window_size: 3
           send_every: 3
