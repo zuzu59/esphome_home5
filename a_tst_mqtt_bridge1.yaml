@@ -1,0 +1,127 @@
+
+# zf210621.2351
+# sources: 
+# 
+# IMPORTANT: il faut ponter les pin D1 et D2 afin de pouvoir bénéficier de la pull up interne de D1 pour D2,
+#            car il n'y a pas de possibilité d'avoir une pull up interne dans un pulse_counter !
+
+esphome:
+  name: a_tst_mqtt_bridge1
+  platform: ESP8266
+  board: d1_mini
+
+# Configuration WIFI
+wifi:
+  networks:
+  - ssid: !secret wifi_ssid
+  - password: !secret wifi_password
+  - ssid: !secret wifi_ssid2
+  - password: !secret wifi_password2
+  - ssid: !secret wifi_ssid3
+  - password: !secret wifi_password3
+  - ssid: !secret wifi_ssid4
+  - password: !secret wifi_password4
+  - ssid: !secret wifi_ssid5
+  - password: !secret wifi_password5
+  - ssid: !secret wifi_ssid6
+  - password: !secret wifi_password6
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "a_tst_mqtt_bridge1 Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+#    level: VERBOSE
+
+# Enable Home Assistant API
+#api:
+#  password: !secret api_password
+
+# Enable OTA
+ota:
+  password: !secret ota_password
+
+# WEB Server
+web_server:
+  port: 80
+
+
+
+# MQTT server
+mqtt:
+  broker:  192.168.0.43
+  port:  !secret mqtt_port_dev
+  username:  !secret mqtt_user_dev
+  password:  !secret mqtt_password_dev
+
+
+
+
+
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "a_tst_mqtt_bridge1 LED"
+    inverted: True
+    id: led
+    pin: D4
+
+  - platform: restart
+    name: "a_tst_mqtt_bridge1 Restart"
+
+
+# Définition des binary sensors
+binary_sensor:
+  - platform: gpio
+    name: "a_tst_mqtt_bridge1 Reed"
+    pin:
+      number: D1
+      mode: INPUT_PULLUP
+      inverted: True
+    on_press:
+      - switch.turn_on: led
+      - delay: 2s
+      - switch.turn_off: led
+
+
+# Définitions des texts sensors
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "a_tst_mqtt_bridge1 IP Address"
+      id: wifi_ip
+    ssid:
+      name: "a_tst_mqtt_bridge1 Connected SSID"
+      id: wifi_ssid
+
+
+# Définitions des Sensors
+sensor:
+  - platform: wifi_signal
+    name: "a_tst_mqtt_bridge1 Signal Wi-Fi"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "a_tst_mqtt_bridge1 Uptime"
+    update_interval: 10s
+
+  - platform: pulse_counter
+    name: 'a_tst_mqtt_bridge1 Flow'
+    id: my_flow_meter
+    pin: D2
+    unit_of_measurement: 'l/mn'
+    update_interval: 60s    # Très important car c'est ici que l'on intègre sur une minute !
+    filters:
+      - multiply: 0.3       # Facteur de conversion durée impulsion / litres minutes
+      - sliding_window_moving_average:
+          window_size: 5
+          send_every: 5
+
+
+
+
