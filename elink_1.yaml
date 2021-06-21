@@ -1,4 +1,10 @@
-# zf210517.1854
+#------------------------------
+#-- elink_1.yaml
+#-- Affiche un mini dashboard sur un mini display e-link 
+#-- L'écran est découpé en 5x3 zones où l'on peut afficher l'état d'un paramètre et un mini level meter
+#-- zf210517.1854
+#--
+
 # sources: 
 # https://community.home-assistant.io/t/using-ttgo-epaper-display-with-esphome/168877
 # https://github.com/esphome/issues/issues/1458
