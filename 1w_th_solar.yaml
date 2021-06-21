@@ -1,5 +1,11 @@
+#------------------------------
+#-- 1w_th_solar.yaml
+#-- Mesures de températures de mon installation solaire thermique SEBASOL à l'aide de sondes 1-wire DS18B20
+#-- ATTENTION, avec les nouveaux DS18B20 chinois, il faut ABSOLUMENT les câbler en mode 3 fils !
+#-- zf210607.1715
+#--
 
-# zf210607.1715
+
 # sources: 
 # https://esphome.io/components/sensor/dallas.html
 

@@ -1,5 +1,10 @@
+#------------------------------
+#-- solar_debit.yaml
+#-- Petit débimètre pour mon installation solaire thermique SEBASOL
+#-- Il compte les impulsions d'une ampoule REED collée sur un débimètre mécanique conventionnel
+#-- zf210618.0728
+#-- 
 
-# zf210618.0728
 # sources: 
 # 
 # IMPORTANT: il faut ponter les pin D1 et D2 afin de pouvoir bénéficier de la pull up interne de D1 pour D2,

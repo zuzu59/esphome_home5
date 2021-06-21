@@ -1,5 +1,10 @@
+#------------------------------
+#-- a_tst_mqtt_bridge1.yaml
+#-- Petit test pour tester ma nouvelle config MQTT master & slave avec un MQTT en mode bridge
+#-- C'est juste pour lui fornir des données pour voir si cela fonctionne le 'bridge'
+#-- zf210622.0022
+#--
 
-# zf210621.2351
 # sources: 
 # 
 # IMPORTANT: il faut ponter les pin D1 et D2 afin de pouvoir bénéficier de la pull up interne de D1 pour D2,
