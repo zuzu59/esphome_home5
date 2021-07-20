@@ -1,4 +1,14 @@
-#zf21020.1646
+#------------------------------
+#-- th-fsd58.yaml
+#-- Petit code pour la formation IoT de la FSD de mars 2021
+#-- Lit la tmpérature et l'humidité du capteur HTU21D et se connecte sur le broker MQTT
+#-- zf210611.0720
+#--
+
+
+# sources: 
+# https://esphome.io/components/sensor/htu21d.html
+# https://esphome.io/components/mqtt.html
 
 esphome:
   name: th-fsd58

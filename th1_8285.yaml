@@ -1,4 +1,16 @@
-#zf210511.1842
+#------------------------------
+#-- th1_8285.yaml
+#-- Mini station météo sur batterie en mode dsleep
+#-- Lit la tmpérature et l'humidité du capteur HTU21D et se connecte sur le broker MQTT
+#-- zf210611.0720
+#--
+
+
+# sources: 
+# https://esphome.io/components/sensor/htu21d.html
+# https://esphome.io/components/mqtt.html
+# https://esphome.io/components/deep_sleep.html
+
 
 # Configuration ESPhome
 esphome:
