@@ -2,7 +2,7 @@
 #-- 1w_th_ext_sud.yaml
 #-- Mesure de la température extérieure à l'aide d'une sonde 1-wire DS18B20
 #-- ATTENTION, avec les nouveaux DS18B20 chinois, il faut ABSOLUMENT le câbler en mode 3 fils !
-#-- zf210601.1158
+#-- zf210713.1114
 #--
 
 # sources: 
@@ -20,8 +20,8 @@ wifi:
   - password: !secret wifi_password
   - ssid: !secret wifi_ssid2
   - password: !secret wifi_password2
-  - ssid: !secret wifi_ssid3
-  - password: !secret wifi_password3
+#  - ssid: !secret wifi_ssid3
+#  - password: !secret wifi_password3
   - ssid: !secret wifi_ssid4
   - password: !secret wifi_password4
   - ssid: !secret wifi_ssid5
