@@ -1,4 +1,15 @@
-#zf210210.1600
+#------------------------------
+#-- th8.yaml
+#-- Petit code mini manilste pour mesurer la température et l'humidité
+#-- Lit la tmpérature et l'humidité du capteur HTU21D
+#-- location: chambre à coucher parents table de nuit zf
+#-- zf210723.0800
+#--
+
+
+# sources: 
+# https://esphome.io/components/sensor/htu21d.html
+
 
 esphome:
   name: th8
@@ -77,5 +88,5 @@ sensor:
       name: "th8 Température"
     humidity:
       name: "th8 Humidité"
-    update_interval: 5s
+    update_interval: 15s
 

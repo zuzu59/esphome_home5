@@ -1,4 +1,15 @@
-#zf210210.1600
+#------------------------------
+#-- th6.yaml
+#-- Petit code mini manilste pour mesurer la température et l'humidité
+#-- Lit la tmpérature et l'humidité du capteur HTU21D
+#-- location: cave vers interrupteur lumière
+#-- zf210720.1023
+#--
+
+
+# sources: 
+# https://esphome.io/components/sensor/htu21d.html
+
 
 esphome:
   name: th6
@@ -77,5 +88,5 @@ sensor:
       name: "th6 Température"
     humidity:
       name: "th6 Humidité"
-    update_interval: 5s
+    update_interval: 15s
 
