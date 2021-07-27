@@ -17,6 +17,20 @@
 #-- zf210622.0022
 #--
 #------------------------------
+#-- co2_66.yaml
+#-- Petit code mini minilste pour mesurer le TVOC et eCO2
+#-- Lit TVOC et eCO2 du capteur ccs811
+#-- location: chambre des parents petit meuble à droite en entrant
+#-- zf210720.1026
+#--
+#------------------------------
+#-- co2_72.yaml
+#-- Petit code mini minilste pour mesurer le COV et eCO2
+#-- Lit COV et eCO2 du capteur ccs811
+#-- location: chambre à Chloé carton vers mur
+#-- zf210720.1033
+#--
+#------------------------------
 #-- elink_1.yaml
 #-- Affiche un mini dashboard sur un mini display e-link 
 #-- L'écran est découpé en 5x3 zones où l'on peut afficher l'état d'un paramètre et un mini level meter
@@ -33,16 +47,51 @@
 #-- Petit débimètre pour mon installation solaire thermique SEBASOL
 #-- Il compte les impulsions d'une ampoule REED collée sur un débimètre mécanique conventionnel
 #-- zf210713.1114
-#-- 
-    #------------------------------
+#--
+#------------------------------
 #-- th-fsd58.yaml
 #-- Petit code pour la formation IoT de la FSD de mars 2021
 #-- Lit la tmpérature et l'humidité du capteur HTU21D et se connecte sur le broker MQTT
 #-- zf210611.0720
 #--
-  #------------------------------
+#------------------------------
+#-- th0.yaml
+#-- Petit code mini manilste pour mesurer la température et l'humidité
+#-- Lit la tmpérature et l'humidité du capteur HTU21D
+#-- location: chambre à Chloé bureau zf
+#-- zf210720.1021
+#--
+#------------------------------
 #-- th1_8285.yaml
 #-- Mini station météo sur batterie en mode dsleep
 #-- Lit la tmpérature et l'humidité du capteur HTU21D et se connecte sur le broker MQTT
 #-- zf210611.0720
+#--
+#------------------------------
+#-- th5.yaml
+#-- Petit code mini manilste pour mesurer la température et l'humidité
+#-- Lit la tmpérature et l'humidité du capteur HTU21D
+#-- location: chambre à Chloé poutre mur
+#-- zf210720.1021
+#--
+#------------------------------
+#-- th6.yaml
+#-- Petit code mini manilste pour mesurer la température et l'humidité
+#-- Lit la tmpérature et l'humidité du capteur HTU21D
+#-- location: cave vers interrupteur lumière
+#-- zf210720.1023
+#--
+#------------------------------
+#-- th7.yaml
+#-- Petit code mini manilste pour mesurer la température et l'humidité
+#-- Lit la tmpérature et l'humidité du capteur HTU21D
+#-- location: salon sur HP basse
+#-- zf210720.1023
+#--
+#------------------------------
+#-- th8.yaml
+#-- Petit code mini manilste pour mesurer la température et l'humidité
+#-- Lit la tmpérature et l'humidité du capteur HTU21D
+#-- location: chambre à coucher parents table de nuit zf
+#-- zf210723.0800
 #--
