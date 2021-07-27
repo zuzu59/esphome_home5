@@ -1,4 +1,14 @@
-#zf210220.1812
+#------------------------------
+#-- co2_66.yaml
+#-- Petit code mini minilste pour mesurer le TVOC et eCO2
+#-- Lit TVOC et eCO2 du capteur ccs811
+#-- location: chambre des parents petit meuble à droite en entrant
+#-- zf210720.1026
+#--
+
+
+# sources: 
+# https://esphome.io/components/sensor/ccs811.html
 
 esphome:
   name: co2_66
@@ -60,6 +70,16 @@ mqtt:
   username:  !secret mqtt_user_dev
   password:  !secret mqtt_password_dev
 
+# Définitions des texts sensors
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: 1w_th_solar IP Address
+      id: wifi_ip
+    ssid:
+      name: 1w_th_solar Connected SSID
+      id: wifi_ssid
+
 
 
 # I2C conf
@@ -95,7 +115,7 @@ sensor:
     baseline: 0xC9BE
 #    temperature: th8_th
 #    humidity: th8_hu
-    update_interval: 5s
+    update_interval: 15s
     eco2:
       name: "co2_66 eCO2"
     tvoc:
