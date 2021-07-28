@@ -1,0 +1,84 @@
+#------------------------------
+#-- esp32-cam.yaml
+#-- Petit test d'une esp32-cam
+#-- ATTENTION, 
+#-- zf210728.0949
+#--
+
+
+# sources: 
+# https://esphome.io/components/esp32_camera.html
+# https://fr.aliexpress.com/item/1005001322358029.html
+# https://randomnerdtutorials.com/esp32-cam-ai-thinker-pinout/
+
+esphome:
+  name: esp32-cam1
+  platform: ESP32
+#  board: esp-wrover-kit
+  board: esp32cam
+
+# Configuration WIFI
+wifi:
+#   ssid: !secret wifi_ssid_apzuzu7
+#   password: !secret wifi_pass_apzuzu7
+
+  networks:
+  
+    - ssid: !secret wifi_ssid_apzuzu7
+    - password: !secret wifi_pass_apzuzu7
+    
+    - ssid: !secret wifi_ssid_apzuzu6
+    - password: !secret wifi_pass_apzuzu6
+    
+    - ssid: !secret wifi_ssid_3G_zf
+    - password: !secret wifi_pass_3G_zf2
+    
+    - ssid: !secret wifi_ssid_3G_zf2
+    - password: !secret wifi_pass_3G_zf2
+    
+    - ssid: !secret wifi_ssid_3g_s7
+    - password: !secret wifi_pass_3g_s7
+    
+    - ssid: !secret wifi_ssid_apzuzu6_EXT
+    - password: !secret wifi_pass_apzuzu6_EXT
+
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "esp32-cam1 Fallback Hotspot"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+#    level: VERBOSE
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+# Enable OTA
+ota:
+  password: !secret ota_password
+
+# WEB Server
+web_server:
+  port: 80
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "esp32-cam1 LED"
+    inverted: True
+    id: led
+    pin: GPIO33
+
+  - platform: gpio
+    name: "esp32-cam1 LED CAM"
+#    inverted: True
+    id: led_cam
+    pin: GPIO4
+
+  - platform: restart
+    name: "esp32-cam1 Restart"

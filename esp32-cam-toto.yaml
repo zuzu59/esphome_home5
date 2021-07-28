@@ -1,0 +1,24 @@
+esphome:
+  name: esp32-cam-toto
+  platform: ESP32
+  board: esp32cam
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  password: "a3b095bdba2310010508272f4c691c6d"
+
+wifi:
+  ssid: "1"
+  password: "1"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Esp32-Cam-Toto Fallback Hotspot"
+    password: "KFhnIUqOwBvn"
+
+captive_portal:
