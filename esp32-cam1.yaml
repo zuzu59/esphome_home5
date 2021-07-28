@@ -2,7 +2,7 @@
 #-- esp32-cam.yaml
 #-- Petit test d'une esp32-cam
 #-- ATTENTION, 
-#-- zf210728.1226
+#-- zf210728.1238
 #--
 
 
@@ -82,6 +82,17 @@ switch:
     
   - platform: restart
     name: "esp32-cam1 Restart"
+
+
+  - platform: gpio
+    name: "esp32-cam1 cam power"
+    inverted: True
+    id: cam_power
+    pin: GPIO32
+
+
+
+
 
 
 # Flashlight
