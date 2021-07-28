@@ -37,6 +37,12 @@
 #-- zf210517.1854
 #--
 #------------------------------
+#-- esp32-cam.yaml
+#-- Petit test d'une esp32-cam
+#-- ATTENTION, 
+#-- zf210728.1238
+#--
+  #------------------------------
 #-- pzem-test-1.yaml
 #-- Petits tests d'un module power-meter PZEM-004T V3
 #-- 
