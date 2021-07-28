@@ -2,7 +2,7 @@
 #-- esp32-cam.yaml
 #-- Petit test d'une esp32-cam
 #-- ATTENTION, 
-#-- zf210728.0949
+#-- zf210728.1226
 #--
 
 
@@ -74,11 +74,50 @@ switch:
     id: led
     pin: GPIO33
 
-  - platform: gpio
-    name: "esp32-cam1 LED CAM"
-#    inverted: True
-    id: led_cam
-    pin: GPIO4
-
+#  - platform: gpio
+#    name: "esp32-cam1 LED FLASH"
+##    inverted: True
+#    id: led_flash
+#    pin: GPIO4
+    
   - platform: restart
     name: "esp32-cam1 Restart"
+
+
+# Flashlight
+output:
+  - platform: gpio
+    pin: GPIO4
+    id: gpio_4
+light:
+  - platform: binary
+    output: gpio_4
+    name: esp32-cam1 LED FLASH
+
+
+
+
+
+
+# Example configuration entry
+esp32_camera:
+  external_clock:
+    pin: GPIO0
+    frequency: 20MHz
+  i2c_pins:
+    sda: GPIO26
+    scl: GPIO27
+  data_pins: [GPIO5, GPIO18, GPIO19, GPIO21, GPIO36, GPIO39, GPIO34, GPIO35]
+  vsync_pin: GPIO25
+  href_pin: GPIO23
+  pixel_clock_pin: GPIO22
+  power_down_pin: GPIO32
+
+  # Image settings
+  name: esp32-cam1
+  resolution: 640x480
+  max_framerate: 5 fps
+  vertical_flip: false
+  horizontal_mirror: true
+  
+  
