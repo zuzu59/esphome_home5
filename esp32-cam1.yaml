@@ -2,7 +2,7 @@
 #-- esp32-cam.yaml
 #-- Petit test d'une esp32-cam
 #-- ATTENTION, 
-#-- zf210728.1238
+#-- zf210730.1404
 #--
 
 
@@ -16,7 +16,9 @@ esphome:
   platform: ESP32
 #  board: esp-wrover-kit
   board: esp32cam
-
+  project:
+    name: "zf.esp32-cam1"
+    version: "1.0.0"
 # Configuration WIFI
 wifi:
 #   ssid: !secret wifi_ssid_apzuzu7
@@ -66,24 +68,24 @@ ota:
 web_server:
   port: 80
 
+
 # Définition des Switch's
 switch:
+  - platform: restart
+    name: "esp32-cam1 Restart"
+
   - platform: gpio
     name: "esp32-cam1 LED"
     inverted: True
     id: led
     pin: GPIO33
 
-#  - platform: gpio
-#    name: "esp32-cam1 LED FLASH"
-##    inverted: True
-#    id: led_flash
-#    pin: GPIO4
+  - platform: gpio
+    name: "esp32-cam1 LED FLASH"
+#    inverted: True
+    id: led_flash
+    pin: GPIO4
     
-  - platform: restart
-    name: "esp32-cam1 Restart"
-
-
   - platform: gpio
     name: "esp32-cam1 cam power"
     inverted: True
@@ -91,27 +93,39 @@ switch:
     pin: GPIO32
 
 
+# Définition des sensors
+sensor:
+  - platform: wifi_signal
+    name: "esp32-cam1 Signal Wi-Fi"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "esp32-cam1 uptime"
+    update_interval: 60s
 
 
+# Définition des text sensors
+text_sensor:
+  - platform: version
+    name: "esp32-cam1 Version"
+
+  - platform: wifi_info
+    ip_address:
+      name: esp32-cam1 IP Address
+      id: wifi_ip
+    ssid:
+      name: esp32-cam1 Connected SSID
+      id: wifi_ssid
+
+# Définition des binary sensors
+binary_sensor:
+  - platform: status
+    name: "esp32-cam1 Status"
 
 
-# Flashlight
-output:
-  - platform: gpio
-    pin: GPIO4
-    id: gpio_4
-light:
-  - platform: binary
-    output: gpio_4
-    name: esp32-cam1 LED FLASH
-
-
-
-
-
-
-# Example configuration entry
+# Définition de la esp32-cam
 esp32_camera:
+  name: esp32-cam1
   external_clock:
     pin: GPIO0
     frequency: 20MHz
@@ -125,7 +139,6 @@ esp32_camera:
   power_down_pin: GPIO32
 
   # Image settings
-  name: esp32-cam1
   resolution: 640x480
   max_framerate: 5 fps
   vertical_flip: false
