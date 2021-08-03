@@ -1,8 +1,8 @@
 #------------------------------
-#-- esp32-cam.yaml
+#-- esp32-cam1.yaml
 #-- Petit test d'une esp32-cam
-#-- ATTENTION, 
-#-- zf210730.1404
+#-- ... 
+#-- zf210803.1505
 #--
 
 
@@ -10,15 +10,17 @@
 # https://esphome.io/components/esp32_camera.html
 # https://fr.aliexpress.com/item/1005001322358029.html
 # https://randomnerdtutorials.com/esp32-cam-ai-thinker-pinout/
+# https://github.com/zuzu59/zfacebox
+
 
 esphome:
   name: esp32-cam1
   platform: ESP32
-#  board: esp-wrover-kit
   board: esp32cam
   project:
     name: "zf.esp32-cam1"
     version: "1.0.0"
+
 # Configuration WIFI
 wifi:
 #   ssid: !secret wifi_ssid_apzuzu7
@@ -140,7 +142,7 @@ esp32_camera:
 
   # Image settings
   resolution: 640x480
-  max_framerate: 5 fps
+  max_framerate: 2 fps
   vertical_flip: false
   horizontal_mirror: true
   
