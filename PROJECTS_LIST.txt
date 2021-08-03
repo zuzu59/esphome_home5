@@ -37,10 +37,16 @@
 #-- zf210517.1854
 #--
 #------------------------------
-#-- esp32-cam.yaml
+#-- esp32-cam-door1.yaml
+#-- Code pour une esp32-cam en fonctionnement sonnette de porte d'entrée
+#-- Je l'ai installée dans un boîtier de déteceur PIR 433MHz 
+#-- zf210803.1457
+#--
+#------------------------------
+#-- esp32-cam1.yaml
 #-- Petit test d'une esp32-cam
-#-- ATTENTION, 
-#-- zf210728.1238
+#-- ... 
+#-- zf210803.1457
 #--
   #------------------------------
 #-- pzem-test-1.yaml
