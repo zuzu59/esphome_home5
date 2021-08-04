@@ -2,7 +2,7 @@
 #-- esp32-cam1.yaml
 #-- Petit test d'une esp32-cam
 #-- ... 
-#-- zf210803.1505
+#-- zf210804.1001
 #--
 
 
@@ -142,7 +142,7 @@ esp32_camera:
 
   # Image settings
   resolution: 640x480
-  max_framerate: 2 fps
+  max_framerate: 3 fps
   vertical_flip: false
   horizontal_mirror: true
   
