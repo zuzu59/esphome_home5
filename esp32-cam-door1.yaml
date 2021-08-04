@@ -2,7 +2,7 @@
 #-- esp32-cam-door1.yaml
 #-- Code pour une esp32-cam en fonctionnement sonnette de porte d'entrée
 #-- Je l'ai installée dans un boîtier de déteceur PIR 433MHz 
-#-- zf210804.1005
+#-- zf210804.2252
 #--
 
 
@@ -127,7 +127,8 @@ binary_sensor:
   - platform: gpio
     pin:
       number: GPIO2
-#      mode: INPUT_PULLUP
+#      number: GPIO14
+      mode: INPUT_PULLUP
       inverted: True
     name: "esp32-cam-door1 pir"
 
@@ -155,7 +156,7 @@ esp32_camera:
 
   # Image settings
   resolution: 640x480
-  max_framerate: 3 fps
+  max_framerate: 5 fps
   vertical_flip: false
   horizontal_mirror: true
   
