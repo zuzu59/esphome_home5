@@ -1,0 +1,155 @@
+#------------------------------
+#-- pzem-3x-test-1.yaml
+#-- Petits tests d2 3x modules power-meter PZEM-004T V3
+#-- ATTENTION: il faut leur changer l'adresse AVANT et tous les brancher en // !
+#-- zf210815.1718
+#--
+
+
+# sources: 
+# https://esphome.io/components/sensor/pzemac.html
+# https://docs.google.com/document/d/1GOp2zN0aFk80cv2Hz6DmlEwY84OPwVK38da-KSO77zw/edit#heading=h.two47z8b310i
+
+
+esphome:
+  name: pzem-3x-test-1
+  platform: ESP8266
+  board: d1_mini
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+ota:
+  password: !secret ota_password
+
+wifi:
+  networks:
+  
+    - ssid: !secret wifi_ssid_apzuzu7
+    - password: !secret wifi_pass_apzuzu7
+    
+    - ssid: !secret wifi_ssid_apzuzu6
+    - password: !secret wifi_pass_apzuzu6
+    
+    - ssid: !secret wifi_ssid_3G_zf
+    - password: !secret wifi_pass_3G_zf2
+    
+    - ssid: !secret wifi_ssid_3G_zf2
+    - password: !secret wifi_pass_3G_zf2
+    
+    - ssid: !secret wifi_ssid_3g_s7
+    - password: !secret wifi_pass_3g_s7
+    
+    - ssid: !secret wifi_ssid_apzuzu6_EXT
+    - password: !secret wifi_pass_apzuzu6_EXT
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "pzem-3x-test-1 Fallback Hotspot"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# WEB Server
+web_server:
+  port: 80
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "pzem-3x-test-1 LED"
+    inverted: True
+    id: led
+    pin: D4
+  - platform: restart
+    name: "pzem-3x-test-1 Restart"
+
+# Définition des binary sensors
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D3
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "pzem-3x-test-1 button"
+    on_press:
+      - switch.toggle: led
+
+# Définitions des texts sensors
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "pzem-3x-test-1 IP Address"
+      id: wifi_ip
+    ssid:
+      name: "pzem-3x-test-1 Connected SSID"
+      id: wifi_ssid
+
+# Définitions des Sensors
+sensor:
+  - platform: wifi_signal
+    name: "pzem-3x-test-1 Signal Wi-Fi"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "pzem-3x-test-1 Uptime"
+    update_interval: 10s
+
+  - platform: pzemac
+    address: 1
+    current:
+      name: "PZEM-L1 Current"
+    voltage:
+      name: "PZEM-L1 Voltage"
+    energy:
+      name: "PZEM-L1 Energy"
+    power:
+      name: "PZEM-L1 Power"
+    frequency:
+      name: "PZEM-L1 Frequency"
+    power_factor:
+      name: "PZEM-L1 Power Factor"
+    update_interval: 5s
+
+  - platform: pzemac
+    address: 2
+    current:
+      name: "PZEM-L2 Current"
+    voltage:
+      name: "PZEM-L2 Voltage"
+    energy:
+      name: "PZEM-L2 Energy"
+    power:
+      name: "PZEM-L2 Power"
+    frequency:
+      name: "PZEM-L2 Frequency"
+    power_factor:
+      name: "PZEM-L2 Power Factor"
+    update_interval: 5s
+
+  - platform: pzemac
+    address: 3
+    current:
+      name: "PZEM-L3 Current"
+    voltage:
+      name: "PZEM-L3 Voltage"
+    energy:
+      name: "PZEM-L3 Energy"
+    power:
+      name: "PZEM-L3 Power"
+    frequency:
+      name: "PZEM-L3 Frequency"
+    power_factor:
+      name: "PZEM-L3 Power Factor"
+    update_interval: 5s
+
+uart:
+  rx_pin: D1    #GPIO5   TX du PZEM
+  tx_pin: D2    #GPIO4   RX du PZEM
+  baud_rate: 9600
+
+
