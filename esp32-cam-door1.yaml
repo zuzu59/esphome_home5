@@ -2,7 +2,7 @@
 #-- esp32-cam-door1.yaml
 #-- Code pour une esp32-cam en fonctionnement sonnette de porte d'entrée
 #-- Je l'ai installée dans un boîtier de déteceur PIR 433MHz 
-#-- zf210804.2252
+#-- zf210805. 0727
 #--
 
 
@@ -158,6 +158,6 @@ esp32_camera:
   resolution: 640x480
   max_framerate: 5 fps
   vertical_flip: false
-  horizontal_mirror: true
+  horizontal_mirror: false
   
   
