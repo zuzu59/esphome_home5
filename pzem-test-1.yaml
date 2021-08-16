@@ -2,7 +2,7 @@
 #-- pzem-test-1.yaml
 #-- Petits tests d'un module power-meter PZEM-004T V3
 #-- 
-#-- zf210719.1813
+#-- zf210815.1638
 #--
 
 
@@ -99,7 +99,7 @@ sensor:
     update_interval: 10s
 
   - platform: pzemac
-    address: 2
+    address: 3
     current:
       name: "PZEM-004T V3 Current"
     voltage:
