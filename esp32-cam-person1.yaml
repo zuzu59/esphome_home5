@@ -1,0 +1,163 @@
+#------------------------------
+#-- esp32-cam-person1.yaml
+#-- Code pour une esp32-cam pour la détection de personnes avec Deepstack
+#-- Je l'ai montée pour l'instant sur un petit trépied photo de webcam 
+#-- zf220104.1310
+#--
+
+
+# sources: 
+# https://esphome.io/components/esp32_camera.html
+# https://fr.aliexpress.com/item/1005001322358029.html
+# https://randomnerdtutorials.com/esp32-cam-ai-thinker-pinout/
+# https://siytek.com/home-assistant-face-recognition/
+
+
+esphome:
+  name: esp32-cam-person1
+  platform: ESP32
+  board: esp32cam
+  project:
+    name: "zf.esp32-cam-person1"
+    version: "1.0.0"
+
+# Configuration WIFI
+wifi:
+#   ssid: !secret wifi_ssid_apzuzu7
+#   password: !secret wifi_pass_apzuzu7
+
+  networks:
+  
+    - ssid: !secret wifi_ssid_apzuzu7
+    - password: !secret wifi_pass_apzuzu7
+    
+    - ssid: !secret wifi_ssid_apzuzu6
+    - password: !secret wifi_pass_apzuzu6
+    
+    - ssid: !secret wifi_ssid_3G_zf
+    - password: !secret wifi_pass_3G_zf2
+    
+    - ssid: !secret wifi_ssid_3G_zf2
+    - password: !secret wifi_pass_3G_zf2
+    
+    - ssid: !secret wifi_ssid_3g_s7
+    - password: !secret wifi_pass_3g_s7
+    
+    - ssid: !secret wifi_ssid_apzuzu6_EXT
+    - password: !secret wifi_pass_apzuzu6_EXT
+
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "esp32-cam-person1 Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+#    level: VERBOSE
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+# Enable OTA
+ota:
+  password: !secret ota_password
+
+# WEB Server
+web_server:
+  port: 80
+
+
+# Définition des Switch's
+switch:
+  - platform: restart
+    name: "esp32-cam-person1 Restart"
+
+  - platform: gpio
+    name: "esp32-cam-person1 LED"
+    inverted: True
+    id: led
+    pin: GPIO33
+
+  - platform: gpio
+    name: "esp32-cam-person1 LED FLASH"
+#    inverted: True
+    id: led_flash
+    pin: GPIO4
+    
+  - platform: gpio
+    name: "esp32-cam-person1 cam power"
+    inverted: True
+    id: cam_power
+    pin: GPIO32
+
+
+# Définition des sensors
+sensor:
+  - platform: wifi_signal
+    name: "esp32-cam-person1 Signal Wi-Fi"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "esp32-cam-person1 uptime"
+    update_interval: 60s
+
+
+# Définition des text sensors
+text_sensor:
+  - platform: version
+    name: "esp32-cam-person1 Version"
+
+  - platform: wifi_info
+    ip_address:
+      name: esp32-cam-person1 IP Address
+      id: wifi_ip
+    ssid:
+      name: esp32-cam-person1 Connected SSID
+      id: wifi_ssid
+
+# Définition des binary sensors
+binary_sensor:
+  - platform: status
+    name: "esp32-cam-person1 Status"
+
+#   - platform: gpio
+#     pin:
+#       number: GPIO2
+# #      number: GPIO14
+#       mode: INPUT_PULLUP
+#       inverted: True
+#     name: "esp32-cam-person1 pir"
+
+
+
+
+
+
+
+
+# Définition de la esp32-cam
+esp32_camera:
+  name: esp32-cam-person1
+  external_clock:
+    pin: GPIO0
+    frequency: 20MHz
+  i2c_pins:
+    sda: GPIO26
+    scl: GPIO27
+  data_pins: [GPIO5, GPIO18, GPIO19, GPIO21, GPIO36, GPIO39, GPIO34, GPIO35]
+  vsync_pin: GPIO25
+  href_pin: GPIO23
+  pixel_clock_pin: GPIO22
+  power_down_pin: GPIO32
+
+  # Image settings
+  resolution: 640x480
+  max_framerate: 5 fps
+  vertical_flip: false
+  horizontal_mirror: false
+  
+  
