@@ -1,0 +1,127 @@
+#------------------------------
+#-- esp32-ble-hub1.yaml
+#-- Code pour une esp32-cam pour test un hub BLE (iBeacon)
+#-- Je squate une esp32-cam comme un esp32 simple avec Bluetooth 
+#-- zf220114.1815
+#--
+
+
+# sources: 
+# 
+
+esphome:
+  name: esp32-ble-hub1
+  project:
+    name: "zf.esp32-ble-hub1"
+    version: "1.0.0"
+
+esp32:
+  board: esp32cam
+  framework:
+    type: arduino
+
+
+# Configuration WIFI
+wifi:
+#   ssid: !secret wifi_ssid_apzuzu7
+#   password: !secret wifi_pass_apzuzu7
+
+  networks:
+  
+    - ssid: !secret wifi_ssid_apzuzu7
+    - password: !secret wifi_pass_apzuzu7
+    
+    - ssid: !secret wifi_ssid_apzuzu6
+    - password: !secret wifi_pass_apzuzu6
+    
+    - ssid: !secret wifi_ssid_3G_zf
+    - password: !secret wifi_pass_3G_zf2
+    
+    - ssid: !secret wifi_ssid_3G_zf2
+    - password: !secret wifi_pass_3G_zf2
+    
+    - ssid: !secret wifi_ssid_3g_s7
+    - password: !secret wifi_pass_3g_s7
+    
+    - ssid: !secret wifi_ssid_apzuzu6_EXT
+    - password: !secret wifi_pass_apzuzu6_EXT
+
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "esp32-ble-hub1 Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+#    level: VERBOSE
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+# Enable OTA
+ota:
+  password: !secret ota_password
+
+# WEB Server
+web_server:
+  port: 80
+
+
+# Définition des Switch's
+switch:
+  - platform: restart
+    name: "esp32-ble-hub1 Restart"
+
+  - platform: gpio
+    name: "esp32-ble-hub1 LED"
+    inverted: True
+    id: led
+    pin: GPIO33
+
+  - platform: gpio
+    name: "esp32-ble-hub1 LED FLASH"
+#    inverted: True
+    id: led_flash
+    pin: GPIO4
+    
+  - platform: gpio
+    name: "esp32-ble-hub1 cam power"
+    inverted: True
+    id: cam_power
+    pin: GPIO32
+
+
+# Définition des sensors
+sensor:
+  - platform: wifi_signal
+    name: "esp32-ble-hub1 Signal Wi-Fi"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "esp32-ble-hub1 uptime"
+    update_interval: 60s
+
+
+# Définition des text sensors
+text_sensor:
+  - platform: version
+    name: "esp32-ble-hub1 Version"
+
+  - platform: wifi_info
+    ip_address:
+      name: esp32-ble-hub1 IP Address
+      id: wifi_ip
+    ssid:
+      name: esp32-ble-hub1 Connected SSID
+      id: wifi_ssid
+
+# Définition des binary sensors
+binary_sensor:
+  - platform: status
+    name: "esp32-ble-hub1 Status"
+
+
