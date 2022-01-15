@@ -1,8 +1,8 @@
 #------------------------------
 #-- esp32-ble-hub1.yaml
-#-- Code pour une esp32-cam pour test un hub BLE (iBeacon)
+#-- Code pour une esp32-cam pour tester un BLE tracker, un hub BLE (iBeacon)
 #-- Je squate une esp32-cam comme un esp32 simple avec Bluetooth 
-#-- zf220114.1815
+#-- zf220114.2013
 #--
 
 
@@ -106,6 +106,19 @@ sensor:
     update_interval: 60s
 
 
+  - platform: ble_rssi
+    mac_address: EF:D4:55:26:8C:27
+    name: "BLE SumUp 835 RSSI value"
+  - platform: ble_rssi
+    mac_address: E0:AA:01:F9:AF:62
+    name: "Tile 1"
+  - platform: ble_rssi
+    mac_address: E1:B0:A7:F3:63:03
+    name: "Tile 2"
+
+
+
+
 # Définition des text sensors
 text_sensor:
   - platform: version
@@ -123,5 +136,15 @@ text_sensor:
 binary_sensor:
   - platform: status
     name: "esp32-ble-hub1 Status"
+
+  # Presence based on MAC address
+  - platform: ble_presence
+    mac_address: EF:D4:55:26:8C:27
+    name: "BLE SumUp 835"
+
+
+
+esp32_ble_tracker:
+
 
 
