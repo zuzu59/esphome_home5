@@ -2,7 +2,7 @@
 #-- esp32-cam-person1.yaml
 #-- Code pour une esp32-cam pour la détection de personnes avec Deepstack
 #-- Je l'ai montée pour l'instant sur un petit trépied photo de webcam 
-#-- zf220104.1310
+#-- zf220115.1100
 #--
 
 
@@ -15,11 +15,18 @@
 
 esphome:
   name: esp32-cam-person1
-  platform: ESP32
-  board: esp32cam
+#  platform: ESP32
+#  board: esp32cam
   project:
     name: "zf.esp32-cam-person1"
-    version: "1.0.0"
+    version: "1.0.1"
+
+esp32:
+  board: esp32cam
+  framework:
+    type: arduino
+
+
 
 # Configuration WIFI
 wifi:
