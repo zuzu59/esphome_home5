@@ -2,7 +2,7 @@
 #-- esp32-ble-hub1.yaml
 #-- Code pour une esp32-cam pour tester un BLE tracker, un hub BLE (iBeacon)
 #-- Je squate une esp32-cam comme un esp32 simple avec Bluetooth 
-#-- zf220114.2013
+#-- zf220115.1419
 #--
 
 
@@ -95,6 +95,11 @@ switch:
     pin: GPIO32
 
 
+
+
+esp32_ble_tracker:
+
+
 # Définition des sensors
 sensor:
   - platform: wifi_signal
@@ -116,6 +121,13 @@ sensor:
     mac_address: E1:B0:A7:F3:63:03
     name: "Tile 2"
 
+  - platform: ble_rssi
+    service_uuid: '4e8cc6b3-490a-4d35-b7cc-282ba9265748'
+    name: "Beacon 4"
+
+
+
+
 
 
 
@@ -132,6 +144,12 @@ text_sensor:
       name: esp32-ble-hub1 Connected SSID
       id: wifi_ssid
 
+
+#  - platform: ble_scanner
+#    name: "BLE Devices Scanner"
+
+
+
 # Définition des binary sensors
 binary_sensor:
   - platform: status
@@ -141,10 +159,6 @@ binary_sensor:
   - platform: ble_presence
     mac_address: EF:D4:55:26:8C:27
     name: "BLE SumUp 835"
-
-
-
-esp32_ble_tracker:
 
 
 
