@@ -2,7 +2,7 @@
 #-- esp32-ble-hub1.yaml
 #-- Code pour une esp32-cam pour tester un BLE tracker, un hub BLE (iBeacon)
 #-- Je squate une esp32-cam comme un esp32 simple avec Bluetooth 
-#-- zf220115.2112
+#-- zf220116.1041
 #--
 
 
@@ -56,27 +56,28 @@ captive_portal:
 
 # Enable logging
 logger:
-  level: VERBOSE
-#  level: VERY_VERBOSE
-  logs:
-    logger: INFO
-    adc: INFO
-    captive_portal: INFO
-    deep_sleep: INFO
-    htu21d: INFO
-    i2c: INFO
-    ota: INFO
-    restart: INFO
-    sensor: INFO
-    switch: INFO
-    switch.gpio: INFO
-    uptime.sensor: INFO
-    web_server: INFO
-    wifi_signal.sensor: INFO
-    mqtt: INFO
-    mqtt.component: INFO
-    mqtt.client: INFO
-    mqtt.switch: INFO
+  level: DEBUG
+#   level: VERBOSE
+# #  level: VERY_VERBOSE
+#   logs:
+#     logger: INFO
+#     adc: INFO
+#     captive_portal: INFO
+#     deep_sleep: INFO
+#     htu21d: INFO
+#     i2c: INFO
+#     ota: INFO
+#     restart: INFO
+#     sensor: INFO
+#     switch: INFO
+#     switch.gpio: INFO
+#     uptime.sensor: INFO
+#     web_server: INFO
+#     wifi_signal.sensor: INFO
+#     mqtt: INFO
+#     mqtt.component: INFO
+#     mqtt.client: INFO
+#     mqtt.switch: INFO
  
 
 # Enable Home Assistant API
@@ -120,7 +121,18 @@ switch:
 
 esp32_ble_tracker:
   scan_parameters:
-    duration: 66s
+    duration: 15s
+
+  on_ble_advertise: 
+    - lambda: |- 
+        if(x.get_ibeacon().has_value()) 
+          { auto ibeacon = x.get_ibeacon().value();
+          ESP_LOGD(ibeacon.get_uuid().to_string().c_str(), "    iBeancon found***********************************");
+        if(strcmp(ibeacon.get_uuid().to_string().c_str(), "485726A9-2B28-CCB7-354D-0A49B3C68C4E") == 0) 
+          { id(ble_rssiz).publish_state(x.get_rssi());
+          ESP_LOGD("ble_adv", "My Phone found***********************************");            
+          }
+        }
 
 
 
@@ -149,6 +161,38 @@ sensor:
   - platform: ble_rssi
     name: "BLE Beacon 4 RSSI value"
     service_uuid: '4e8cc6b3-490a-4d35-b7cc-282ba9265748'
+
+
+  - platform: template 
+    id: ble_rssiz
+    name: "BLE iBeacon 4 RSSI" 
+    icon: "mdi:signal-distance-variant" 
+#    update_interval: never 
+    unit_of_measurement: "dBm" 
+#    filters: 
+#      - median: 
+#          window_size: 5 
+#          send_every: 1
+
+
+
+
+# function zcalc_distance(zrssi2)
+#     zrssi_1m=-40    zn=2
+#     zdist=10^((zrssi_1m - zrssi2) / (10 * zn))
+#     return zdist
+# end
+
+# --[[
+# print("distance: "..zcalc_distance(-60).."m")
+# La formule pour calculer la distance est assez simple.
+# d = 10 ^ ((TxPower - RSSI) / (10 * n))
+# - TxPower est le RSSI mesuré à 1 m d'un point d'accès connu. Par exemple: -84 dB.
+# - n est la constante de propagation ou l'exposant d'affaiblissement de trajet. Par exemple: 2,7 à 4,3 (l'espace libre a n = 2 pour référence).
+# - RSSI est le RSSI mesuré
+# - d est la distance en mètre
+# ]]
+
 
 
 
@@ -191,7 +235,10 @@ binary_sensor:
     mac_address: E1:B0:A7:F3:63:03
   - platform: ble_presence
     name: "BLE Beacon 4"
-    service_uuid: '4e8cc6b3-490a-4d35-b7cc-282ba9265748'
+#    service_uuid: '4e8cc6b3-490a-4d35-b7cc-282ba9265748'
+    ibeacon_uuid : 4e8cc6b3-490a-4d35-b7cc-282ba9265748 
+    ibeacon_major : 100 
+    ibeacon_minor : 1 
 
 
 
