@@ -2,7 +2,7 @@
 #-- esp32-ble-hub1.yaml
 #-- Code pour une esp32-cam pour tester un BLE tracker, un hub BLE (iBeacon)
 #-- Je squate une esp32-cam comme un esp32 simple avec Bluetooth 
-#-- zf220115.1419
+#-- zf220115.2112
 #--
 
 
@@ -56,7 +56,28 @@ captive_portal:
 
 # Enable logging
 logger:
-#    level: VERBOSE
+  level: VERBOSE
+#  level: VERY_VERBOSE
+  logs:
+    logger: INFO
+    adc: INFO
+    captive_portal: INFO
+    deep_sleep: INFO
+    htu21d: INFO
+    i2c: INFO
+    ota: INFO
+    restart: INFO
+    sensor: INFO
+    switch: INFO
+    switch.gpio: INFO
+    uptime.sensor: INFO
+    web_server: INFO
+    wifi_signal.sensor: INFO
+    mqtt: INFO
+    mqtt.component: INFO
+    mqtt.client: INFO
+    mqtt.switch: INFO
+ 
 
 # Enable Home Assistant API
 api:
@@ -98,6 +119,10 @@ switch:
 
 
 esp32_ble_tracker:
+  scan_parameters:
+    duration: 66s
+
+
 
 
 # Définition des sensors
@@ -112,18 +137,18 @@ sensor:
 
 
   - platform: ble_rssi
-    mac_address: EF:D4:55:26:8C:27
     name: "BLE SumUp 835 RSSI value"
+    mac_address: EF:D4:55:26:8C:27
   - platform: ble_rssi
+    name: "BLE Tile 1 RSSI value"
     mac_address: E0:AA:01:F9:AF:62
-    name: "Tile 1"
   - platform: ble_rssi
+    name: "BLE Tile 2 RSSI value"
     mac_address: E1:B0:A7:F3:63:03
-    name: "Tile 2"
 
   - platform: ble_rssi
+    name: "BLE Beacon 4 RSSI value"
     service_uuid: '4e8cc6b3-490a-4d35-b7cc-282ba9265748'
-    name: "Beacon 4"
 
 
 
@@ -155,10 +180,19 @@ binary_sensor:
   - platform: status
     name: "esp32-ble-hub1 Status"
 
-  # Presence based on MAC address
   - platform: ble_presence
-    mac_address: EF:D4:55:26:8C:27
     name: "BLE SumUp 835"
+    mac_address: EF:D4:55:26:8C:27
+  - platform: ble_presence
+    name: "BLE Tile 1"
+    mac_address: E0:AA:01:F9:AF:62
+  - platform: ble_presence
+    name: "BLE Tile 2"
+    mac_address: E1:B0:A7:F3:63:03
+  - platform: ble_presence
+    name: "BLE Beacon 4"
+    service_uuid: '4e8cc6b3-490a-4d35-b7cc-282ba9265748'
+
 
 
 
