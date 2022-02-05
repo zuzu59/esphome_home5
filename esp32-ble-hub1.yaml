@@ -155,6 +155,31 @@ sensor:
     name: "BLE SumUp 835 RSSI value"
     mac_address: EF:D4:55:26:8C:27
     id: toto0136
+    
+    on_value:
+      then:
+        lambda: |-
+          static float zrssi_1m=-75.0;
+          static float zn=2.0;
+          //static float zdist = pow(10.0,zrssi_1m - x / (10.0 * zn));
+          //static float zdist = id(toto0136).state;
+          static float zdist = id(toto0136).state;
+          id(toto1755).publish_state(zdist);
+    
+    
+  - platform: template 
+    name: "BLE SumUp 835 DIST value" 
+    id: "toto1755"
+    icon: "mdi:signal-distance-variant" 
+    unit_of_measurement: "m" 
+    update_interval: 5s
+    
+    
+    
+    
+    
+    
+    
   - platform: ble_rssi
     name: "BLE Tile 1 RSSI value"
     mac_address: E0:AA:01:F9:AF:62
@@ -167,20 +192,8 @@ sensor:
     service_uuid: '4e8cc6b3-490a-4d35-b7cc-282ba9265748'
 
 
-  - platform: template 
-    name: "BLE SumUp 835 DIST value" 
-    icon: "mdi:signal-distance-variant" 
-    unit_of_measurement: "m" 
-    update_interval: 5s
 
-    lambda: |-
-      static float zrssi_1m=-40;
-      static float zn=2;
-      //static float zdist = 10^((zrssi_1m - id(toto0136).state) / (10 * zn));
-      //static float zdist = pow(10,(zrssi_1m - id(toto0136).state) / (10 * zn));
-      //static float zdist = (zrssi_1m - id(toto0136).state) / (10 * zn);
-      static float zdist = (id(toto0136).state);
-      return zdist;
+
 
 
 
