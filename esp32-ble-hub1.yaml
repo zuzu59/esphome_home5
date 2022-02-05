@@ -1,19 +1,22 @@
 #------------------------------
 #-- esp32-ble-hub1.yaml
-#-- Code pour une esp32-cam pour tester un BLE tracker, un hub BLE (iBeacon)
+#-- Code pour une esp32-cam pour tester un BLE tracker, un hub BLE (iBeacon, iTag ou Tile)
 #-- Je squate une esp32-cam comme un esp32 simple avec Bluetooth 
-#-- zf220116.1041
+#-- zf220205.1622
 #--
 
 
 # sources: 
+# https://esphome.io/components/esp32_ble_tracker.html
+# https://esphome.io/guides/automations.html#config-lambda
+# https://esphome.io/components/sensor/template.html
 # 
 
 esphome:
   name: esp32-ble-hub1
   project:
     name: "zf.esp32-ble-hub1"
-    version: "1.0.0"
+    version: "1.0.1"
 
 esp32:
   board: esp32cam
@@ -123,16 +126,16 @@ esp32_ble_tracker:
   scan_parameters:
     duration: 15s
 
-  on_ble_advertise: 
-    - lambda: |- 
-        if(x.get_ibeacon().has_value()) 
-          { auto ibeacon = x.get_ibeacon().value();
-          ESP_LOGD(ibeacon.get_uuid().to_string().c_str(), "    iBeancon found***********************************");
-        if(strcmp(ibeacon.get_uuid().to_string().c_str(), "485726A9-2B28-CCB7-354D-0A49B3C68C4E") == 0) 
-          { id(ble_rssiz).publish_state(x.get_rssi());
-          ESP_LOGD("ble_adv", "My Phone found***********************************");            
-          }
-        }
+#   on_ble_advertise: 
+#     - lambda: |- 
+#         if(x.get_ibeacon().has_value()) 
+#           { auto ibeacon = x.get_ibeacon().value();
+#           ESP_LOGD(ibeacon.get_uuid().to_string().c_str(), "    iBeancon found***********************************");
+#         if(strcmp(ibeacon.get_uuid().to_string().c_str(), "485726A9-2B28-CCB7-354D-0A49B3C68C4E") == 0) 
+#           { id(ble_rssiz).publish_state(x.get_rssi());
+#           ESP_LOGD("ble_adv", "My Phone found***********************************");            
+#           }
+#         }
 
 
 
@@ -151,6 +154,7 @@ sensor:
   - platform: ble_rssi
     name: "BLE SumUp 835 RSSI value"
     mac_address: EF:D4:55:26:8C:27
+    id: toto0136
   - platform: ble_rssi
     name: "BLE Tile 1 RSSI value"
     mac_address: E0:AA:01:F9:AF:62
@@ -164,15 +168,19 @@ sensor:
 
 
   - platform: template 
-    id: ble_rssiz
-    name: "BLE iBeacon 4 RSSI" 
+    name: "BLE SumUp 835 DIST value" 
     icon: "mdi:signal-distance-variant" 
-#    update_interval: never 
-    unit_of_measurement: "dBm" 
-#    filters: 
-#      - median: 
-#          window_size: 5 
-#          send_every: 1
+    unit_of_measurement: "m" 
+    update_interval: 5s
+
+    lambda: |-
+      static float zrssi_1m=-40;
+      static float zn=2;
+      //static float zdist = 10^((zrssi_1m - id(toto0136).state) / (10 * zn));
+      //static float zdist = pow(10,(zrssi_1m - id(toto0136).state) / (10 * zn));
+      //static float zdist = (zrssi_1m - id(toto0136).state) / (10 * zn);
+      static float zdist = (id(toto0136).state);
+      return zdist;
 
 
 
