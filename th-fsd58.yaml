@@ -3,7 +3,7 @@
 #-- th-fsd58.yaml
 #-- Petit code pour la formation IoT de la FSD de mars 2021
 #-- Lit la tmpérature et l'humidité du capteur HTU21D et se connecte sur le broker MQTT
-#-- zf210611.0720
+#-- zf210611.0720, zf220219.1450
 #--
 
 
@@ -18,8 +18,29 @@ esphome:
 
 # Configuration WIFI
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
+#   ssid: !secret wifi_ssid_apzuzu7
+#   password: !secret wifi_pass_apzuzu7
+
+  networks:
+  
+    - ssid: !secret wifi_ssid_apzuzu7
+    - password: !secret wifi_pass_apzuzu7
+    
+    - ssid: !secret wifi_ssid_apzuzu6
+    - password: !secret wifi_pass_apzuzu6
+    
+    - ssid: !secret wifi_ssid_3G_zf
+    - password: !secret wifi_pass_3G_zf2
+    
+    - ssid: !secret wifi_ssid_3G_zf2
+    - password: !secret wifi_pass_3G_zf2
+    
+    - ssid: !secret wifi_ssid_3g_s7
+    - password: !secret wifi_pass_3g_s7
+    
+    - ssid: !secret wifi_ssid_apzuzu6_EXT
+    - password: !secret wifi_pass_apzuzu6_EXT
+
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
@@ -61,6 +82,19 @@ binary_sensor:
     on_press:
       - switch.toggle: led
 
+# Définitions des texts sensors
+text_sensor:
+  - platform: version
+    name: "th-fsd58 Version"
+
+  - platform: wifi_info
+    ip_address:
+      name: th-fsd58 IP Address
+      id: wifi_ip
+    ssid:
+      name: th-fsd58 Connected SSID
+      id: wifi_ssid
+
 # WEB Server
 web_server:
   port: 80
@@ -97,11 +131,11 @@ sensor:
     update_interval: 5s
 
 ######### juste là pour changer l'harmonique du CPU qui interagit avec le WIFI sur mes NodeMCU lowcost :-(
-  - platform: homeassistant
-    name: "th8 Temp"
-    entity_id: sensor.th8_temperature
+#  - platform: homeassistant
+#    name: "th8 Temp"
+#    entity_id: sensor.th8_temperature
 #    id: th8_th
-    internal: true
+#    internal: true
 #########
 
 
