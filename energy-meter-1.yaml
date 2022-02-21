@@ -1,0 +1,147 @@
+#------------------------------
+#-- energy-meter-1.yaml
+#-- Mesures de puissance de mes grands consommateurs (cuisinière et charge voiture)
+#-- La mesure se fait simplement avec 3x transfos de courant clips avec un ADC i2C et un mini d1
+#-- zf220221.1935
+#--
+
+
+# sources: 
+# https://esphome.io/components/sensor/ads1115.html
+
+esphome:
+  name: energy-meter-1
+esp8266:
+  board: d1_mini
+
+# Configuration WIFI
+# On le force sur apzuzu7, plus stable
+wifi:
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
+
+  # networks:
+  
+  #   - ssid: !secret wifi_ssid_apzuzu7
+  #   - password: !secret wifi_pass_apzuzu7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6
+  #   - password: !secret wifi_pass_apzuzu6
+
+  #   - ssid: !secret wifi_ssid_3G_zf
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3G_zf2
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3g_s7
+  #   - password: !secret wifi_pass_3g_s7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
+  #   - password: !secret wifi_pass_apzuzu6_EXT
+
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "energy-meter-1 Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+#    level: VERBOSE
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+# Enable OTA
+ota:
+  password: !secret ota_password
+
+# WEB Server
+web_server:
+  port: 80
+
+
+
+
+i2c:
+  sda: D2
+  scl: D1
+  scan: False
+
+ads1115:
+  - address: 0x48
+#    continuous_mode: True
+
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "energy-meter-1 LED"
+    inverted: True
+    id: led
+    pin: D4
+
+  - platform: restart
+    name: "energy-meter-1 Restart"
+
+# Définition du bouton physique
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D3
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "energy-meter-1 button"
+    on_press:
+      - switch.toggle: led
+
+
+# Définitions des texts sensors
+text_sensor:
+  - platform: version
+    name: "energy-meter-1 Version"
+
+  - platform: wifi_info
+    ip_address:
+      name: energy-meter-1 IP Address
+      id: wifi_ip
+    ssid:
+      name: energy-meter-1 Connected SSID
+      id: wifi_ssid
+
+
+
+# Sensors
+sensor:
+
+  - platform: wifi_signal
+    name: "energy-meter-1 Signal Wi-Fi"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "energy-meter-1 uptime"
+    update_interval: 60s
+
+  - platform: ads1115
+    name: "ADS1115 Channel A1-GND"
+    multiplexer: 'A1_GND'
+    gain: 1.024
+    update_interval: 5s
+
+  - platform: ads1115
+    name: "ADS1115 Channel A2-GND"
+    multiplexer: 'A2_GND'
+    gain: 1.024
+    update_interval: 5s
+
+  - platform: ads1115
+    name: "ADS1115 Channel A3-GND"
+    multiplexer: 'A3_GND'
+    gain: 1.024
+    update_interval: 5s
+
+
