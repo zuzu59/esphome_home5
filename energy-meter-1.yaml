@@ -2,7 +2,7 @@
 #-- energy-meter-1.yaml
 #-- Mesures de puissance de mes grands consommateurs (cuisinière et charge voiture)
 #-- La mesure se fait simplement avec 3x transfos de courant clips avec un ADC i2C et un mini d1
-#-- zf220221.2321
+#-- zf220222.0807
 #--
 
 
@@ -88,16 +88,16 @@ switch:
   - platform: restart
     name: "energy-meter-1 Restart"
 
-# Définition du bouton physique
-binary_sensor:
-  - platform: gpio
-    pin:
-      number: D3
-      mode: INPUT_PULLUP
-      inverted: True
-    name: "energy-meter-1 button"
-    on_press:
-      - switch.toggle: led
+# # Définition du bouton physique
+# binary_sensor:
+#   - platform: gpio
+#     pin:
+#       number: D3
+#       mode: INPUT_PULLUP
+#       inverted: True
+#     name: "energy-meter-1 button"
+#     on_press:
+#       - switch.toggle: led
 
 
 # Définitions des texts sensors
