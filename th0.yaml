@@ -3,7 +3,7 @@
 #-- Petit code mini manilste pour mesurer la température et l'humidité
 #-- Lit la tmpérature et l'humidité du capteur HTU21D
 #-- location: chambre à Chloé bureau zf
-#-- zf210720.1021, zf220219.0915
+#-- zf210720.1021, zf220328.0954
 #--
 
 
@@ -18,28 +18,28 @@ esphome:
 
 # Configuration WIFI
 wifi:
-#   ssid: !secret wifi_ssid_apzuzu7
-#   password: !secret wifi_pass_apzuzu7
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
 
-  networks:
+  # networks:
   
-    - ssid: !secret wifi_ssid_apzuzu7
-    - password: !secret wifi_pass_apzuzu7
+  #   - ssid: !secret wifi_ssid_apzuzu7
+  #   - password: !secret wifi_pass_apzuzu7
     
-    - ssid: !secret wifi_ssid_apzuzu6
-    - password: !secret wifi_pass_apzuzu6
+  #   - ssid: !secret wifi_ssid_apzuzu6
+  #   - password: !secret wifi_pass_apzuzu6
+
+  #   - ssid: !secret wifi_ssid_3G_zf
+  #   - password: !secret wifi_pass_3G_zf2
     
-    - ssid: !secret wifi_ssid_3G_zf
-    - password: !secret wifi_pass_3G_zf2
+  #   - ssid: !secret wifi_ssid_3G_zf2
+  #   - password: !secret wifi_pass_3G_zf2
     
-    - ssid: !secret wifi_ssid_3G_zf2
-    - password: !secret wifi_pass_3G_zf2
+  #   - ssid: !secret wifi_ssid_3g_s7
+  #   - password: !secret wifi_pass_3g_s7
     
-    - ssid: !secret wifi_ssid_3g_s7
-    - password: !secret wifi_pass_3g_s7
-    
-    - ssid: !secret wifi_ssid_apzuzu6_EXT
-    - password: !secret wifi_pass_apzuzu6_EXT
+  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
+  #   - password: !secret wifi_pass_apzuzu6_EXT
 
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
@@ -86,9 +86,6 @@ binary_sensor:
 web_server:
   port: 80
 
-
-
-
 # I2C conf
 i2c:
   sda: D5
@@ -113,6 +110,9 @@ sensor:
 
 # Sensors text
 text_sensor:
+  - platform: version
+    name: "th0 Version"
+
   - platform: wifi_info
     ip_address:
       name: th0 IP Address
