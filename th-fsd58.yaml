@@ -3,7 +3,7 @@
 #-- th-fsd58.yaml
 #-- Petit code pour la formation IoT de la FSD de mars 2021
 #-- Lit la tmpérature et l'humidité du capteur HTU21D et se connecte sur le broker MQTT
-#-- zf210611.0720, zf220219.1450
+#-- zf210611.0720, zf220503.0940
 #--
 
 
@@ -131,11 +131,11 @@ sensor:
     update_interval: 5s
 
 ######### juste là pour changer l'harmonique du CPU qui interagit avec le WIFI sur mes NodeMCU lowcost :-(
-#  - platform: homeassistant
-#    name: "th8 Temp"
-#    entity_id: sensor.th8_temperature
-#    id: th8_th
-#    internal: true
+  - platform: homeassistant
+    name: "th-fsd58 toto tutu"
+    entity_id: sensor.toto_tutu
+    id: th_fsd58_toto_tutu
+    internal: true
 #########
 
 
