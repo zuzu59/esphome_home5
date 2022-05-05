@@ -2,13 +2,13 @@
 #-- 1w_th_ext_sud.yaml
 #-- Mesure de la température extérieure à l'aide d'une sonde 1-wire DS18B20
 #-- ATTENTION, avec les nouveaux DS18B20 chinois, il faut ABSOLUMENT le câbler en mode 3 fils !
-#-- zf210713.1114
+#-- zf210804.1113, zf220219.1438
 #--
 #------------------------------
 #-- 1w_th_solar.yaml
 #-- Mesures de températures de mon installation solaire thermique SEBASOL à l'aide de sondes 1-wire DS18B20
 #-- ATTENTION, avec les nouveaux DS18B20 chinois, il faut ABSOLUMENT les câbler en mode 3 fils !
-#-- zf210716.1414
+#-- zf210804.1042, zf220220.1211
 #--
 #------------------------------
 #-- a_tst_mqtt_bridge1.yaml
@@ -31,47 +31,90 @@
 #-- zf210720.1033
 #--
 #------------------------------
+#-- demo-darby1.yaml
+#-- Petit code une démo de ESPhome à Darby
+#-- allume juste la petite LED
+#-- 
+#-- zf2205.1220
+#--
+#------------------------------
 #-- elink_1.yaml
 #-- Affiche un mini dashboard sur un mini display e-link 
 #-- L'écran est découpé en 5x3 zones où l'on peut afficher l'état d'un paramètre et un mini level meter
 #-- zf210517.1854
 #--
 #------------------------------
+#-- energy-meter-1.yaml
+#-- Mesures de puissance de mes grands consommateurs (cuisinière et charge voiture)
+#-- La mesure se fait simplement avec 3x transfos de courant clips avec un ADC i2C et un mini d1
+#-- zf220222.0807
+#--
+#------------------------------
+#-- esp32-ble-hub1.yaml
+#-- Code pour une esp32-cam pour tester un BLE tracker, un hub BLE (iBeacon, iTag ou Tile)
+#-- Je squate une esp32-cam comme un esp32 simple avec Bluetooth 
+#-- zf220205.1622
+#--
+#------------------------------
+#-- esp32-ble-ibeacon-scanner.yaml
+#-- Scanner de iBeacon's. Les iBeacon's découverts se trouvent dans les logs
+#-- Je squate une esp32-cam comme un esp32 simple avec Bluetooth 
+#-- zf220116.1340
+#--
+#------------------------------
 #-- esp32-cam-door1.yaml
 #-- Code pour une esp32-cam en fonctionnement sonnette de porte d'entrée
 #-- Je l'ai installée dans un boîtier de déteceur PIR 433MHz 
-#-- zf210803.1457
+#-- zf210805. 0727
 #--
-#------------------------------
+  #------------------------------
+#-- esp32-cam-person1.yaml
+#-- Code pour une esp32-cam pour la détection de personnes avec Deepstack
+#-- Je l'ai montée pour l'instant sur un petit trépied photo de webcam 
+#-- zf220115.1100
+#--
+  #------------------------------
+#-- esp32-cam-test1.yaml
+#-- Code pour tester rapidement une esp32-cam pour voir si elle fonctionne
+#-- ATTENTION, c'est du code jetable, vu qu'il sera flashé sur plusieurs caméras qui auront donc le même mDNS ! 
+#-- zf210810.2127
+#--
+  #------------------------------
 #-- esp32-cam1.yaml
 #-- Petit test d'une esp32-cam
 #-- ... 
-#-- zf210803.1457
+#-- zf210804.1001
 #--
   #------------------------------
+#-- pzem-3x-test-1.yaml
+#-- Petits tests d2 3x modules power-meter PZEM-004T V3
+#-- ATTENTION: il faut leur changer l'adresse AVANT et tous les brancher en // !
+#-- zf210817.0804, zf220502.0912
+#--
+#------------------------------
 #-- pzem-test-1.yaml
 #-- Petits tests d'un module power-meter PZEM-004T V3
 #-- 
-#-- zf210719.1813
+#-- zf210815.1638
 #--
 #------------------------------
 #-- solar_debit.yaml
 #-- Petit débimètre pour mon installation solaire thermique SEBASOL
 #-- Il compte les impulsions d'une ampoule REED collée sur un débimètre mécanique conventionnel
-#-- zf210713.1114
+#-- zf210713.1114, zf220302.1149
 #--
 #------------------------------
 #-- th-fsd58.yaml
 #-- Petit code pour la formation IoT de la FSD de mars 2021
 #-- Lit la tmpérature et l'humidité du capteur HTU21D et se connecte sur le broker MQTT
-#-- zf210611.0720
+#-- zf210611.0720, zf220503.0940
 #--
 #------------------------------
 #-- th0.yaml
 #-- Petit code mini manilste pour mesurer la température et l'humidité
 #-- Lit la tmpérature et l'humidité du capteur HTU21D
 #-- location: chambre à Chloé bureau zf
-#-- zf210720.1021
+#-- zf210720.1021, zf220328.0954
 #--
 #------------------------------
 #-- th1_8285.yaml
@@ -84,26 +127,26 @@
 #-- Petit code mini manilste pour mesurer la température et l'humidité
 #-- Lit la tmpérature et l'humidité du capteur HTU21D
 #-- location: chambre à Chloé poutre mur
-#-- zf210720.1021
+#-- zf210720.1021, zf220302.1155
 #--
 #------------------------------
 #-- th6.yaml
 #-- Petit code mini manilste pour mesurer la température et l'humidité
 #-- Lit la tmpérature et l'humidité du capteur HTU21D
 #-- location: cave vers interrupteur lumière
-#-- zf210720.1023
+#-- zf210720.1023, zf220302.1155
 #--
 #------------------------------
 #-- th7.yaml
 #-- Petit code mini manilste pour mesurer la température et l'humidité
 #-- Lit la tmpérature et l'humidité du capteur HTU21D
 #-- location: salon sur HP basse
-#-- zf210720.1023
+#-- zf210720.1023, zf220302.1155
 #--
 #------------------------------
 #-- th8.yaml
 #-- Petit code mini manilste pour mesurer la température et l'humidité
 #-- Lit la tmpérature et l'humidité du capteur HTU21D
 #-- location: chambre à coucher parents table de nuit zf
-#-- zf210723.0800
+#-- zf210723.0800, zf220302.1155
 #--
