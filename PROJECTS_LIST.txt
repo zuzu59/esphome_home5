@@ -89,7 +89,7 @@
 #-- pzem-3x-test-1.yaml
 #-- Petits tests d2 3x modules power-meter PZEM-004T V3
 #-- ATTENTION: il faut leur changer l'adresse AVANT et tous les brancher en // !
-#-- zf210817.0804, zf220502.0912
+#-- zf210817.0804, zf220509.1035
 #--
 #------------------------------
 #-- pzem-test-1.yaml
@@ -149,4 +149,11 @@
 #-- Lit la tmpérature et l'humidité du capteur HTU21D
 #-- location: chambre à coucher parents table de nuit zf
 #-- zf210723.0800, zf220302.1155
+#--
+#------------------------------
+#-- tst_d1_disp1.yaml
+#-- Petit code pour une démo d'un display mini OLED de mini-d1
+#-- va chercher le COV sur un autre capteur ESPhome et l'affiche
+#-- source: https://esphome.io/cookbook/display_time_temp_oled.html
+#-- zf210208.1701, zf2209.1129
 #--
