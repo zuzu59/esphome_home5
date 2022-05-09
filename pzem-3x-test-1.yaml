@@ -2,7 +2,7 @@
 #-- pzem-3x-test-1.yaml
 #-- Petits tests d2 3x modules power-meter PZEM-004T V3
 #-- ATTENTION: il faut leur changer l'adresse AVANT et tous les brancher en // !
-#-- zf210817.0804, zf220502.0912
+#-- zf210817.0804, zf220509.1035
 #--
 
 
@@ -29,8 +29,8 @@ ota:
 
 # Configuration WIFI
 wifi:
-  ssid: !secret wifi_ssid_apzuzu7
-  password: !secret wifi_pass_apzuzu7
+  ssid: !secret wifi_ssid_apzuzu6
+  password: !secret wifi_pass_apzuzu6
 
   # networks:
   
@@ -160,4 +160,5 @@ uart:
   tx_pin: D2    #GPIO4   RX du PZEM
   baud_rate: 9600
 
+modbus:
 
