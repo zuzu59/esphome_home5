@@ -1,0 +1,102 @@
+#------------------------------
+#-- test-pompe1.yaml
+#-- Petit code pour tester la pompe pour chauffer la piscine d'Antoine
+#-- pour l'instant ce n'est qu'une maquette de démo
+#--
+#-- pinout mini-d1: https://docs.google.com/document/d/1GOp2zN0aFk80cv2Hz6DmlEwY84OPwVK38da-KSO77zw/edit#heading=h.ohz2baooedzi
+#-- zf220519.1748
+#--
+
+esphome:
+  name: test-pompe1
+esp8266:
+  board: esp01_1m
+
+# Configuration WIFI
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  # networks:
+  #   - ssid: !secret wifi_ssid_apzuzu7
+  #   - password: !secret wifi_pass_apzuzu7
+  #   - ssid: !secret wifi_ssid_apzuzu6
+  #   - password: !secret wifi_pass_apzuzu6
+  #   - ssid: !secret wifi_ssid_3G_zf
+  #   - password: !secret wifi_pass_3G_zf2
+  #   - ssid: !secret wifi_ssid_3G_zf2
+  #   - password: !secret wifi_pass_3G_zf2
+  #   - ssid: !secret wifi_ssid_3g_s7
+  #   - password: !secret wifi_pass_3g_s7
+  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
+  #   - password: !secret wifi_pass_apzuzu6_EXT
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "test-pompe1 Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+# Enable logging
+
+logger:
+#    level: VERBOSE
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+ota:
+  password: !secret ota_password
+
+# WEB Server
+web_server:
+  port: 80
+
+# Configuration pour les capteur de température DS18B20
+dallas:
+  - pin: GPIO4
+    update_interval: 10s
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "test-pompe1 LED"
+    inverted: True
+    id: led
+    pin: GPIO2
+  - platform: restart
+    name: "test-pompe1 Restart"
+  - platform: gpio
+    name: "test-pompe1 pompe1"
+    inverted: True
+    id: pompe1
+    pin: GPIO5
+
+# Sensors
+sensor:
+  - platform: wifi_signal
+    name: "test-pompe1 Signal Wi-Fi"
+    update_interval: 60s
+  - platform: uptime
+    name: "test-pompe1 uptime"
+    update_interval: 60s
+  - platform: dallas
+    address: 0xd1020a92465ec628
+    name: test-pompe1 aller"
+  - platform: dallas
+    address: 0x3a0309977932c728
+    name: "test-pompe1 retour"
+
+# Sensors text
+text_sensor:
+  - platform: version
+    name: "test-pompe1 Version"
+  - platform: wifi_info
+    ip_address:
+      name: test-pompe1 IP Address
+      id: wifi_ip
+    ssid:
+      name: test-pompe1 Connected SSID
+      id: wifi_ssid
+
+    
+    
