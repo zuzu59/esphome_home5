@@ -4,7 +4,7 @@
 #-- pour l'instant ce n'est qu'une maquette de démo
 #--
 #-- pinout mini-d1: https://docs.google.com/document/d/1GOp2zN0aFk80cv2Hz6DmlEwY84OPwVK38da-KSO77zw/edit#heading=h.ohz2baooedzi
-#-- zf220519.1748
+#-- zf220519.1823
 #--
 
 esphome:
@@ -85,6 +85,25 @@ sensor:
   - platform: dallas
     address: 0x3a0309977932c728
     name: "test-pompe1 retour"
+
+  - platform: homeassistant
+    name: "Consigne pompe 1"
+    id: consigne_pompe1
+    entity_id: input_number.consigne_pompe1
+    internal: false    
+    on_value:
+      then:
+        - if:
+            condition:
+              lambda: 'return id(consigne_pompe1).state < 30;'
+            then:
+              - logger.log: "The sensor value is below 30!"
+              - switch.turn_on: led
+              - delay: 5s
+            else:
+              - logger.log: "The sensor value is above 30!"
+        - switch.turn_off: led
+    
 
 # Sensors text
 text_sensor:
