@@ -1,10 +1,11 @@
 #------------------------------
 #-- test-pompe1.yaml
-#-- Petit code pour tester la pompe pour chauffer la piscine d'Antoine
-#-- pour l'instant ce n'est qu'une maquette de démo
+#-- Petit code pour tester la régulation de la pompe pour chauffer la piscine d'Antoine
+#-- si la T aller - T retour est > que T consigne, alors allume la pompe
+#-- pour l'instant ce n'est qu'une maquette de démo !
 #--
 #-- pinout mini-d1: https://docs.google.com/document/d/1GOp2zN0aFk80cv2Hz6DmlEwY84OPwVK38da-KSO77zw/edit#heading=h.ohz2baooedzi
-#-- zf220520.0904
+#-- zf220520.0930
 #--
 
 esphome:
@@ -51,10 +52,13 @@ ota:
 web_server:
   port: 80
 
-# Configuration pour les capteur de température DS18B20
+
+
+# Configuration 1-wire pour les capteurs de température DS18B20
 dallas:
   - pin: GPIO4
     update_interval: 3s
+
 
 # Définition des Switch's
 switch:
@@ -71,11 +75,13 @@ switch:
     id: test_pompe1_pompe1
     pin: GPIO5
 
-# Sensors
+
+# Définition des sensors numériques
 sensor:
   - platform: wifi_signal
     name: "test-pompe1 Signal Wi-Fi"
     update_interval: 60s
+
   - platform: uptime
     name: "test-pompe1 uptime"
     update_interval: 60s
@@ -92,15 +98,16 @@ sensor:
 
   - platform: homeassistant
     name: "test-pompe1 Consigne pompe 1"
-    id: test_pompe1_consigne_pompe1
     entity_id: input_number.consigne_pompe1
     internal: false    
+    id: test_pompe1_consigne_pompe1
     
 
-# Sensors text
+# Définition des sensors texts
 text_sensor:
   - platform: version
     name: "test-pompe1 Version"
+
   - platform: wifi_info
     ip_address:
       name: test-pompe1 IP Address
@@ -110,7 +117,7 @@ text_sensor:
       id: wifi_ssid
 
 
-# Automation loop
+# Boucle de régulation
 interval:
   - interval: 1s
     then:
@@ -133,12 +140,3 @@ interval:
                   - switch.turn_off: test_pompe1_pompe1
           
 
-
-
-
-
-
-
-
-    
-    
