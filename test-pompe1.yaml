@@ -5,7 +5,7 @@
 #-- pour l'instant ce n'est qu'une maquette de démo !
 #--
 #-- pinout mini-d1: https://docs.google.com/document/d/1GOp2zN0aFk80cv2Hz6DmlEwY84OPwVK38da-KSO77zw/edit#heading=h.ohz2baooedzi
-#-- zf220520.0930
+#-- zf220520.1615
 #--
 
 esphome:
@@ -67,13 +67,30 @@ switch:
     inverted: True
     id: led
     pin: GPIO2
+
   - platform: restart
     name: "test-pompe1 Restart"
+
   - platform: gpio
     name: "test-pompe1 pompe1"
     inverted: True
     id: test_pompe1_pompe1
-    pin: GPIO5
+    pin: GPIO14
+
+  - platform: gpio
+    name: "test-pompe1 pompe2"
+    inverted: True
+    id: test_pompe1_pompe2
+    pin: GPIO12
+
+
+# Définition du bouton physique
+binary_sensor:
+  - platform: homeassistant
+    name: "test-pompe1 Priorite jacuzzi"
+    entity_id: input_boolean.test_pompe1_priorite_jacuzzi
+    internal: false    
+    id: test_pompe1_priorite_jacuzzi
 
 
 # Définition des sensors numériques
@@ -101,7 +118,7 @@ sensor:
     entity_id: input_number.consigne_pompe1
     internal: false    
     id: test_pompe1_consigne_pompe1
-    
+
 
 # Définition des sensors texts
 text_sensor:
@@ -130,6 +147,12 @@ interval:
                   lambda: 'return id(test_pompe1_pompe1).state == 0;'
                 then:
                   - logger.log: "La tempéreature est plus HAUTE que la consigne !"
+                  
+                  
+                  
+                  
+                  
+                  
                   - switch.turn_on: test_pompe1_pompe1
           else:
             - if:
