@@ -4,7 +4,7 @@
 #-- pour l'instant ce n'est qu'une maquette de démo
 #--
 #-- pinout mini-d1: https://docs.google.com/document/d/1GOp2zN0aFk80cv2Hz6DmlEwY84OPwVK38da-KSO77zw/edit#heading=h.ohz2baooedzi
-#-- zf220519.1823
+#-- zf220520.0904
 #--
 
 esphome:
@@ -54,7 +54,7 @@ web_server:
 # Configuration pour les capteur de température DS18B20
 dallas:
   - pin: GPIO4
-    update_interval: 10s
+    update_interval: 3s
 
 # Définition des Switch's
 switch:
@@ -68,7 +68,7 @@ switch:
   - platform: gpio
     name: "test-pompe1 pompe1"
     inverted: True
-    id: pompe1
+    id: test_pompe1_pompe1
     pin: GPIO5
 
 # Sensors
@@ -79,30 +79,22 @@ sensor:
   - platform: uptime
     name: "test-pompe1 uptime"
     update_interval: 60s
+
   - platform: dallas
     address: 0xd1020a92465ec628
-    name: test-pompe1 aller"
+    name: test-pompe1 temp aller"
+    id: test_pompe1_temp_aller
+
   - platform: dallas
     address: 0x3a0309977932c728
-    name: "test-pompe1 retour"
+    name: "test-pompe1 temp retour"
+    id: test_pompe1_temp_retour
 
   - platform: homeassistant
-    name: "Consigne pompe 1"
-    id: consigne_pompe1
+    name: "test-pompe1 Consigne pompe 1"
+    id: test_pompe1_consigne_pompe1
     entity_id: input_number.consigne_pompe1
     internal: false    
-    on_value:
-      then:
-        - if:
-            condition:
-              lambda: 'return id(consigne_pompe1).state < 30;'
-            then:
-              - logger.log: "The sensor value is below 30!"
-              - switch.turn_on: led
-              - delay: 5s
-            else:
-              - logger.log: "The sensor value is above 30!"
-        - switch.turn_off: led
     
 
 # Sensors text
@@ -116,6 +108,37 @@ text_sensor:
     ssid:
       name: test-pompe1 Connected SSID
       id: wifi_ssid
+
+
+# Automation loop
+interval:
+  - interval: 1s
+    then:
+      - if:
+          condition:
+            lambda: 'return id(test_pompe1_temp_aller).state > id(test_pompe1_consigne_pompe1).state;'
+          then:
+            - if:
+                condition:
+                  lambda: 'return id(test_pompe1_pompe1).state == 0;'
+                then:
+                  - logger.log: "La tempéreature est plus HAUTE que la consigne !"
+                  - switch.turn_on: test_pompe1_pompe1
+          else:
+            - if:
+                condition:
+                  lambda: 'return id(test_pompe1_pompe1).state == 1;'
+                then:
+                  - logger.log: "La tempéreature est plus BASSE que la consigne !"
+                  - switch.turn_off: test_pompe1_pompe1
+          
+
+
+
+
+
+
+
 
     
     
