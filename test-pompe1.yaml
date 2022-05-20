@@ -5,7 +5,7 @@
 #-- pour l'instant ce n'est qu'une maquette de démo !
 #--
 #-- pinout mini-d1: https://docs.google.com/document/d/1GOp2zN0aFk80cv2Hz6DmlEwY84OPwVK38da-KSO77zw/edit#heading=h.ohz2baooedzi
-#-- zf220520.1630
+#-- zf220520.1649
 #--
 
 esphome:
@@ -137,8 +137,8 @@ text_sensor:
 # Variables globales
 globals:
    - id: pompe_state
-     type: int
-     initial_value: '0'
+     type: bool
+     initial_value: 'false'
 
 
 # Boucle de régulation
@@ -151,12 +151,12 @@ interval:
           then:
             - if:
                 condition:
-                  lambda: 'return id(pompe_state) == 0;'
+                  lambda: 'return id(pompe_state) == false;'
                 then:
                   - logger.log: "La différence de tempéreature est plus HAUTE que la consigne, on allume la pompe !"
                   - globals.set:
                       id: pompe_state
-                      value: '1'
+                      value: 'true'
                   - if:
                       condition:
                         lambda: 'return id(test_pompe1_priorite_jacuzzi).state == 0;'
@@ -168,7 +168,7 @@ interval:
                   - logger.log: "La différence de tempéreature est plus BASSE que la consigne, on éteint la pompe !"
                   - globals.set:
                       id: pompe_state
-                      value: '0'
+                      value: 'false'
                   - if:
                       condition:
                         lambda: 'return id(test_pompe1_priorite_jacuzzi).state == 0;'
