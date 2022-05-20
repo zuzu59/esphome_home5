@@ -5,7 +5,7 @@
 #-- pour l'instant ce n'est qu'une maquette de démo !
 #--
 #-- pinout mini-d1: https://docs.google.com/document/d/1GOp2zN0aFk80cv2Hz6DmlEwY84OPwVK38da-KSO77zw/edit#heading=h.ohz2baooedzi
-#-- zf220520.1615
+#-- zf220520.1630
 #--
 
 esphome:
@@ -84,7 +84,7 @@ switch:
     pin: GPIO12
 
 
-# Définition du bouton physique
+# Définition des sensors binaires
 binary_sensor:
   - platform: homeassistant
     name: "test-pompe1 Priorite jacuzzi"
@@ -134,6 +134,13 @@ text_sensor:
       id: wifi_ssid
 
 
+# Variables globales
+globals:
+   - id: pompe_state
+     type: int
+     initial_value: '0'
+
+
 # Boucle de régulation
 interval:
   - interval: 1s
@@ -144,22 +151,30 @@ interval:
           then:
             - if:
                 condition:
-                  lambda: 'return id(test_pompe1_pompe1).state == 0;'
+                  lambda: 'return id(pompe_state) == 0;'
                 then:
-                  - logger.log: "La tempéreature est plus HAUTE que la consigne !"
-                  
-                  
-                  
-                  
-                  
-                  
-                  - switch.turn_on: test_pompe1_pompe1
-          else:
-            - if:
-                condition:
-                  lambda: 'return id(test_pompe1_pompe1).state == 1;'
-                then:
-                  - logger.log: "La tempéreature est plus BASSE que la consigne !"
-                  - switch.turn_off: test_pompe1_pompe1
+                  - logger.log: "La différence de tempéreature est plus HAUTE que la consigne, on allume la pompe !"
+                  - globals.set:
+                      id: pompe_state
+                      value: '1'
+                  - if:
+                      condition:
+                        lambda: 'return id(test_pompe1_priorite_jacuzzi).state == 0;'
+                      then:
+                        - switch.turn_on: test_pompe1_pompe1
+                      else:
+                        - switch.turn_on: test_pompe1_pompe2
+                else:
+                  - logger.log: "La différence de tempéreature est plus BASSE que la consigne, on éteint la pompe !"
+                  - globals.set:
+                      id: pompe_state
+                      value: '0'
+                  - if:
+                      condition:
+                        lambda: 'return id(test_pompe1_priorite_jacuzzi).state == 0;'
+                      then:
+                        - switch.turn_off: test_pompe1_pompe1
+                      else:
+                        - switch.turn_off: test_pompe1_pompe2
           
 
