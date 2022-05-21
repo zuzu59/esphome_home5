@@ -12,6 +12,15 @@ esphome:
 
 esp8266:
   board: esp01_1m
+  restore_from_flash: true
+
+preferences:
+  flash_write_interval: 5s
+
+
+
+
+
 
 
 # Configuration WIFI
@@ -125,6 +134,9 @@ number:
     id: demo_darby1_poids
     
     
-    
+  
+  
+  
+  
     
     
