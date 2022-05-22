@@ -4,7 +4,7 @@
 #-- Cherche des consignes sur le Home Assistant
 #-- et fait une petite détection de dépassement avec alarme sur Telegram
 #-- 
-#-- zf220521.1429
+#-- zf220522.0934
 #--
 
 esphome:
@@ -12,16 +12,10 @@ esphome:
 
 esp8266:
   board: esp01_1m
-  restore_from_flash: true
-
-preferences:
-  flash_write_interval: 5s
-
-
-
-
-
-
+#  restore_from_flash: false
+  
+#preferences:
+#  flash_write_interval: 10min
 
 # Configuration WIFI
 wifi:
@@ -87,6 +81,7 @@ switch:
 
   - platform: template
     name: "demo-darby1 quittance alarme"
+#    restore_state: true
     optimistic: true
     id: demo_darby1_quittance_alarme
 
@@ -119,6 +114,7 @@ text_sensor:
 number:
   - platform: template
     name: "demo-darby1 consigne"
+    restore_value: true
     optimistic: true
     min_value: 0
     max_value: 100
@@ -126,7 +122,17 @@ number:
     id: demo_darby1_consigne
 
   - platform: template
+    name: "demo-darby1 hysterese"
+    restore_value: true
+    optimistic: true
+    min_value: 0
+    max_value: 100
+    step: 1
+    id: demo_darby1_hysterese
+
+  - platform: template
     name: "demo-darby1 poids"
+    restore_value: true
     optimistic: true
     min_value: 0
     max_value: 100
