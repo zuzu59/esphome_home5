@@ -6,7 +6,7 @@
 #-- pour l'instant ce n'est qu'une maquette de démo !
 #--
 #-- pinout mini-d1: https://docs.google.com/document/d/1GOp2zN0aFk80cv2Hz6DmlEwY84OPwVK38da-KSO77zw/edit#heading=h.ohz2baooedzi
-#-- zf220523.1155
+#-- zf220523.1221
 #--
 
 esphome:
@@ -120,7 +120,7 @@ number:
     restore_value: true
     optimistic: true
     min_value: 0
-    max_value: 100
+    max_value: +10
     step: 1
     id: test_pompe1_temperature_hysterese
 
@@ -168,7 +168,7 @@ interval:
     then:
       - if:
           condition:
-            lambda: 'return (id(test_pompe1_temp_retour).state - id(test_pompe1_temp_aller).state) > id(test_pompe1_temperature_delta).state;'
+            lambda: 'return (id(test_pompe1_temp_retour).state - id(test_pompe1_temp_aller).state) > (id(test_pompe1_temperature_delta).state + id(test_pompe1_temperature_hysterese).state);'
           then:
             - if:
                 condition:
@@ -185,7 +185,10 @@ interval:
                       else:
                         - switch.turn_on: test_pompe1_pompe2
                         - switch.turn_off: test_pompe1_pompe1
-          else:
+      - if:
+          condition:
+            lambda: 'return (id(test_pompe1_temp_retour).state - id(test_pompe1_temp_aller).state) < (id(test_pompe1_temperature_delta).state - id(test_pompe1_temperature_hysterese).state);'
+          then:
             - if:
                 condition:
                   lambda: 'return id(test_pompe1_pompe_state).state == 1;'
