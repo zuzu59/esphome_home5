@@ -1,11 +1,12 @@
 #------------------------------
 #-- test-pompe1.yaml
 #-- Petit code pour tester la régulation de la pompe pour chauffer la piscine d'Antoine
-#-- si la T aller - T retour est > que T consigne, alors allume la pompe
+#-- si la T aller - T retour est > que T consigne, alors allume la bonne pompe
+#-- tous les paramètres de configuration se trouvent en input number directement sur l'ESPhome !
 #-- pour l'instant ce n'est qu'une maquette de démo !
 #--
 #-- pinout mini-d1: https://docs.google.com/document/d/1GOp2zN0aFk80cv2Hz6DmlEwY84OPwVK38da-KSO77zw/edit#heading=h.ohz2baooedzi
-#-- zf220523.0943
+#-- zf220523.1155
 #--
 
 esphome:
@@ -106,13 +107,13 @@ switch:
 # Définition des inputs numbers
 number:
   - platform: template
-    name: "test-pompe1 Température Consigne"
+    name: "test-pompe1 Température Delta"
     restore_value: true
     optimistic: true
-    min_value: 0
-    max_value: 100
+    min_value: -10
+    max_value: +10
     step: 1
-    id: test_pompe1_temperature_consigne
+    id: test_pompe1_temperature_delta
 
   - platform: template
     name: "test-pompe1 Température Hysterese"
@@ -165,18 +166,15 @@ text_sensor:
 interval:
   - interval: 1s
     then:
-#      - logger.log:
-#          format: "L'état de la pompe est: %i"
-#          args: [ 'id(pompe_state)' ]
       - if:
           condition:
-            lambda: 'return id(test_pompe1_temp_aller).state > id(test_pompe1_temperature_consigne).state;'
+            lambda: 'return (id(test_pompe1_temp_retour).state - id(test_pompe1_temp_aller).state) > id(test_pompe1_temperature_delta).state;'
           then:
             - if:
                 condition:
                   lambda: 'return id(test_pompe1_pompe_state).state == 0;'
                 then:
-                  - logger.log: "La différence de tempéreature est plus HAUTE que la consigne, on allume la bonne pompe !"
+                  - logger.log: "La tempéreature Retour est plus HAUTE que la tempéreature Aller, on allume la bonne pompe !"
                   - switch.turn_on: test_pompe1_pompe_state
                   - if:
                       condition:
@@ -192,7 +190,7 @@ interval:
                 condition:
                   lambda: 'return id(test_pompe1_pompe_state).state == 1;'
                 then:
-                  - logger.log: "La différence de tempéreature est plus BASSE que la consigne, on éteint toutes les pompes !"
+                  - logger.log: "La tempéreature Retour est plus BASSE que la tempéreature Aller, on éteint toutes les pompes !"
                   - switch.turn_off: test_pompe1_pompe_state
                   - switch.turn_off: test_pompe1_pompe1
                   - switch.turn_off: test_pompe1_pompe2
