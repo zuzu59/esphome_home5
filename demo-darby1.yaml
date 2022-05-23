@@ -4,7 +4,7 @@
 #-- Cherche des consignes sur le Home Assistant
 #-- et fait une petite détection de dépassement avec alarme sur Telegram
 #-- 
-#-- zf220522.1855
+#-- zf220523.0942
 #--
 
 esphome:
@@ -15,7 +15,7 @@ esp8266:
   restore_from_flash: false
   
 preferences:
-  flash_write_interval: 10s
+  flash_write_interval: 10min
 
 # Configuration WIFI
 wifi:
