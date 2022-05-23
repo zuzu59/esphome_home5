@@ -5,13 +5,17 @@
 #-- pour l'instant ce n'est qu'une maquette de démo !
 #--
 #-- pinout mini-d1: https://docs.google.com/document/d/1GOp2zN0aFk80cv2Hz6DmlEwY84OPwVK38da-KSO77zw/edit#heading=h.ohz2baooedzi
-#-- zf220520.1649
+#-- zf220523.0943
 #--
 
 esphome:
   name: test-pompe1
 esp8266:
   board: esp01_1m
+  restore_from_flash: false
+  
+preferences:
+  flash_write_interval: 10min
 
 # Configuration WIFI
 wifi:
@@ -30,14 +34,16 @@ wifi:
   #   - password: !secret wifi_pass_3g_s7
   #   - ssid: !secret wifi_ssid_apzuzu6_EXT
   #   - password: !secret wifi_pass_apzuzu6_EXT
+
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "test-pompe1 Fallback"
     password: !secret ap_wifi_password
 
+# Enable wifi configuration fallback
 captive_portal:
-# Enable logging
 
+# Enable logging
 logger:
 #    level: VERBOSE
 
@@ -45,10 +51,11 @@ logger:
 api:
   password: !secret api_password
 
+# Enable OTA updates
 ota:
   password: !secret ota_password
 
-# WEB Server
+# Enable WEB Server
 web_server:
   port: 80
 
@@ -71,6 +78,18 @@ switch:
   - platform: restart
     name: "test-pompe1 Restart"
 
+  - platform: template
+    name: "test-pompe1 Priorite Jacuzzi"
+    restore_state: true
+    optimistic: true
+    id: test_pompe1_priorite_jacuzzi
+
+  - platform: template
+    name: "test-pompe1 Pompe State"
+    restore_state: true
+    optimistic: true
+    id: test_pompe1_pompe_state
+
   - platform: gpio
     name: "test-pompe1 pompe1"
     inverted: True
@@ -84,16 +103,28 @@ switch:
     pin: GPIO12
 
 
-# Définition des sensors binaires
-binary_sensor:
-  - platform: homeassistant
-    name: "test-pompe1 Priorite jacuzzi"
-    entity_id: input_boolean.test_pompe1_priorite_jacuzzi
-    internal: false    
-    id: test_pompe1_priorite_jacuzzi
+# Définition des inputs numbers
+number:
+  - platform: template
+    name: "test-pompe1 consigne"
+    restore_value: true
+    optimistic: true
+    min_value: 0
+    max_value: 100
+    step: 1
+    id: test_pompe1_consigne
+
+  - platform: template
+    name: "test-pompe1 hysterese"
+    restore_value: true
+    optimistic: true
+    min_value: 0
+    max_value: 100
+    step: 1
+    id: test_pompe1_hysterese
 
 
-# Définition des sensors numériques
+# Définition des sensors
 sensor:
   - platform: wifi_signal
     name: "test-pompe1 Signal Wi-Fi"
@@ -113,12 +144,6 @@ sensor:
     name: "test-pompe1 temp retour"
     id: test_pompe1_temp_retour
 
-  - platform: homeassistant
-    name: "test-pompe1 Consigne pompe 1"
-    entity_id: input_number.consigne_pompe1
-    internal: false    
-    id: test_pompe1_consigne_pompe1
-
 
 # Définition des sensors texts
 text_sensor:
@@ -134,57 +159,52 @@ text_sensor:
       id: wifi_ssid
 
 
-# Variables globales
-globals:
-   - id: pompe_state
-     type: int
-     initial_value: '0'
 
 
-# Boucle de régulation
-interval:
-  - interval: 1s
+# # Boucle de régulation
+# interval:
+#   - interval: 1s
   
   
   
-    then:
+#     then:
 
-      - logger.log:
-          format: "L'état de la pompe est: %i"
-          args: [ 'id(pompe_state)' ]
+#       - logger.log:
+#           format: "L'état de la pompe est: %i"
+#           args: [ 'id(pompe_state)' ]
       
       
-      - if:
-          condition:
-            lambda: 'return id(test_pompe1_temp_aller).state > id(test_pompe1_consigne_pompe1).state;'
-          then:
-            - if:
-                condition:
-                  lambda: 'return id(pompe_state) == 0;'
-                then:
-                  - logger.log: "La différence de tempéreature est plus HAUTE que la consigne, on allume la pompe !"
-                  - globals.set:
-                      id: pompe_state
-                      value: '1'
-                  - if:
-                      condition:
-                        lambda: 'return id(test_pompe1_priorite_jacuzzi).state == 0;'
-                      then:
-                        - switch.turn_on: test_pompe1_pompe1
-                      else:
-                        - switch.turn_on: test_pompe1_pompe2
-                else:
-                  - logger.log: "La différence de tempéreature est plus BASSE que la consigne, on éteint la pompe !"
-                  - globals.set:
-                      id: pompe_state
-                      value: '0'
-                  - if:
-                      condition:
-                        lambda: 'return id(test_pompe1_priorite_jacuzzi).state == 0;'
-                      then:
-                        - switch.turn_off: test_pompe1_pompe1
-                      else:
-                        - switch.turn_off: test_pompe1_pompe2
+#       - if:
+#           condition:
+#             lambda: 'return id(test_pompe1_temp_aller).state > id(test_pompe1_consigne_pompe1).state;'
+#           then:
+#             - if:
+#                 condition:
+#                   lambda: 'return id(pompe_state) == 0;'
+#                 then:
+#                   - logger.log: "La différence de tempéreature est plus HAUTE que la consigne, on allume la pompe !"
+#                   - globals.set:
+#                       id: pompe_state
+#                       value: '1'
+#                   - if:
+#                       condition:
+#                         lambda: 'return id(test_pompe1_priorite_jacuzzi).state == 0;'
+#                       then:
+#                         - switch.turn_on: test_pompe1_pompe1
+#                       else:
+#                         - switch.turn_on: test_pompe1_pompe2
+#                 else:
+#                   - logger.log: "La différence de tempéreature est plus BASSE que la consigne, on éteint la pompe !"
+#                   - globals.set:
+#                       id: pompe_state
+#                       value: '0'
+#                   - if:
+#                       condition:
+#                         lambda: 'return id(test_pompe1_priorite_jacuzzi).state == 0;'
+#                       then:
+#                         - switch.turn_off: test_pompe1_pompe1
+#                       else:
+#                         - switch.turn_off: test_pompe1_pompe2
           
 
 
