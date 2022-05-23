@@ -106,22 +106,22 @@ switch:
 # Définition des inputs numbers
 number:
   - platform: template
-    name: "test-pompe1 consigne"
+    name: "test-pompe1 Température Consigne"
     restore_value: true
     optimistic: true
     min_value: 0
     max_value: 100
     step: 1
-    id: test_pompe1_consigne
+    id: test_pompe1_temperature_consigne
 
   - platform: template
-    name: "test-pompe1 hysterese"
+    name: "test-pompe1 Température Hysterese"
     restore_value: true
     optimistic: true
     min_value: 0
     max_value: 100
     step: 1
-    id: test_pompe1_hysterese
+    id: test_pompe1_temperature_hysterese
 
 
 # Définition des sensors
@@ -161,87 +161,43 @@ text_sensor:
 
 
 
-# # Boucle de régulation
-# interval:
-#   - interval: 1s
-  
-  
-  
-#     then:
-
-#       - logger.log:
-#           format: "L'état de la pompe est: %i"
-#           args: [ 'id(pompe_state)' ]
-      
-      
-#       - if:
-#           condition:
-#             lambda: 'return id(test_pompe1_temp_aller).state > id(test_pompe1_consigne_pompe1).state;'
-#           then:
-#             - if:
-#                 condition:
-#                   lambda: 'return id(pompe_state) == 0;'
-#                 then:
-#                   - logger.log: "La différence de tempéreature est plus HAUTE que la consigne, on allume la pompe !"
-#                   - globals.set:
-#                       id: pompe_state
-#                       value: '1'
-#                   - if:
-#                       condition:
-#                         lambda: 'return id(test_pompe1_priorite_jacuzzi).state == 0;'
-#                       then:
-#                         - switch.turn_on: test_pompe1_pompe1
-#                       else:
-#                         - switch.turn_on: test_pompe1_pompe2
-#                 else:
-#                   - logger.log: "La différence de tempéreature est plus BASSE que la consigne, on éteint la pompe !"
-#                   - globals.set:
-#                       id: pompe_state
-#                       value: '0'
-#                   - if:
-#                       condition:
-#                         lambda: 'return id(test_pompe1_priorite_jacuzzi).state == 0;'
-#                       then:
-#                         - switch.turn_off: test_pompe1_pompe1
-#                       else:
-#                         - switch.turn_off: test_pompe1_pompe2
+# Boucle de régulation
+interval:
+  - interval: 1s
+    then:
+#      - logger.log:
+#          format: "L'état de la pompe est: %i"
+#          args: [ 'id(pompe_state)' ]
+      - if:
+          condition:
+            lambda: 'return id(test_pompe1_temp_aller).state > id(test_pompe1_temperature_consigne).state;'
+          then:
+            - if:
+                condition:
+                  lambda: 'return id(test_pompe1_pompe_state).state == 0;'
+                then:
+                  - logger.log: "La différence de tempéreature est plus HAUTE que la consigne, on allume la bonne pompe !"
+                  - switch.turn_on: test_pompe1_pompe_state
+                  - if:
+                      condition:
+                        lambda: 'return id(test_pompe1_priorite_jacuzzi).state == 0;'
+                      then:
+                        - switch.turn_on: test_pompe1_pompe1
+                        - switch.turn_off: test_pompe1_pompe2
+                      else:
+                        - switch.turn_on: test_pompe1_pompe2
+                        - switch.turn_off: test_pompe1_pompe1
+          else:
+            - if:
+                condition:
+                  lambda: 'return id(test_pompe1_pompe_state).state == 1;'
+                then:
+                  - logger.log: "La différence de tempéreature est plus BASSE que la consigne, on éteint toutes les pompes !"
+                  - switch.turn_off: test_pompe1_pompe_state
+                  - switch.turn_off: test_pompe1_pompe1
+                  - switch.turn_off: test_pompe1_pompe2
           
 
 
-# # Boucle de régulation
-# interval:
-#   - interval: 1s
-#     then:
-#       - if:
-#           condition:
-#             lambda: 'return id(test_pompe1_temp_aller).state > id(test_pompe1_consigne_pompe1).state;'
-#           then:
-#             - if:
-#                 condition:
-#                   lambda: 'return id(pompe_state) == false;'
-#                 then:
-#                   - logger.log: "La différence de tempéreature est plus HAUTE que la consigne, on allume la pompe !"
-#                   - globals.set:
-#                       id: pompe_state
-#                       value: 'true'
-#                   - if:
-#                       condition:
-#                         lambda: 'return id(test_pompe1_priorite_jacuzzi).state == 0;'
-#                       then:
-#                         - switch.turn_on: test_pompe1_pompe1
-#                       else:
-#                         - switch.turn_on: test_pompe1_pompe2
-#                 else:
-#                   - logger.log: "La différence de tempéreature est plus BASSE que la consigne, on éteint la pompe !"
-#                   - globals.set:
-#                       id: pompe_state
-#                       value: 'false'
-#                   - if:
-#                       condition:
-#                         lambda: 'return id(test_pompe1_priorite_jacuzzi).state == 0;'
-#                       then:
-#                         - switch.turn_off: test_pompe1_pompe1
-#                       else:
-#                         - switch.turn_off: test_pompe1_pompe2
-          
+
 
