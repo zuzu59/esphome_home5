@@ -6,7 +6,7 @@
 #-- pour l'instant ce n'est qu'une maquette de démo !
 #--
 #-- pinout mini-d1: https://docs.google.com/document/d/1GOp2zN0aFk80cv2Hz6DmlEwY84OPwVK38da-KSO77zw/edit#heading=h.ohz2baooedzi
-#-- zf220523.1221
+#-- zf220525.0938
 #--
 
 esphome:
@@ -139,11 +139,21 @@ sensor:
     address: 0xd1020a92465ec628
     name: test-pompe1 temp aller"
     id: test_pompe1_temp_aller
+    filters:
+    - offset: -0.7
 
   - platform: dallas
     address: 0x3a0309977932c728
     name: "test-pompe1 temp retour"
     id: test_pompe1_temp_retour
+    filters:
+    - offset: +0.7
+
+  - platform: template
+    name: "test-pompe1 temp diff"
+    id: test_pompe1_temp_diff
+    lambda: 'return (id(test_pompe1_temp_retour).state - id(test_pompe1_temp_aller).state);'
+    update_interval: 3s
 
 
 # Définition des sensors texts
