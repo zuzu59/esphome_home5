@@ -2,12 +2,18 @@
 #-- energy-meter-1.yaml
 #-- Mesures de puissance de mes grands consommateurs (cuisinière et charge voiture)
 #-- La mesure se fait simplement avec 3x transfos de courant clips avec un ADC i2C et un mini d1
-#-- zf220222.0807
+#-- zf220612.1747
 #--
 
 
 # sources: 
 # https://esphome.io/components/sensor/ads1115.html
+# Simulateur électronique: https://www.falstad.com/circuit/
+- # Diode sans seuil: https://www.astuces-pratiques.fr/electronique/redresseur-sans-seuil-a-ampli-op-schema
+# Le petit transfo clip de courant a un rapport de 25mA à 20A, soit 0.025/20=0.00125 soit encore 1/800
+# Donc à 16A, il donnera un courant de 20mA
+
+
 
 esphome:
   name: energy-meter-1
