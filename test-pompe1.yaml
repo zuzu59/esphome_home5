@@ -6,7 +6,7 @@
 #-- pour l'instant ce n'est qu'une maquette de démo !
 #--
 #-- pinout mini-d1: https://docs.google.com/document/d/1GOp2zN0aFk80cv2Hz6DmlEwY84OPwVK38da-KSO77zw/edit#heading=h.ohz2baooedzi
-#-- zf220616.1214
+#-- zf220616.1225
 #--
 
 esphome:
@@ -113,7 +113,9 @@ number:
     optimistic: true
     min_value: -10
     max_value: +10
-    step: 1
+    step: 0.5
+    initial_value: 4
+    unit_of_measurement: "°K"
     id: test_pompe1_temperature_delta
 
   - platform: template
@@ -122,7 +124,9 @@ number:
     optimistic: true
     min_value: 0
     max_value: +10
-    step: 1
+    step: 0.5
+    initial_value: 2
+    unit_of_measurement: "°K"
     id: test_pompe1_temperature_hysterese
 
   - platform: template
@@ -132,6 +136,8 @@ number:
     min_value: -5
     max_value: +5
     step: 0.02
+    initial_value: 1.6
+    unit_of_measurement: "°K"
     id: test_pompe1_temperature_calibration
 
   - platform: template
@@ -142,6 +148,7 @@ number:
     max_value: +10
     step: 0.1
     initial_value: 6
+    unit_of_measurement: "l/mn"
     id: test_pompe1_debit_minute
 
 
