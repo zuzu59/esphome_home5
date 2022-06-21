@@ -1,33 +1,44 @@
 #------------------------------
 #-- 1w_th_ext_sud.yaml
-#-- Mesure de la température extérieure à l'aide d'une sonde 1-wire DS18B20
-#-- ATTENTION, avec les nouveaux DS18B20 chinois, il faut ABSOLUMENT le câbler en mode 3 fils !
-#-- zf210804.1113, zf220219.1438
+#-- Petite sonde de température 1-wire DS18B20 pour mesurer la température au sud sous le balcon
+#-- zf220621.1907
 #--
 
 # sources: 
-# https://esphome.io/components/sensor/dallas.html
+# 
+# IMPORTANT:  il faut ponter les pin D1 et D2 afin de pouvoir bénéficier de la pull up interne de D1 pour D2,
+#             car il n'y a pas de possibilité d'avoir une pull up interne dans la pin 1-wire !
+#             Cela évite de devoir souder une résistance pour alimenter la sonde 1-wire
 
 esphome:
   name: 1w_th_ext_sud
   platform: ESP8266
-  board: nodemcuv2
+  board: d1_mini
 
 # Configuration WIFI
 wifi:
-  networks:
-  - ssid: !secret wifi_ssid
-  - password: !secret wifi_password
-  - ssid: !secret wifi_ssid2
-  - password: !secret wifi_password2
-#  - ssid: !secret wifi_ssid3
-#  - password: !secret wifi_password3
-  - ssid: !secret wifi_ssid4
-  - password: !secret wifi_password4
-  - ssid: !secret wifi_ssid5
-  - password: !secret wifi_password5
-  - ssid: !secret wifi_ssid6
-  - password: !secret wifi_password6
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
+
+  # networks:
+  
+  #   - ssid: !secret wifi_ssid_apzuzu7
+  #   - password: !secret wifi_pass_apzuzu7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6
+  #   - password: !secret wifi_pass_apzuzu6
+
+  #   - ssid: !secret wifi_ssid_3G_zf
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3G_zf2
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3g_s7
+  #   - password: !secret wifi_pass_3g_s7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
+  #   - password: !secret wifi_pass_apzuzu6_EXT
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
@@ -52,10 +63,19 @@ ota:
 web_server:
   port: 80
 
+
+
+# Configuration 1-wire pour les capteurs de température DS18B20
+dallas:
+  - pin: D2
+    update_interval: 3s
+
+
+
 # Définition des Switch's
 switch:
   - platform: gpio
-    name: "1-w_th-ext_sud LED"
+    name: "1w_th_ext_sud LED"
     inverted: True
     id: led
     pin: D4
@@ -63,70 +83,76 @@ switch:
   - platform: restart
     name: "1w_th_ext_sud Restart"
 
-# Définition du bouton physique
+
+# Définition des binary sensors
 binary_sensor:
   - platform: gpio
+    name: "1w_th_ext_sud Reed"
     pin:
-      number: D3
+      number: D1
       mode: INPUT_PULLUP
       inverted: True
-    name: "1w_th_ext_sud button"
     on_press:
-      - switch.toggle: led
+      - switch.turn_on: led
+      - delay: 2s
+      - switch.turn_off: led
 
 
 # Définitions des texts sensors
 text_sensor:
   - platform: version
     name: "1w_th_ext_sud Version"
+
   - platform: wifi_info
     ip_address:
-      name: 1w_th_ext_sud IP Address
+      name: "1w_th_ext_sud IP Address"
       id: wifi_ip
     ssid:
-      name: 1w_th_ext_sud Connected SSID
+      name: "1w_th_ext_sud Connected SSID"
       id: wifi_ssid
 
 
 
-# Example configuration entry
-dallas:
-  - pin: D3
-    update_interval: 10s
+# Définition des inputs numbers
+number:
+  - platform: template
+    name: "1w_th_ext_sud Température Calibration"
+    restore_value: true
+    optimistic: true
+    min_value: -10
+    max_value: +10
+    step: 0.05
+    initial_value: 0
+    unit_of_measurement: "°K"
+    id: th_ext_sud_temperature_calibration
 
 
 
 
-# Sensors
+
+# Définitions des Sensors
 sensor:
-
-######### juste là pour changer l'harmonique du CPU qui interagit avec le WIFI sur mes NodeMCU lowcost :-(
-  - platform: homeassistant
-    name: "th8 Temp"
-    entity_id: sensor.th8_temperature
-#    id: th8_th
-    internal: true
-
-#   - platform: homeassistant
-#     name: "th7 Temp"
-#     entity_id: sensor.th7_temperature
-# #    id: th7_th
-#     internal: true
-#########
-
   - platform: wifi_signal
     name: "1w_th_ext_sud Signal Wi-Fi"
     update_interval: 60s
 
   - platform: uptime
-    name: "1w_th_ext_sud uptime"
-    update_interval: 60s
+    name: "1w_th_ext_sud Uptime"
+    update_interval: 10s
 
 
 
+# Température aller
   - platform: dallas
-    address: 0x23000005662C1E28
+    address: 0xd60000059fd9f328
     name: "1w_th_ext_sud temp"
+    id: th_ext_sud_temp
+    filters:
+        - lambda: return ( x - (id(th_ext_sud_temperature_calibration).state /1) );
+
+
+
+
 
 
 
