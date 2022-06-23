@@ -2,7 +2,7 @@
 #-- 1w_th_solar.yaml
 #-- Mesures de températures de mon installation solaire thermique SEBASOL à l'aide de sondes 1-wire DS18B20
 #-- ATTENTION, avec les nouveaux DS18B20 chinois, il faut ABSOLUMENT les câbler en mode 3 fils !
-#-- zf210804.1042, zf220610.1624
+#-- zf210804.1042, zf220623.1202
 #--
 
 
@@ -18,6 +18,8 @@ esphome:
 wifi:
   ssid: !secret wifi_ssid_apzuzu6
   password: !secret wifi_pass_apzuzu6
+
+  reboot_timeout: 0s
 
   # networks:
   
@@ -40,7 +42,7 @@ wifi:
   #   - password: !secret wifi_pass_apzuzu6_EXT
 
 
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
+# Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "1w_th_solar Fallback Hotspot"
     password: !secret ap_wifi_password
@@ -63,6 +65,14 @@ ota:
 web_server:
   port: 80
 
+
+
+# Configuration du 1-wire
+dallas:
+  - pin: D2
+    update_interval: 100s
+
+
 # Définition des Switch's
 switch:
   - platform: gpio
@@ -73,6 +83,7 @@ switch:
 
   - platform: restart
     name: "1w_th_solar Restart"
+
 
 # Définition du bouton physique
 binary_sensor:
@@ -100,26 +111,8 @@ text_sensor:
       id: wifi_ssid
 
 
-
-# Example configuration entry
-dallas:
-  - pin: D2
-    update_interval: 60s
-
-
-
-
 # Sensors
 sensor:
-
-######### juste là pour changer l'harmonique du CPU qui interagit avec le WIFI sur mes NodeMCU lowcost :-(
-#   - platform: homeassistant
-#     name: "th8 Temp"
-#     entity_id: sensor.th8_temperature
-# #    id: th8_th
-#     internal: true
-#########
-
   - platform: wifi_signal
     name: "1w_th_solar Signal Wi-Fi"
     update_interval: 60s
@@ -127,7 +120,6 @@ sensor:
   - platform: uptime
     name: "1w_th_solar uptime"
     update_interval: 60s
-
 
   - platform: dallas
     address: 0x7E0300A279AFA028
