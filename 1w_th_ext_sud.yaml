@@ -1,7 +1,7 @@
 #------------------------------
 #-- 1w_th_ext_sud.yaml
 #-- Petite sonde de température 1-wire DS18B20 pour mesurer la température au sud sous le balcon
-#-- zf220621.1907
+#-- zf220622.0758
 #--
 
 # sources: 
@@ -17,8 +17,8 @@ esphome:
 
 # Configuration WIFI
 wifi:
-  ssid: !secret wifi_ssid_apzuzu7
-  password: !secret wifi_pass_apzuzu7
+  ssid: !secret wifi_ssid_apzuzu6
+  password: !secret wifi_pass_apzuzu6
 
   # networks:
   
@@ -62,14 +62,16 @@ ota:
 # WEB Server
 web_server:
   port: 80
+#  version: 1
+
+
 
 
 
 # Configuration 1-wire pour les capteurs de température DS18B20
 dallas:
   - pin: D2
-    update_interval: 3s
-
+    update_interval: 30s
 
 
 # Définition des Switch's
@@ -87,15 +89,11 @@ switch:
 # Définition des binary sensors
 binary_sensor:
   - platform: gpio
-    name: "1w_th_ext_sud Reed"
+    name: "1w_th_ext_sud pull up"
     pin:
       number: D1
       mode: INPUT_PULLUP
       inverted: True
-    on_press:
-      - switch.turn_on: led
-      - delay: 2s
-      - switch.turn_off: led
 
 
 # Définitions des texts sensors
@@ -112,7 +110,6 @@ text_sensor:
       id: wifi_ssid
 
 
-
 # Définition des inputs numbers
 number:
   - platform: template
@@ -122,12 +119,9 @@ number:
     min_value: -10
     max_value: +10
     step: 0.05
-    initial_value: 0
+    initial_value: 0.65
     unit_of_measurement: "°K"
     id: th_ext_sud_temperature_calibration
-
-
-
 
 
 # Définitions des Sensors
@@ -139,8 +133,6 @@ sensor:
   - platform: uptime
     name: "1w_th_ext_sud Uptime"
     update_interval: 10s
-
-
 
 # Température aller
   - platform: dallas
