@@ -2,7 +2,7 @@
 #-- pzem-3x-test-1.yaml
 #-- Petits tests d2 3x modules power-meter PZEM-004T V3
 #-- ATTENTION: il faut leur changer l'adresse AVANT et tous les brancher en // !
-#-- zf210817.0804, zf220509.1035
+#-- zf210817.0804, zf220624.0934
 #--
 
 
@@ -18,11 +18,12 @@ esphome:
 
 # Enable logging
 logger:
+    level: INFO
 
 # Enable Home Assistant API
 api:
   password: !secret api_password
-  reboot_timeout: 30s
+  reboot_timeout: 30min
 
 ota:
   password: !secret ota_password
@@ -31,6 +32,7 @@ ota:
 wifi:
   ssid: !secret wifi_ssid_apzuzu6
   password: !secret wifi_pass_apzuzu6
+  reboot_timeout: 30min
 
   # networks:
   
@@ -63,6 +65,9 @@ captive_portal:
 web_server:
   port: 80
 
+
+
+
 # Définition des Switch's
 switch:
   - platform: gpio
@@ -73,16 +78,6 @@ switch:
   - platform: restart
     name: "pzem-3x-test-1 Restart"
 
-# # Définition des binary sensors
-# binary_sensor:
-#   - platform: gpio
-#     pin:
-#       number: D3
-#       mode: INPUT_PULLUP
-#       inverted: True
-#     name: "pzem-3x-test-1 button"
-#     on_press:
-#       - switch.toggle: led
 
 # Définitions des texts sensors
 text_sensor:
@@ -96,6 +91,7 @@ text_sensor:
     ssid:
       name: "pzem-3x-test-1 Connected SSID"
       id: wifi_ssid
+
 
 # Définitions des Sensors
 sensor:
@@ -155,10 +151,12 @@ sensor:
       name: "PZEM-L3 Power Factor"
     update_interval: 15s
 
+
 uart:
   rx_pin: D1    #GPIO5   TX du PZEM
   tx_pin: D2    #GPIO4   RX du PZEM
   baud_rate: 9600
+
 
 modbus:
 
