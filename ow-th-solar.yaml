@@ -2,7 +2,7 @@
 #-- ow-th-solar.yaml
 #-- Mesures de températures de mon installation solaire thermique SEBASOL à l'aide de sondes 1-wire DS18B20
 #-- ATTENTION, avec les nouveaux DS18B20 chinois, il faut ABSOLUMENT les câbler en mode 3 fils !
-#-- zf210804.1042, zf220627.0954
+#-- zf210804.1042, zf220627.1104
 #--
 
 
@@ -10,7 +10,7 @@
 # https://esphome.io/components/sensor/dallas.html
 
 esphome:
-  name: 1w_th_solar
+  name: ow-th-solar
   platform: ESP8266
   board: nodemcuv2
 
@@ -20,7 +20,7 @@ wifi:
   password: !secret wifi_pass_apzuzu6
   reboot_timeout: 60min
 
-  use_address: ow-th-solar.local
+#  use_address: 1w_th_solar.local
 
   # networks:
   
@@ -45,7 +45,7 @@ wifi:
 
 # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "1w_th_solar Fallback Hotspot"
+    ssid: "ow-th-solar Fallback Hotspot"
     password: !secret ap_wifi_password
 
 captive_portal:
@@ -79,13 +79,13 @@ dallas:
 # Définition des Switch's
 switch:
   - platform: gpio
-    name: "1w_th_solar LED"
+    name: "ow-th-solar LED"
     inverted: True
     id: led
     pin: D4
 
   - platform: restart
-    name: "1w_th_solar Restart"
+    name: "ow-th-solar Restart"
 
 
 # Définition du bouton physique
@@ -95,7 +95,7 @@ binary_sensor:
       number: D3
       mode: INPUT_PULLUP
       inverted: True
-    name: "1w_th_solar button"
+    name: "ow-th-solar button"
     on_press:
       - switch.toggle: led
 
@@ -103,53 +103,53 @@ binary_sensor:
 # Définitions des texts sensors
 text_sensor:
   - platform: version
-    name: "1w_th_solar Version"
+    name: "ow-th-solar Version"
 
   - platform: wifi_info
     ip_address:
-      name: 1w_th_solar IP Address
+      name: ow-th-solar IP Address
       id: wifi_ip
     ssid:
-      name: 1w_th_solar Connected SSID
+      name: ow-th-solar Connected SSID
       id: wifi_ssid
 
 
 # Sensors
 sensor:
   - platform: wifi_signal
-    name: "1w_th_solar Signal Wi-Fi"
+    name: "ow-th-solar Signal Wi-Fi"
     update_interval: 60s
 
   - platform: uptime
-    name: "1w_th_solar uptime"
+    name: "ow-th-solar uptime"
     update_interval: 60s
 
   - platform: dallas
     address: 0x7E0300A279AFA028
-    name: "1w_th_solar aller"
+    name: "ow-th-solar aller"
 
   - platform: dallas
     address: 0x860301A279FFE428
-    name: "1w_th_solar retour"
+    name: "ow-th-solar retour"
 
   - platform: dallas
     address: 0x710301A279230C28
-    name: "1w_th_solar boiler2"
+    name: "ow-th-solar boiler2"
 
   - platform: dallas
     address: 0xD80301A279E37228
-    name: "1w_th_solar boiler1"
+    name: "ow-th-solar boiler1"
 
   - platform: dallas
     address: 0xCC0301A2793FD328
-    name: "1w_th_solar consigne"
+    name: "ow-th-solar consigne"
 
   - platform: dallas
     address: 0xEE0301A27920E728
-    name: "1w_th_solar froid"
+    name: "ow-th-solar froid"
 
   - platform: dallas
     address: 0xA40301A279F37228
-    name: "1w_th_solar ext sud"
+    name: "ow-th-solar ext nord"
 
 
