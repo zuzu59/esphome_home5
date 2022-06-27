@@ -1,7 +1,7 @@
 #------------------------------
-#-- 1w_th_ext_sud.yaml
+#-- ow-th-ext-sud.yaml
 #-- Petite sonde de température 1-wire DS18B20 pour mesurer la température au sud sous le balcon
-#-- zf220622.0758
+#-- zf220627.1116
 #--
 
 # sources: 
@@ -11,7 +11,7 @@
 #             Cela évite de devoir souder une résistance pour alimenter la sonde 1-wire
 
 esphome:
-  name: 1w_th_ext_sud
+  name: ow-th-ext-sud
   platform: ESP8266
   board: d1_mini
 
@@ -19,6 +19,8 @@ esphome:
 wifi:
   ssid: !secret wifi_ssid_apzuzu6
   password: !secret wifi_pass_apzuzu6
+
+#  use_address: 1w_th_ext_sud.local
 
   # networks:
   
@@ -42,14 +44,16 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "1w_th_ext_sud Fallback Hotspot"
+    ssid: "ow-th-ext-sud Fallback Hotspot"
     password: !secret ap_wifi_password
 
 captive_portal:
 
 # Enable logging
 logger:
-#    level: VERBOSE
+  level: INFO
+  esp8266_store_log_strings_in_flash: false
+
 
 # Enable Home Assistant API
 api:
@@ -77,19 +81,19 @@ dallas:
 # Définition des Switch's
 switch:
   - platform: gpio
-    name: "1w_th_ext_sud LED"
+    name: "ow-th-ext-sud LED"
     inverted: True
     id: led
     pin: D4
 
   - platform: restart
-    name: "1w_th_ext_sud Restart"
+    name: "ow-th-ext-sud Restart"
 
 
 # Définition des binary sensors
 binary_sensor:
   - platform: gpio
-    name: "1w_th_ext_sud pull up"
+    name: "ow-th-ext-sud pull up"
     pin:
       number: D1
       mode: INPUT_PULLUP
@@ -99,21 +103,21 @@ binary_sensor:
 # Définitions des texts sensors
 text_sensor:
   - platform: version
-    name: "1w_th_ext_sud Version"
+    name: "ow-th-ext-sud Version"
 
   - platform: wifi_info
     ip_address:
-      name: "1w_th_ext_sud IP Address"
+      name: "ow-th-ext-sud IP Address"
       id: wifi_ip
     ssid:
-      name: "1w_th_ext_sud Connected SSID"
+      name: "ow-th-ext-sud Connected SSID"
       id: wifi_ssid
 
 
 # Définition des inputs numbers
 number:
   - platform: template
-    name: "1w_th_ext_sud Température Calibration"
+    name: "ow-th-ext-sud Température Calibration"
     restore_value: true
     optimistic: true
     min_value: -10
@@ -127,17 +131,17 @@ number:
 # Définitions des Sensors
 sensor:
   - platform: wifi_signal
-    name: "1w_th_ext_sud Signal Wi-Fi"
+    name: "ow-th-ext-sud Signal Wi-Fi"
     update_interval: 60s
 
   - platform: uptime
-    name: "1w_th_ext_sud Uptime"
+    name: "ow-th-ext-sud Uptime"
     update_interval: 10s
 
 # Température aller
   - platform: dallas
     address: 0xd60000059fd9f328
-    name: "1w_th_ext_sud temp"
+    name: "ow-th-ext-sud temp"
     id: th_ext_sud_temp
     filters:
         - lambda: return ( x - (id(th_ext_sud_temperature_calibration).state /1) );
