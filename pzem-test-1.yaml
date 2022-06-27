@@ -2,7 +2,7 @@
 #-- pzem-test-1.yaml
 #-- Petits tests d'un module power-meter PZEM-004T V3
 #-- 
-#-- zf210815.1638
+#-- zf21081, zf220627.1123
 #--
 
 
@@ -17,6 +17,8 @@ esphome:
 
 # Enable logging
 logger:
+  level: INFO
+  esp8266_store_log_strings_in_flash: false
 
 # Enable Home Assistant API
 api:

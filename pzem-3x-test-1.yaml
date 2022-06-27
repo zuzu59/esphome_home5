@@ -2,9 +2,8 @@
 #-- pzem-3x-test-1.yaml
 #-- Petits tests d2 3x modules power-meter PZEM-004T V3
 #-- ATTENTION: il faut leur changer l'adresse AVANT et tous les brancher en // !
-#-- zf210817.0804, zf220625.0827
+#-- zf210817.0804, zf220627.1124
 #--
-
 
 # sources: 
 # https://esphome.io/components/sensor/pzemac.html
@@ -18,7 +17,8 @@ esphome:
 
 # Enable logging
 logger:
-    level: INFO
+  level: INFO
+  esp8266_store_log_strings_in_flash: false
 
 # Enable Home Assistant API
 api:
