@@ -1,8 +1,8 @@
 #------------------------------
-#-- 1w_th_solar.yaml
+#-- ow-th-solar.yaml
 #-- Mesures de températures de mon installation solaire thermique SEBASOL à l'aide de sondes 1-wire DS18B20
 #-- ATTENTION, avec les nouveaux DS18B20 chinois, il faut ABSOLUMENT les câbler en mode 3 fils !
-#-- zf210804.1042, zf220624.0930
+#-- zf210804.1042, zf220627.0954
 #--
 
 
@@ -18,7 +18,9 @@ esphome:
 wifi:
   ssid: !secret wifi_ssid_apzuzu6
   password: !secret wifi_pass_apzuzu6
-  reboot_timeout: 30min
+  reboot_timeout: 60min
+
+  use_address: ow-th-solar.local
 
   # networks:
   
@@ -50,12 +52,13 @@ captive_portal:
 
 # Enable logging
 logger:
-    level: INFO
+  level: INFO
+  esp8266_store_log_strings_in_flash: false
 
 # Enable Home Assistant API
 api:
   password: !secret api_password
-  reboot_timeout: 30min
+  reboot_timeout: 60min
 
 # Enable OTA
 ota:
