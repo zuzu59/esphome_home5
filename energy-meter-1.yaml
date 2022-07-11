@@ -2,7 +2,7 @@
 #-- energy-meter-1.yaml
 #-- Mesures de puissance de mes grands consommateurs (cuisinière et charge voiture)
 #-- La mesure se fait simplement avec 3x transfos de courant clips avec un ADC i2C et un mini d1
-#-- zf220711.1259
+#-- zf220711.2135
 #--
 
 
@@ -123,19 +123,28 @@ sensor:
   - platform: ads1115
     name: "energy-meter-1-A0"
     multiplexer: 'A0_GND'
-    gain: 1.024
-    accuracy_decimals: 1
+    gain: 4.096
+    accuracy_decimals: 2
     update_interval: 5s
     unit_of_measurement: "A"
     icon: "mdi:flash"
-    # filters:
-    # - calibrate_polynomial:
-    #   degree: 2
-    #   datapoints:
-    #       - 0.0 -> 0.0
-    #       - 0.102 -> 3.6
-    #       - 0.146 -> 5.0
-    #       - 0.238 -> 8.4
+    filters:
+    - calibrate_polynomial:
+        degree: 3
+        datapoints:
+          - 0.06 -> 0.35
+          - 0.87 -> 1.3
+          - 1.87 -> 3.8
+          - 2.25 -> 5.2
+          - 2.98 -> 8.6
+          - 3.11 -> 10.3
+    - lambda: |-
+        if (x <= 0.3) {
+          return 0.0;
+        } else {
+          return x;
+        }
+          
 
   - platform: ads1115
     name: "energy-meter-1-A1"
