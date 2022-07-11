@@ -2,14 +2,14 @@
 #-- energy-meter-1.yaml
 #-- Mesures de puissance de mes grands consommateurs (cuisinière et charge voiture)
 #-- La mesure se fait simplement avec 3x transfos de courant clips avec un ADC i2C et un mini d1
-#-- zf220612.1747
+#-- zf220711.1259
 #--
 
 
 # sources: 
 # https://esphome.io/components/sensor/ads1115.html
 # Simulateur électronique: https://www.falstad.com/circuit/
-- # Diode sans seuil: https://www.astuces-pratiques.fr/electronique/redresseur-sans-seuil-a-ampli-op-schema
+# Diode sans seuil: https://www.astuces-pratiques.fr/electronique/redresseur-sans-seuil-a-ampli-op-schema
 # Le petit transfo clip de courant a un rapport de 25mA à 20A, soit 0.025/20=0.00125 soit encore 1/800
 # Donc à 16A, il donnera un courant de 20mA
 
@@ -78,6 +78,7 @@ i2c:
   scl: D1
   scan: False
 
+
 ads1115:
   - address: 0x48
 #    continuous_mode: True
@@ -94,17 +95,6 @@ switch:
   - platform: restart
     name: "energy-meter-1 Restart"
 
-# # Définition du bouton physique
-# binary_sensor:
-#   - platform: gpio
-#     pin:
-#       number: D3
-#       mode: INPUT_PULLUP
-#       inverted: True
-#     name: "energy-meter-1 button"
-#     on_press:
-#       - switch.toggle: led
-
 
 # Définitions des texts sensors
 text_sensor:
@@ -120,10 +110,8 @@ text_sensor:
       id: wifi_ssid
 
 
-
-# Sensors
+# Définitions des sensors
 sensor:
-
   - platform: wifi_signal
     name: "energy-meter-1 Signal Wi-Fi"
     update_interval: 60s
@@ -133,58 +121,71 @@ sensor:
     update_interval: 60s
 
   - platform: ads1115
-    name: "ADS1115 Channel A1-GND"
+    name: "energy-meter-1-A0"
+    multiplexer: 'A0_GND'
+    gain: 1.024
+    accuracy_decimals: 1
+    update_interval: 5s
+    unit_of_measurement: "A"
+    icon: "mdi:flash"
+    # filters:
+    # - calibrate_polynomial:
+    #   degree: 2
+    #   datapoints:
+    #       - 0.0 -> 0.0
+    #       - 0.102 -> 3.6
+    #       - 0.146 -> 5.0
+    #       - 0.238 -> 8.4
+
+  - platform: ads1115
+    name: "energy-meter-1-A1"
     multiplexer: 'A1_GND'
     gain: 1.024
     accuracy_decimals: 1
     update_interval: 5s
     unit_of_measurement: "A"
     icon: "mdi:flash"
-    filters:
-    - calibrate_polynomial:
-       degree: 2
-       datapoints:
-          - 0.0 -> 0.0
-          - 0.102 -> 3.6
-          - 0.146 -> 5.0
-          - 0.238 -> 8.4
+    # filters:
+    # - calibrate_polynomial:
+    #   degree: 2
+    #   datapoints:
+    #       - 0.0 -> 0.0
+    #       - 0.102 -> 3.6
+    #       - 0.146 -> 5.0
+    #       - 0.238 -> 8.4
 
   - platform: ads1115
-    name: "ADS1115 Channel A2-GND"
+    name: "energy-meter-1-A2"
     multiplexer: 'A2_GND'
     gain: 1.024
     accuracy_decimals: 1
     update_interval: 5s
     unit_of_measurement: "A"
     icon: "mdi:flash"
-    filters:
-    - calibrate_polynomial:
-       degree: 2
-       datapoints:
-          - 0.0 -> 0.0
-          - 0.113 -> 3.6
-          - 0.157 -> 5.0
-          - 0.251 -> 8.4
+    # filters:
+    # - calibrate_polynomial:
+    #   degree: 2
+    #   datapoints:
+    #       - 0.0 -> 0.0
+    #       - 0.113 -> 3.6
+    #       - 0.157 -> 5.0
+    #       - 0.251 -> 8.4
 
   - platform: ads1115
-    name: "ADS1115 Channel A3-GND"
+    name: "energy-meter-1-A3"
     multiplexer: 'A3_GND'
     gain: 1.024
     accuracy_decimals: 1
     update_interval: 5s
     unit_of_measurement: "A"
     icon: "mdi:flash"
-    filters:
-    - calibrate_polynomial:
-       degree: 2
-       datapoints:
-          - 0.0 -> 0.0
-          - 0.102 -> 3.6
-          - 0.146 -> 5.0
-          - 0.232 -> 8.4
-
-
-
-
+    # filters:
+    # - calibrate_polynomial:
+    #   degree: 2
+    #   datapoints:
+    #       - 0.0 -> 0.0
+    #       - 0.102 -> 3.6
+    #       - 0.146 -> 5.0
+    #       - 0.232 -> 8.4
 
 
