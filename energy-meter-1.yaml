@@ -2,7 +2,7 @@
 #-- energy-meter-1.yaml
 #-- Mesures de puissance de mes grands consommateurs (cuisinière et charge voiture)
 #-- La mesure se fait simplement avec 3x transfos de courant clips avec un ADC i2C et un mini d1
-#-- zf220711.2241
+#-- zf220711.2258
 #--
 
 
@@ -132,12 +132,12 @@ sensor:
     - calibrate_polynomial:
         degree: 3
         datapoints:
-          - 0.06 -> 0.35
-          - 0.88 -> 1.30
-          - 2.22 -> 5.13
-          - 2.98 -> 10.24
+          - 0.16 -> 0.35
+          - 1.05 -> 1.30
+          - 2.31 -> 5.13
+          - 3.22 -> 10.24
     - lambda: |-
-        if (x <= 0.28) {
+        if (x <= 0.30) {
           return 0.0;
         } else {
           return x;
