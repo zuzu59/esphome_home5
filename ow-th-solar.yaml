@@ -2,7 +2,7 @@
 #-- ow-th-solar.yaml
 #-- Mesures de températures de mon installation solaire thermique SEBASOL à l'aide de sondes 1-wire DS18B20
 #-- ATTENTION, avec les nouveaux DS18B20 chinois, il faut ABSOLUMENT les câbler en mode 3 fils !
-#-- zf210804.1042, zf220627.1104
+#-- zf210804.1042, zf220705.0731
 #--
 
 
@@ -16,9 +16,9 @@ esphome:
 
 # Configuration WIFI
 wifi:
-  ssid: !secret wifi_ssid_apzuzu6
-  password: !secret wifi_pass_apzuzu6
-  reboot_timeout: 60min
+  ssid: !secret wifi_ssid_apzuzu6_domo
+  password: !secret wifi_pass_apzuzu6_domo
+  reboot_timeout: 30min
 
 #  use_address: 1w_th_solar.local
 
