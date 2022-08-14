@@ -2,14 +2,14 @@
 #-- energy-meter-1.yaml
 #-- Mesures de puissance de mes grands consommateurs (cuisinière et charge voiture)
 #-- La mesure se fait simplement avec 3x transfos de courant clips avec un ADC i2C et un mini d1
-#-- zf220711.2258
+#-- zf220712.1438
 #--
 
 
 # sources: 
-# https://esphome.io/components/sensor/ads1115.html
+# Hardware utilisé pour ce projet: https://github.com/zuzu59/esphome_home5/tree/master/0_Projets/Mesure_courant_clip
+# EspHome convertisseur ADC ADS1115: https://esphome.io/components/sensor/ads1115.html
 # Simulateur électronique: https://www.falstad.com/circuit/
-# Diode sans seuil: https://www.astuces-pratiques.fr/electronique/redresseur-sans-seuil-a-ampli-op-schema
 # Le petit transfo clip de courant a un rapport de 25mA à 20A, soit 0.025/20=0.00125 soit encore 1/800
 # Donc à 16A, il donnera un courant de 20mA
 
@@ -21,10 +21,10 @@ esp8266:
   board: d1_mini
 
 # Configuration WIFI
-# On le force sur apzuzu7, plus stable
+# On le force sur apzuzu6, plus stable
 wifi:
-  ssid: !secret wifi_ssid_apzuzu7
-  password: !secret wifi_pass_apzuzu7
+  ssid: !secret wifi_ssid_apzuzu6
+  password: !secret wifi_pass_apzuzu6
 
   # networks:
   
@@ -132,12 +132,12 @@ sensor:
     - calibrate_polynomial:
         degree: 3
         datapoints:
-          - 0.16 -> 0.35
-          - 1.05 -> 1.30
-          - 2.31 -> 5.13
-          - 3.22 -> 10.24
+          - 0.17 -> 0.35
+          - 1.04 -> 1.30
+          - 2.30 -> 5.13
+          - 3.25 -> 10.24
     - lambda: |-
-        if (x <= 0.30) {
+        if (x <= 0.32) {
           return 0.0;
         } else {
           return x;
@@ -155,12 +155,12 @@ sensor:
     - calibrate_polynomial:
         degree: 3
         datapoints:
-          - 0.01 -> 0.35
-          - 0.60 -> 1.30
-          - 2.00 -> 5.13
-          - 2.84 -> 10.24
+          - 0.06 -> 0.35
+          - 0.74 -> 1.30
+          - 2.11 -> 5.13
+          - 3.00 -> 10.24
     - lambda: |-
-        if (x <= 0.34) {
+        if (x <= 0.29) {
           return 0.0;
         } else {
           return x;
@@ -178,12 +178,12 @@ sensor:
     - calibrate_polynomial:
         degree: 3
         datapoints:
-          - 0.01 -> 0.35
-          - 0.59 -> 1.30
-          - 1.92 -> 5.13
-          - 2.87 -> 10.24
+          - 0.07 -> 0.35
+          - 0.72 -> 1.30
+          - 2.08 -> 5.13
+          - 3.00 -> 10.24
     - lambda: |-
-        if (x <= 0.34) {
+        if (x <= 0.27) {
           return 0.0;
         } else {
           return x;
@@ -201,12 +201,12 @@ sensor:
     - calibrate_polynomial:
         degree: 3
         datapoints:
-          - 0.01 -> 0.35
-          - 0.68 -> 1.30
-          - 1.95 -> 5.13
-          - 2.82 -> 10.24
+          - 0.09 -> 0.35
+          - 0.83 -> 1.30
+          - 2.09 -> 5.13
+          - 3.00 -> 10.24
     - lambda: |-
-        if (x <= 0.34) {
+        if (x <= 0.29) {
           return 0.0;
         } else {
           return x;
