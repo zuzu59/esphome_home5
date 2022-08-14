@@ -1,0 +1,102 @@
+esphome:
+  name: rfbridge1
+
+esp8266:
+  board: esp8285
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "x8gwPqawG8tqq6avSr1j3mM9x1V9HjJnMIAfQQc5L9c="
+
+ota:
+  password: "6b0bca905981822c79c560219036ef44"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Rfbridge1 Fallback Hotspot"
+    password: "A0lMFlJ0YSv4"
+
+captive_portal:
+
+web_server:
+
+
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: yes
+
+# USBRX = GPIO4 ---> receiver
+# USBTX = GPIO5 ---> trasmitter
+
+# receiver = pin 5 of the 8-legged chip (the one closer to the wifi antenna)
+# transmitter = pin 4 of the 6-legged chip (closest to r12)
+
+
+# remote_receiver:
+#   pin:
+#     number: GPIO04
+# #    inverted: true
+#   dump: raw
+#   tolerance: 50%
+#   filter: 35us
+#   idle: 4ms
+
+
+remote_transmitter:
+  pin: GPIO05
+  carrier_duty_percent: 100%
+
+# this will log received commands, and can also transmit. Read up here:
+# https://esphome.io/components/remote_transmitter.html#remote-setting-up-rf
+
+
+switch:
+  - platform: template
+    name: RF Power Button 1
+    turn_on_action:
+      - remote_transmitter.transmit_rc_switch_raw:
+          code: '101001011111111011100111000001010001000'
+          protocol: 6
+          repeat:
+            times: 12
+            wait_time: 100ms
+
+  - platform: template
+    name: RF Power Button 2
+    turn_on_action:
+      - remote_transmitter.transmit_raw:
+          code: [
+          -1400, 701, -386, 362, -719, 720, -365, 362, -719, 365, -717, 721, -364, 361, -719, 722, -368, 
+          716, -364, 720, -363, 718, -365, 717, -365, 718, -365, 719, -365, 719, -365, 362, -719, 722, 
+          -364, 720, -364, 720, -364, 362, -720, 364, -720, 721
+          ] 
+          repeat:
+            times: 12
+ 
+         
+
+  - platform: template
+    name: RF Power Button 3
+    turn_on_action:
+      - remote_transmitter.transmit_pronto:
+          data: "0000 006D 0001 0000 06C3 0000 006D 0029 0000 0038 001C 000D 000F 001B 001D 000D 000F 001B 000F 001B 001C 000D 000F 001B 001D 000D 001C 000D 001C 000D 001C 000D 001C 000D 001C 000D 001C 000D 001C 000D 000F 001B 001C 000D 001C 000D 001C 000D 000F 001B 000F 001B 001C 000D 001C 000D 001C 000D 000F 001B 000F 001B 000F 001B 000F 001B 000F 001B 001C 000D 000F 001B 001C 000D 000F 001B 000F 001B 000F 001B 001C 000D 001C 000D 001C 000D 001C 000D 000F 06C3"
+
+
+
+
+
+
+
+
+
+
