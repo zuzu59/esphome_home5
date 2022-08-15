@@ -2,7 +2,7 @@
 #-- rfbridge1.yaml
 #-- Tests du bridge RF de SonOff
 #-- J'essaie d'apprendre un code de la remote de mon store banne et de le rejouer
-#-- zf220815.0935
+#-- zf220815.1022
 #--
 # sources: 
 # Hardware utilisé pour ce projet (mais attention en version V2 R2.2 !): https://sonoff.tech/product/smart-home-security/rf-bridge/
@@ -91,9 +91,10 @@ remote_receiver:
     number: GPIO04
 #    inverted: true
   dump:
-    - rc_switch
+#    - rc_switch
+    - raw
   tolerance: 50%
-  filter: 250us
+  filter: 35us
   idle: 4ms
   buffer_size: 2kb
 
@@ -143,35 +144,58 @@ switch:
 
 
   - platform: template
-    name: RF Power Button 1
+    name: RF Button 1
     turn_on_action:
       - remote_transmitter.transmit_rc_switch_raw:
           code: '001011100010101000000010'
           protocol: 1
           repeat:
-            times: 3
+            times: 5
             wait_time: 100ms
 
   - platform: template
-    name: RF Power Button 2
+    name: RF Button 2
+    turn_on_action:
+      - remote_transmitter.transmit_rc_switch_raw:
+          code: '001011100010101000000010'
+          protocol: 2
+          repeat:
+            times: 5
+            wait_time: 100ms
+
+
+
+
+
+
+
+  - platform: template
+    name: RF Button 3
     turn_on_action:
       - remote_transmitter.transmit_raw:
           code: [
-          -1400, 701, -386, 362, -719, 720, -365, 362, -719, 365, -717, 721, -364, 361, -719, 722, -368, 
-          716, -364, 720, -363, 718, -365, 717, -365, 718, -365, 719, -365, 719, -365, 362, -719, 722, 
-          -364, 720, -364, 720, -364, 362, -720, 364, -720, 721
-          ] 
+                362, -1015, 365, -1013, 996, -386, 357, -1014, 998, -384, 993, -386, 989, -386, 359, 
+                -1013, 371, -1006, 360, -1018, 996, -384, 357, -1015, 1000, -382, 359, -1014, 665, 
+                -715, 364, -1008, 362, -1020, 355, -1016, 362, -1015, 364, -1010, 363, -1013, 365, 
+                -1016, 992, -386, 358, -1010, 362
+           ] 
           repeat:
-            times: 12
+            times: 4
  
          
 
   - platform: template
-    name: RF Power Button 3
+    name: RF Button 4
     turn_on_action:
-      - remote_transmitter.transmit_pronto:
-          data: "0000 006D 0001 0000 06C3 0000 006D 0029 0000 0038 001C 000D 000F 001B 001D 000D 000F 001B 000F 001B 001C 000D 000F 001B 001D 000D 001C 000D 001C 000D 001C 000D 001C 000D 001C 000D 001C 000D 001C 000D 000F 001B 001C 000D 001C 000D 001C 000D 000F 001B 000F 001B 001C 000D 001C 000D 001C 000D 000F 001B 000F 001B 000F 001B 000F 001B 000F 001B 001C 000D 000F 001B 001C 000D 000F 001B 000F 001B 000F 001B 001C 000D 001C 000D 001C 000D 001C 000D 000F 06C3"
-
+      - remote_transmitter.transmit_raw:
+          code: [
+                362, -1013, 362, -1016, 993, -386, 358, -1017, 996, -384, 991, -384, 996, -381, 
+                355, -1020, 360, -1015, 362, -1034, 985, -374, 357, -1018, 994, -385, 358, -1017, 
+                997, -381, 359, -1016, 362, -1013, 359, -1017, 361, -1015, 364, -1013, 362, -1013, 
+                363, -1015, 996, -381, 357, -1013, 357
+           ] 
+          repeat:
+            times: 4
 
 
 
