@@ -1,32 +1,72 @@
+#------------------------------
+#-- rfbridge1.yaml
+#-- Tests du bridge RF de SonOff
+#-- J'essaie d'apprendre un code de la remote de mon store banne et de le rejouer
+#-- zf220815.0935
+#--
+# sources: 
+# Hardware utilisé pour ce projet (mais attention en version V2 R2.2 !): https://sonoff.tech/product/smart-home-security/rf-bridge/
+# Comme plus compatible pour Tasmota depuis fin 2021, il faut utiliser ceci:
+# https://community.home-assistant.io/t/new-sonoff-rf-bridge-board-need-flashing-help/344326
+# Oscilloscope pour visualiser les trames 433MHz: https://dbuezas.github.io/esphome-remote_receiver-oscilloscope/
+
+
+
 esphome:
   name: rfbridge1
 
 esp8266:
   board: esp8285
 
-# Enable logging
-logger:
-
-# Enable Home Assistant API
-api:
-  encryption:
-    key: "x8gwPqawG8tqq6avSr1j3mM9x1V9HjJnMIAfQQc5L9c="
-
-ota:
-  password: "6b0bca905981822c79c560219036ef44"
-
+# Configuration WIFI
+# On le force sur apzuzu7, plus stable
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
+
+  # networks:
+  
+  #   - ssid: !secret wifi_ssid_apzuzu7
+  #   - password: !secret wifi_pass_apzuzu7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6
+  #   - password: !secret wifi_pass_apzuzu6
+
+  #   - ssid: !secret wifi_ssid_3G_zf
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3G_zf2
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3g_s7
+  #   - password: !secret wifi_pass_3g_s7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
+  #   - password: !secret wifi_pass_apzuzu6_EXT
+
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "Rfbridge1 Fallback Hotspot"
-    password: "A0lMFlJ0YSv4"
+    ssid: "energy-meter-1 Fallback"
+    password: !secret ap_wifi_password
 
 captive_portal:
 
+# Enable logging
+logger:
+#    level: VERBOSE
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+# Enable OTA
+ota:
+  password: !secret ota_password
+
+# WEB Server
 web_server:
+  port: 80
 
 
 
@@ -42,15 +82,16 @@ status_led:
 # transmitter = pin 4 of the 6-legged chip (closest to r12)
 
 
-# remote_receiver:
-#   pin:
-#     number: GPIO04
-# #    inverted: true
-#   dump: raw
-#   tolerance: 50%
-#   filter: 35us
-#   idle: 4ms
-
+remote_receiver:
+  pin:
+    number: GPIO04
+#    inverted: true
+  dump:
+    - rc_switch
+  tolerance: 50%
+  filter: 250us
+  idle: 4ms
+  buffer_size: 2kb
 
 remote_transmitter:
   pin: GPIO05
@@ -65,7 +106,7 @@ switch:
     name: RF Power Button 1
     turn_on_action:
       - remote_transmitter.transmit_rc_switch_raw:
-          code: '101001011111111011100111000001010001000'
+          code: '001011100010101000000010'
           protocol: 6
           repeat:
             times: 12
