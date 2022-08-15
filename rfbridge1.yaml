@@ -2,7 +2,7 @@
 #-- rfbridge1.yaml
 #-- Tests du bridge RF de SonOff
 #-- J'essaie d'apprendre un code de la remote de mon store banne et de le rejouer
-#-- zf220815.1847
+#-- zf220815.1900
 #--
 # sources: 
 # Hardware utilisé pour ce projet (mais attention en version V2 R2.2 !): https://sonoff.tech/product/smart-home-security/rf-bridge/
@@ -209,6 +209,7 @@ switch:
            ] 
           repeat:
             times: 4
+            wait_time: 100ms
   - platform: template
     name: RF1 send Store Balcon STOP
     turn_on_action:
@@ -234,6 +235,7 @@ switch:
            ] 
           repeat:
             times: 4
+            wait_time: 100ms
   - platform: template
     name: RF1 send Store Balcon DOWN
     turn_on_action:
@@ -259,6 +261,7 @@ switch:
            ] 
           repeat:
             times: 4
+            wait_time: 100ms
 
 
 # Définition des Binary Sensor's
