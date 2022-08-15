@@ -47,7 +47,7 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "energy-meter-1 Fallback"
+    ssid: "rfbridge1 Fallback"
     password: !secret ap_wifi_password
 
 captive_portal:
@@ -68,12 +68,14 @@ ota:
 web_server:
   port: 80
 
+#status_led:
+#  pin:
+#    number: GPIO13
+#    inverted: yes
 
 
-status_led:
-  pin:
-    number: GPIO13
-    inverted: yes
+
+
 
 # USBRX = GPIO4 ---> receiver
 # USBTX = GPIO5 ---> trasmitter
@@ -81,6 +83,8 @@ status_led:
 # receiver = pin 5 of the 8-legged chip (the one closer to the wifi antenna)
 # transmitter = pin 4 of the 6-legged chip (closest to r12)
 
+# this will log received commands, and can also transmit. Read up here:
+# https://esphome.io/components/remote_transmitter.html#remote-setting-up-rf
 
 remote_receiver:
   pin:
@@ -97,19 +101,55 @@ remote_transmitter:
   pin: GPIO05
   carrier_duty_percent: 100%
 
-# this will log received commands, and can also transmit. Read up here:
-# https://esphome.io/components/remote_transmitter.html#remote-setting-up-rf
 
 
+
+# Définitions des texts sensors
+text_sensor:
+  - platform: version
+    name: "rfbridge1 Version"
+
+  - platform: wifi_info
+    ip_address:
+      name: rfbridge1 IP Address
+      id: wifi_ip
+    ssid:
+      name: rfbridge1 Connected SSID
+      id: wifi_ssid
+
+
+# Définitions des sensors
+sensor:
+  - platform: wifi_signal
+    name: "rfbridge1 Signal Wi-Fi"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "rfbridge1 uptime"
+    update_interval: 60s
+
+
+# Définition des Switch's
 switch:
+  - platform: gpio
+    name: "rfbridge1 LED"
+    inverted: True
+    id: led
+    pin: GPIO13
+
+  - platform: restart
+    name: "rfbridge1 Restart"
+
+
+
   - platform: template
     name: RF Power Button 1
     turn_on_action:
       - remote_transmitter.transmit_rc_switch_raw:
           code: '001011100010101000000010'
-          protocol: 6
+          protocol: 1
           repeat:
-            times: 12
+            times: 3
             wait_time: 100ms
 
   - platform: template
