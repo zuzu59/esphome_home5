@@ -2,13 +2,14 @@
 #-- rfbridge1.yaml
 #-- Tests du bridge RF de SonOff
 #-- J'essaie d'apprendre un code de la remote de mon store banne et de le rejouer
-#-- zf220815.1608
+#-- zf220815.1731
 #--
 # sources: 
 # Hardware utilisé pour ce projet (mais attention en version V2 R2.2 !): https://sonoff.tech/product/smart-home-security/rf-bridge/
 # Comme plus compatible pour Tasmota depuis fin 2021, il faut utiliser ceci:
 # https://community.home-assistant.io/t/new-sonoff-rf-bridge-board-need-flashing-help/344326
 # Oscilloscope pour visualiser les trames 433MHz: https://dbuezas.github.io/esphome-remote_receiver-oscilloscope/
+# https://esphome.io/components/remote_transmitter.html#remote-setting-up-rf
 
 
 
@@ -89,9 +90,7 @@ web_server:
 remote_receiver:
   pin:
     number: GPIO04
-#    number: GPIO13
-#    inverted: true
-  dump: raw
+#  dump: raw
   tolerance: 50%
   filter: 10us
   idle: 10ms
@@ -144,7 +143,7 @@ switch:
 
 
   - platform: template
-    name: RF remote chinoise ON
+    name: RF1 remote Test LED ON
     turn_on_action:
       - remote_transmitter.transmit_raw:
           code: [
@@ -158,7 +157,7 @@ switch:
 
 
   - platform: template
-    name: RF Button up
+    name: RF1 Button up
     turn_on_action:
       - remote_transmitter.transmit_raw:
           code: [
@@ -183,7 +182,7 @@ switch:
 
 
   - platform: template
-    name: RF Button stop
+    name: RF1 Button stop
     turn_on_action:
       - remote_transmitter.transmit_raw:
           code: [
@@ -208,7 +207,7 @@ switch:
 
 
   - platform: template
-    name: RF Button down
+    name: RF1 Button down
     turn_on_action:
       - remote_transmitter.transmit_raw:
           code: [
@@ -233,5 +232,14 @@ switch:
 
 
 
-
+binary_sensor:
+  - platform: remote_receiver
+    name: "RF1 Test LED ON"
+    raw:
+      code: [
+            362, -1013, 362, -1016, 993, -386, 358, -1017, 996, -384, 991, -384, 996, -381, 
+            355, -1020, 360, -1015, 362, -1034, 985, -374, 357, -1018, 994, -385, 358, -1017, 
+            997, -381, 359, -1016, 362, -1013, 359, -1017, 361, -1015, 364, -1013, 362, -1013, 
+            363, -1015, 996, -381, 357, -1013, 357
+       ] 
 
