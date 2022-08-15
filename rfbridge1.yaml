@@ -2,7 +2,7 @@
 #-- rfbridge1.yaml
 #-- Tests du bridge RF de SonOff
 #-- J'essaie d'apprendre un code de la remote de mon store banne et de le rejouer
-#-- zf220815.1731
+#-- zf220815.1847
 #--
 # sources: 
 # Hardware utilisé pour ce projet (mais attention en version V2 R2.2 !): https://sonoff.tech/product/smart-home-security/rf-bridge/
@@ -10,7 +10,8 @@
 # https://community.home-assistant.io/t/new-sonoff-rf-bridge-board-need-flashing-help/344326
 # Oscilloscope pour visualiser les trames 433MHz: https://dbuezas.github.io/esphome-remote_receiver-oscilloscope/
 # https://esphome.io/components/remote_transmitter.html#remote-setting-up-rf
-
+# https://esphome.io/components/remote_receiver.html
+# https://esphome.io/components/remote_transmitter.html
 
 
 esphome:
@@ -141,23 +142,50 @@ switch:
   - platform: restart
     name: "rfbridge1 Restart"
 
-
+# Remote pour faire des tests avec le micro récepteur à Yvan
   - platform: template
-    name: RF1 remote Test LED ON
+    name: RF1 send Test LED ON
     turn_on_action:
       - remote_transmitter.transmit_raw:
           code: [
-                362, -1013, 362, -1016, 993, -386, 358, -1017, 996, -384, 991, -384, 996, -381, 
-                355, -1020, 360, -1015, 362, -1034, 985, -374, 357, -1018, 994, -385, 358, -1017, 
-                997, -381, 359, -1016, 362, -1013, 359, -1017, 361, -1015, 364, -1013, 362, -1013, 
-                363, -1015, 996, -381, 357, -1013, 357
+            362, -1013, 362, -1016, 993, -386, 358, -1017, 996, -384, 991, -384, 996, -381, 
+            355, -1020, 360, -1015, 362, -1034, 985, -374, 357, -1018, 994, -385, 358, -1017, 
+            997, -381, 359, -1016, 362, -1013, 359, -1017, 361, -1015, 364, -1013, 362, -1013, 
+            363, -1015, 996, -381, 357, -1013, 357
            ] 
           repeat:
             times: 4
 
-
+# Remote pour la bougie LED qui utilise le micro récepteur à Yvan
   - platform: template
-    name: RF1 Button up
+    name: RF1 send Bougie LED ON
+    turn_on_action:
+      - remote_transmitter.transmit_raw:
+          code: [
+            361, -1020, 362, -1018, 1001, -383, 999, -383, 999, -383, 999, -383, 360, -1020, 
+            996, -388, 997, -384, 997, -387, 996, -386, 996, -386, 996, -386, 998, -384, 
+            999, -383, 996, -386, 357, -1020, 362, -1018, 363, -1017, 362, -1017, 360, 
+            -1020, 362, -1019, 1000, -383, 360, -1014, 361
+           ] 
+          repeat:
+            times: 4
+  - platform: template
+    name: RF1 send Bougie LED OFF
+    turn_on_action:
+      - remote_transmitter.transmit_raw:
+          code: [
+            364, -1015, 362, -1020, 999, -384, 998, -384, 995, -386, 997, -383, 360, -1017, 
+            1001, -384, 996, -385, 997, -383, 997, -384, 998, -383, 999, -383, 997, -384, 
+            998, -383, 996, -384, 359, -1018, 361, -1019, 378, -1005, 359, -1015, 362, 
+            -1019, 1001, -381, 358, -1019, 361, -1013, 362
+           ] 
+          repeat:
+            times: 4
+
+# Remote pour le store banne du balcon
+# ATTENTION: pour le store banne du balcon, il faut envoyer deux trames séparées par un délais !
+  - platform: template
+    name: RF1 send Store Balcon UP
     turn_on_action:
       - remote_transmitter.transmit_raw:
           code: [
@@ -179,10 +207,10 @@ switch:
             363, -717, 367, -717, 367, -717, 722, -364, 362, -717, 367, 
             -717, 365, -719, 722,
            ] 
-
-
+          repeat:
+            times: 4
   - platform: template
-    name: RF1 Button stop
+    name: RF1 send Store Balcon STOP
     turn_on_action:
       - remote_transmitter.transmit_raw:
           code: [
@@ -204,10 +232,10 @@ switch:
             359, -717, 720, -368, 356, -717, 722, -360, 362, -717, 719, 
             -362, 360, -718, 721, -362, 366, -713, 722
            ] 
-
-
+          repeat:
+            times: 4
   - platform: template
-    name: RF1 Button down
+    name: RF1 send Store Balcon DOWN
     turn_on_action:
       - remote_transmitter.transmit_raw:
           code: [
@@ -229,10 +257,13 @@ switch:
             -361, 363, -715, 719, -365, 359, -717, 365, -717, 722, -362, 
             723, -357, 363, -715, 365, -717, 723, -358, 717
            ] 
+          repeat:
+            times: 4
 
 
-
+# Définition des Binary Sensor's
 binary_sensor:
+# Détection de l'appui sur une touche de la remote pour faire des tests avec le micro récepteur à Yvan
   - platform: remote_receiver
     name: "RF1 Test LED ON"
     raw:
@@ -242,4 +273,84 @@ binary_sensor:
             997, -381, 359, -1016, 362, -1013, 359, -1017, 361, -1015, 364, -1013, 362, -1013, 
             363, -1015, 996, -381, 357, -1013, 357
        ] 
+# Détection de l'appui sur une touche de la remote pour la bougie LED qui utilise le micro récepteur à Yvan
+  - platform: remote_receiver
+    name: "RF1 Bougie LED ON"
+    raw:
+      code: [
+        361, -1020, 362, -1018, 1001, -383, 999, -383, 999, -383, 999, -383, 360, -1020, 
+        996, -388, 997, -384, 997, -387, 996, -386, 996, -386, 996, -386, 998, -384, 
+        999, -383, 996, -386, 357, -1020, 362, -1018, 363, -1017, 362, -1017, 360, 
+        -1020, 362, -1019, 1000, -383, 360, -1014, 361
+       ] 
+  - platform: remote_receiver
+    name: "RF1 Bougie LED OFF"
+    raw:
+      code: [
+        364, -1015, 362, -1020, 999, -384, 998, -384, 995, -386, 997, -383, 360, -1017, 
+        1001, -384, 996, -385, 997, -383, 997, -384, 998, -383, 999, -383, 997, -384, 
+        998, -383, 996, -384, 359, -1018, 361, -1019, 378, -1005, 359, -1015, 362, 
+        -1019, 1001, -381, 358, -1019, 361, -1013, 362
+       ] 
+
+# La détection de l'appui sur une touche de la remote du balcon ne fonctionne pas.
+# Je ne sais pas pour quoi ?
+
+# # Détection de l'appui sur une touche de la remote pour le store banne du balcon
+#   - platform: remote_receiver
+#     name: "RF1 Store Balcon UP"
+#     raw:
+#       code: [
+#         -7817, 4830, -1489, 724, -362, 365, -717, 722, -364, 362, -717, 367, 
+#         -715, 724, -362, 362, -717, 724, -362, 722, -362, 720, -364, 
+#         719, -364, 720, -362, 720, -362, 719, -365, 719, -365, 362, 
+#         -717, 724, -364, 720, -363, 721, -362, 360, -719, 367, -717, 
+#         722, -364, 720, -362, 719, -362, 362, -720, 364, -717, 367, 
+#         -717, 367, -717, 364, -720, 722, -365, 361, -720, 724, -363, 
+#         363, -717, 367, -717, 367, -717, 722, -364, 362, -717, 367, 
+#         -717, 365, -719, 722,
+#         -7817, 4830, 
+#         -1489, 724, -362, 365, -717, 722, -364, 362, -717, 367, 
+#         -715, 724, -362, 362, -717, 724, -362, 722, -362, 720, -364, 
+#         719, -364, 720, -362, 720, -362, 719, -365, 719, -365, 362, 
+#         -717, 724, -364, 720, -363, 721, -362, 360, -719, 367, -717, 
+#         722, -364, 720, -362, 719, -362, 362, -720, 364, -717, 367, 
+#         -717, 367, -717, 364, -720, 722, -365, 361, -720, 724, -363, 
+#         363, -717, 367, -717, 367, -717, 722, -364, 362, -717, 367, 
+#         -717, 365, -719, 722,
+#       ] 
+#   - platform: remote_receiver
+#     name: "RF1 Store Balcon STOP"
+#     raw:
+#       code: [
+#         -1483, 723, -359, 360, -714, 720, -361, 361, -714, 366, -713, 
+#         720, -359, 251, -827, 721, -362, 717, -362, 717, -360, 717, 
+#         -362, 717, -362, 719, -360, 715, -365, 714, -365, 359, -718, 
+#         719, -362, 717, -362, 717, -362, 363, -714, 362, -717, 720, 
+#         -362, 717, -362, 717, -362, 362, -716, 363, -717, 362, -717, 
+#         365, -717, 362, -717, 720, -362, 362, -717, 719, -362, 362, 
+#         -715, 722, -362, 360, -717, 719, -362, 362, -717, 720, -362, 
+#         360, -719, 719, 
+#         -7786, 4812, 
+#         -1486, 719, -362, 362, -717, 720, 
+#         -362, 360, -717, 364, -716, 721, -362, 362, -717, 719, -365, 
+#         717, -364, 717, -362, 720, -362, 719, -360, 717, -365, 717, 
+#         -362, 717, -362, 362, -717, 719, -363, 719, -362, 718, -361, 
+#         360, -717, 364, -717, 720, -362, 718, -363, 718, -362, 362, 
+#         -717, 366, -713, 364, -715, 365, -715, 364, -717, 722, -362, 
+#         359, -717, 720, -368, 356, -717, 722, -360, 362, -717, 719, 
+#         -362, 360, -718, 721, -362, 366, -713, 722
+#       ] 
+#   - platform: remote_receiver
+#     name: "RF1 Store Balcon DOWN"
+#     raw:
+#       code: [
+#         719, -363, 359, -718, 718, -364, 361, -715, 364, -716, 720, -361, 
+#         361, -716, 718, -365, 712, -364, 715, -362, 717, -362, 715, -360, 717, -363, 
+#         716, -362, 718, -359, 359, -718, 717, -362, 717, -362, 715, -362, 359, -717, 
+#         365, -715, 719, -362, 715, -364, 715, -364, 360, -717, 362, -715, 364, -715, 
+#         364, -715, 362, -717, 720, -363, 359, -717, 719, -362, 362, -715, 364, -715, 
+#         719, -363, 714, -362, 360, -720, 359, -716, 718, -362, 715
+#       ] 
+
 
