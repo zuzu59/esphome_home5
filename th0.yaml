@@ -3,7 +3,7 @@
 #-- Petit code mini manilste pour mesurer la température et l'humidité
 #-- Lit la tmpérature et l'humidité du capteur HTU21D
 #-- location: chambre à Chloé bureau zf
-#-- zf210720.1021, zf220328.0954
+#-- zf210720.1021, zf220811.2350
 #--
 
 
@@ -108,10 +108,21 @@ sensor:
       name: "th0 Humidité"
     update_interval: 15s
 
+  - platform: adc
+    pin: A0
+    name: "th0 luminosite"
+    update_interval: 2s
+    unit_of_measurement: "/255"
+    filters:
+      - calibrate_linear:
+          - 0.0 -> 0
+          - 0.6 -> 255
+
+
 # Sensors text
 text_sensor:
   - platform: version
-    name: "th0 Version"
+    name: "th0 Version 2350"
 
   - platform: wifi_info
     ip_address:
@@ -120,4 +131,21 @@ text_sensor:
     ssid:
       name: th0 Connected SSID
       id: wifi_ssid
+
+
+# Définition des inputs numbers
+number:
+  - platform: template
+    name: "th0 consigne brightness"
+    restore_value: true
+    optimistic: true
+    min_value: 0
+    max_value: +255
+    step: 1
+    initial_value: 50
+    unit_of_measurement: "/255"
+    id: th0_consigne_brightness
+
+
+
 
