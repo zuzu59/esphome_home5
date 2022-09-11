@@ -2,7 +2,7 @@
 #-- rfbridge1.yaml
 #-- Tests du bridge RF de SonOff
 #-- J'essaie d'apprendre un code de la remote de mon store banne et de le rejouer
-#-- zf220815.1900
+#-- zf220815.2127
 #--
 # sources: 
 # Hardware utilisé pour ce projet (mais attention en version V2 R2.2 !): https://sonoff.tech/product/smart-home-security/rf-bridge/
@@ -264,37 +264,37 @@ switch:
             wait_time: 100ms
 
 
-# Définition des Binary Sensor's
-binary_sensor:
-# Détection de l'appui sur une touche de la remote pour faire des tests avec le micro récepteur à Yvan
-  - platform: remote_receiver
-    name: "RF1 Test LED ON"
-    raw:
-      code: [
-            362, -1013, 362, -1016, 993, -386, 358, -1017, 996, -384, 991, -384, 996, -381, 
-            355, -1020, 360, -1015, 362, -1034, 985, -374, 357, -1018, 994, -385, 358, -1017, 
-            997, -381, 359, -1016, 362, -1013, 359, -1017, 361, -1015, 364, -1013, 362, -1013, 
-            363, -1015, 996, -381, 357, -1013, 357
-       ] 
-# Détection de l'appui sur une touche de la remote pour la bougie LED qui utilise le micro récepteur à Yvan
-  - platform: remote_receiver
-    name: "RF1 Bougie LED ON"
-    raw:
-      code: [
-        361, -1020, 362, -1018, 1001, -383, 999, -383, 999, -383, 999, -383, 360, -1020, 
-        996, -388, 997, -384, 997, -387, 996, -386, 996, -386, 996, -386, 998, -384, 
-        999, -383, 996, -386, 357, -1020, 362, -1018, 363, -1017, 362, -1017, 360, 
-        -1020, 362, -1019, 1000, -383, 360, -1014, 361
-       ] 
-  - platform: remote_receiver
-    name: "RF1 Bougie LED OFF"
-    raw:
-      code: [
-        364, -1015, 362, -1020, 999, -384, 998, -384, 995, -386, 997, -383, 360, -1017, 
-        1001, -384, 996, -385, 997, -383, 997, -384, 998, -383, 999, -383, 997, -384, 
-        998, -383, 996, -384, 359, -1018, 361, -1019, 378, -1005, 359, -1015, 362, 
-        -1019, 1001, -381, 358, -1019, 361, -1013, 362
-       ] 
+# # Définition des Binary Sensor's
+# binary_sensor:
+# # Détection de l'appui sur une touche de la remote pour faire des tests avec le micro récepteur à Yvan
+#   - platform: remote_receiver
+#     name: "RF1 Test LED ON"
+#     raw:
+#       code: [
+#             362, -1013, 362, -1016, 993, -386, 358, -1017, 996, -384, 991, -384, 996, -381, 
+#             355, -1020, 360, -1015, 362, -1034, 985, -374, 357, -1018, 994, -385, 358, -1017, 
+#             997, -381, 359, -1016, 362, -1013, 359, -1017, 361, -1015, 364, -1013, 362, -1013, 
+#             363, -1015, 996, -381, 357, -1013, 357
+#       ] 
+# # Détection de l'appui sur une touche de la remote pour la bougie LED qui utilise le micro récepteur à Yvan
+#   - platform: remote_receiver
+#     name: "RF1 Bougie LED ON"
+#     raw:
+#       code: [
+#         361, -1020, 362, -1018, 1001, -383, 999, -383, 999, -383, 999, -383, 360, -1020, 
+#         996, -388, 997, -384, 997, -387, 996, -386, 996, -386, 996, -386, 998, -384, 
+#         999, -383, 996, -386, 357, -1020, 362, -1018, 363, -1017, 362, -1017, 360, 
+#         -1020, 362, -1019, 1000, -383, 360, -1014, 361
+#       ] 
+#   - platform: remote_receiver
+#     name: "RF1 Bougie LED OFF"
+#     raw:
+#       code: [
+#         364, -1015, 362, -1020, 999, -384, 998, -384, 995, -386, 997, -383, 360, -1017, 
+#         1001, -384, 996, -385, 997, -383, 997, -384, 998, -383, 999, -383, 997, -384, 
+#         998, -383, 996, -384, 359, -1018, 361, -1019, 378, -1005, 359, -1015, 362, 
+#         -1019, 1001, -381, 358, -1019, 361, -1013, 362
+#       ] 
 
 # La détection de l'appui sur une touche de la remote du balcon ne fonctionne pas.
 # Je ne sais pas pour quoi ?
