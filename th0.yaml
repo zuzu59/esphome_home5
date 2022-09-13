@@ -3,7 +3,7 @@
 #-- Petit code mini manilste pour mesurer la température et l'humidité
 #-- Lit la tmpérature et l'humidité du capteur HTU21D
 #-- location: chambre à Chloé bureau zf
-#-- zf210720.1021, zf220811.2350
+#-- zf210720.1021, zf220814.0026
 #--
 
 
@@ -114,10 +114,15 @@ sensor:
     update_interval: 2s
     unit_of_measurement: "/255"
     filters:
-      - calibrate_linear:
-          - 0.0 -> 0
+#      - calibrate_linear:
+#          - 0.0 -> 0
+#          - 0.6 -> 255
+      - calibrate_polynomial:
+         degree: 2
+         datapoints:
+          - 0.001 -> 1
+          - 0.1 -> 20
           - 0.6 -> 255
-
 
 # Sensors text
 text_sensor:
