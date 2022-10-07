@@ -3,13 +3,15 @@
 #-- Petit code pour monitorer une batterie
 #-- Lit le port ADC0 et l'envoie sur un mqtt broker
 #-- location: xxx
-#-- zf221007.1134
+#-- zf221007.1216
 #--
 # sources: 
 # ...
 
 esphome:
   name: batt_meter1
+  on_boot:
+  - switch.turn_on: led
 
 esp8266:
   board: d1_mini
@@ -49,11 +51,34 @@ captive_portal:
 
 # Enable logging
 logger:
-    level: VERBOSE
+  level: DEBUG
+  logs:
+    logger: INFO
+    adc: INFO
+    captive_portal: INFO
+    deep_sleep: INFO
+    htu21d: INFO
+    i2c: INFO
+    ota: INFO
+    restart: INFO
+    sensor: INFO
+    switch: INFO
+    switch.gpio: INFO
+    uptime.sensor: INFO
+    web_server: INFO
+    wifi_signal.sensor: INFO
+    mqtt: INFO
+    mqtt.component: INFO
+    mqtt.client: INFO
+    mqtt.switch: INFO
+    mqtt.sensor: INFO
+
+
+
 
 # Enable Home Assistant API
-api:
-  password: !secret api_password
+#api:
+#  password: !secret api_password
 
 ota:
   password: !secret ota_password
@@ -74,11 +99,31 @@ web_server:
   port: 80
 
 
+# MQTT server
+mqtt:
+  broker:  !secret mqtt_server_dev
+  port:  !secret mqtt_port_dev
+  username:  !secret mqtt_user_dev
+  password:  !secret mqtt_password_dev
+
+
 # Sensors
 sensor:
   - platform: wifi_signal
     name: "batt_meter1 Signal Wi-Fi"
-    update_interval: 60s
+    update_interval: 3s
+    on_value:
+      if:
+        condition:
+          mqtt.connected:
+        then:
+#            - delay: 2s
+          - logger.log: Je suis connected et envoie la sauce !
+          - delay: 1s
+          - logger.log: Je vais dormir !
+          - deep_sleep.enter: deep_sleep_1
+        else:
+          - logger.log: WiFi not Antoine connected!
 
   - platform: uptime
     name: "batt_meter1 uptime"
@@ -86,7 +131,7 @@ sensor:
 
 # valeur brute en volts de l'ADC
   - platform: adc
-    pin: A0
+    pin: VCC
     name: "batt_meter1 brut en volts"
     id: batt_meter1_brut_en_volts
     update_interval: 2s
@@ -121,5 +166,11 @@ number:
     id: batt_meter1_consigne_alarme_low
 
 
+
+# Deep Sleep
+deep_sleep:
+  run_duration: 10s
+  sleep_duration: 10s
+  id: deep_sleep_1
 
 
