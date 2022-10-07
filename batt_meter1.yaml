@@ -1,0 +1,125 @@
+#------------------------------
+#-- batt_meter1.yaml
+#-- Petit code pour monitorer une batterie
+#-- Lit le port ADC0 et l'envoie sur un mqtt broker
+#-- location: xxx
+#-- zf221007.1134
+#--
+# sources: 
+# ...
+
+esphome:
+  name: batt_meter1
+
+esp8266:
+  board: d1_mini
+
+# Configuration WIFI
+wifi:
+  ssid: !secret wifi_ssid_3G_zf2
+  password: !secret wifi_pass_3G_zf2
+
+  # networks:
+  
+  #   - ssid: !secret wifi_ssid_apzuzu7
+  #   - password: !secret wifi_pass_apzuzu7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6
+  #   - password: !secret wifi_pass_apzuzu6
+
+  #   - ssid: !secret wifi_ssid_3G_zf
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3G_zf2
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3g_s7
+  #   - password: !secret wifi_pass_3g_s7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
+  #   - password: !secret wifi_pass_apzuzu6_EXT
+
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "esp32-ble-hub1 Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+    level: VERBOSE
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+ota:
+  password: !secret ota_password
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "batt_meter1 LED"
+    inverted: True
+    id: led
+    pin: D4
+
+  - platform: restart
+    name: "batt_meter1 Restart"
+
+# WEB Server
+web_server:
+  port: 80
+
+
+# Sensors
+sensor:
+  - platform: wifi_signal
+    name: "batt_meter1 Signal Wi-Fi"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "batt_meter1 uptime"
+    update_interval: 60s
+
+# valeur brute en volts de l'ADC
+  - platform: adc
+    pin: A0
+    name: "batt_meter1 brut en volts"
+    id: batt_meter1_brut_en_volts
+    update_interval: 2s
+    unit_of_measurement: "V"
+
+
+# Sensors text
+text_sensor:
+  - platform: version
+    name: "batt_meter1 Version 1150"
+
+  - platform: wifi_info
+    ip_address:
+      name: batt_meter1 IP Address
+      id: wifi_ip
+    ssid:
+      name: batt_meter1 Connected SSID
+      id: wifi_ssid
+
+
+# Définition des inputs numbers
+number:
+  - platform: template
+    name: "batt_meter1 consigne alarme low"
+    restore_value: true
+    optimistic: true
+    min_value: 0.0
+    max_value: 0.8
+    step: 0.01
+    initial_value: 0.4
+    unit_of_measurement: "V"
+    id: batt_meter1_consigne_alarme_low
+
+
+
+
