@@ -2,8 +2,9 @@
 #-- batmon_d1_1.yaml
 #-- Petit code pour monitorer une batterie
 #-- Lit le port ADC0 et l'envoie sur un mqtt broker
+#-- Si la pin D2 est à GND, alors part en dsleep pour une certaine durée
 #-- location: xxx
-#-- zf221007.1216
+#-- zf221007.2221
 #--
 # sources: 
 # ...
@@ -74,14 +75,13 @@ logger:
     mqtt.sensor: INFO
 
 
-
-
 # Enable Home Assistant API
 #api:
 #  password: !secret api_password
 
 ota:
   password: !secret ota_password
+
 
 # Définition des Switch's
 switch:
@@ -111,19 +111,23 @@ mqtt:
 sensor:
   - platform: wifi_signal
     name: "batmon_d1_1 Signal Wi-Fi"
-    update_interval: 3s
+    update_interval: 60s
     on_value:
       if:
         condition:
           mqtt.connected:
         then:
-#            - delay: 2s
-          - logger.log: Je suis connected et envoie la sauce !
-          - delay: 1s
-          - logger.log: Je vais dormir !
-          - deep_sleep.enter: deep_sleep_1
+          - logger.log: Je suis connected sur le mqtt et j'envoie la sauce !
+          - if:
+              condition:
+                lambda: 'return id(batmon_d1_1_sleep_mode).state == 1;'
+              then:
+                - delay: 1s
+                - logger.log: On me demande de dormir !
+                - deep_sleep.enter: deep_sleep_1
         else:
-          - logger.log: WiFi not Antoine connected!
+          - logger.log: Erreur 007 *********************************************************
+          - deep_sleep.enter: deep_sleep_1
 
   - platform: uptime
     name: "batmon_d1_1 uptime"
@@ -136,6 +140,17 @@ sensor:
     id: batmon_d1_1_brut_en_volts
     update_interval: 2s
     unit_of_measurement: "V"
+
+
+# Définition des binary sensor
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D2
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "batmon_d1_1 sleep mode"
+    id: batmon_d1_1_sleep_mode
 
 
 # Sensors text
@@ -152,25 +167,8 @@ text_sensor:
       id: wifi_ssid
 
 
-# Définition des inputs numbers
-number:
-  - platform: template
-    name: "batmon_d1_1 consigne alarme low"
-    restore_value: true
-    optimistic: true
-    min_value: 0.0
-    max_value: 0.8
-    step: 0.01
-    initial_value: 0.4
-    unit_of_measurement: "V"
-    id: batmon_d1_1_consigne_alarme_low
-
-
-
 # Deep Sleep
 deep_sleep:
-  run_duration: 10s
+#  run_duration: 20s
   sleep_duration: 10s
   id: deep_sleep_1
-
-
