@@ -1,5 +1,5 @@
 #------------------------------
-#-- batt_meter1.yaml
+#-- batmon_d1_1.yaml
 #-- Petit code pour monitorer une batterie
 #-- Lit le port ADC0 et l'envoie sur un mqtt broker
 #-- location: xxx
@@ -9,7 +9,7 @@
 # ...
 
 esphome:
-  name: batt_meter1
+  name: batmon_d1_1
   on_boot:
   - switch.turn_on: led
 
@@ -86,13 +86,13 @@ ota:
 # Définition des Switch's
 switch:
   - platform: gpio
-    name: "batt_meter1 LED"
+    name: "batmon_d1_1 LED"
     inverted: True
     id: led
     pin: D4
 
   - platform: restart
-    name: "batt_meter1 Restart"
+    name: "batmon_d1_1 Restart"
 
 # WEB Server
 web_server:
@@ -110,7 +110,7 @@ mqtt:
 # Sensors
 sensor:
   - platform: wifi_signal
-    name: "batt_meter1 Signal Wi-Fi"
+    name: "batmon_d1_1 Signal Wi-Fi"
     update_interval: 3s
     on_value:
       if:
@@ -126,14 +126,14 @@ sensor:
           - logger.log: WiFi not Antoine connected!
 
   - platform: uptime
-    name: "batt_meter1 uptime"
+    name: "batmon_d1_1 uptime"
     update_interval: 60s
 
 # valeur brute en volts de l'ADC
   - platform: adc
     pin: VCC
-    name: "batt_meter1 brut en volts"
-    id: batt_meter1_brut_en_volts
+    name: "batmon_d1_1 brut en volts"
+    id: batmon_d1_1_brut_en_volts
     update_interval: 2s
     unit_of_measurement: "V"
 
@@ -141,21 +141,21 @@ sensor:
 # Sensors text
 text_sensor:
   - platform: version
-    name: "batt_meter1 Version 1150"
+    name: "batmon_d1_1 Version 1150"
 
   - platform: wifi_info
     ip_address:
-      name: batt_meter1 IP Address
+      name: batmon_d1_1 IP Address
       id: wifi_ip
     ssid:
-      name: batt_meter1 Connected SSID
+      name: batmon_d1_1 Connected SSID
       id: wifi_ssid
 
 
 # Définition des inputs numbers
 number:
   - platform: template
-    name: "batt_meter1 consigne alarme low"
+    name: "batmon_d1_1 consigne alarme low"
     restore_value: true
     optimistic: true
     min_value: 0.0
@@ -163,7 +163,7 @@ number:
     step: 0.01
     initial_value: 0.4
     unit_of_measurement: "V"
-    id: batt_meter1_consigne_alarme_low
+    id: batmon_d1_1_consigne_alarme_low
 
 
 
