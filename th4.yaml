@@ -2,10 +2,10 @@
 #-- th4.yaml
 #-- Petit code pour monitorer la température et l'humidité dans une pièce
 #-- location: xxx
-#-- zf221008.1330
+#-- zf221008.1437
 #--
 # sources: 
-# ...
+# https://esphome.io/components/sensor/htu21d.html
 
 esphome:
   name: th4
