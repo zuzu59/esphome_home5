@@ -1,0 +1,113 @@
+#------------------------------
+#-- th2.yaml
+#-- Petit code pour monitorer la température et l'humidité dans une pièce
+#-- location: xxx
+#-- zf221008.1330
+#--
+# sources: 
+# ...
+
+esphome:
+  name: th2
+
+esp8266:
+  board: d1_mini
+
+# Configuration WIFI
+wifi:
+  ssid: !secret wifi_ssid_3G_zf2
+  password: !secret wifi_pass_3G_zf2
+
+  # networks:
+  
+  #   - ssid: !secret wifi_ssid_apzuzu7
+  #   - password: !secret wifi_pass_apzuzu7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6
+  #   - password: !secret wifi_pass_apzuzu6
+
+  #   - ssid: !secret wifi_ssid_3G_zf
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3G_zf2
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3g_s7
+  #   - password: !secret wifi_pass_3g_s7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
+  #   - password: !secret wifi_pass_apzuzu6_EXT
+
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "esp32-ble-hub1 Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+    level: VERBOSE
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+ota:
+  password: !secret ota_password
+
+# WEB Server
+web_server:
+  port: 80
+
+
+# I2C conf
+i2c:
+  sda: D5
+  scl: D6
+
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "th2 LED"
+    inverted: True
+    id: led
+    pin: D4
+
+  - platform: restart
+    name: "th2 Restart"
+
+
+# Définition des Sensors
+sensor:
+  - platform: wifi_signal
+    name: "th2 Signal Wi-Fi"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "th2 uptime"
+    update_interval: 60s
+
+  - platform: htu21d
+    temperature:
+      name: "th2 Température"
+    humidity:
+      name: "th2 Humidité"
+    update_interval: 15s
+
+
+# Définition des Sensors text
+text_sensor:
+  - platform: version
+    name: "th2 Version 1257"
+
+  - platform: wifi_info
+    ip_address:
+      name: th2 IP Address
+      id: wifi_ip
+    ssid:
+      name: th2 Connected SSID
+      id: wifi_ssid
+
