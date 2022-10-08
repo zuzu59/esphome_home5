@@ -8,7 +8,7 @@ je ne sais pas pourquoi, mais le code ESPhome ne veut pas de tiret dans ses id's
 #-- Petit code pour monitorer une batterie
 #-- Lit le port ADC0 et l'envoie sur un mqtt broker
 #-- location: xxx
-#-- zf221007.1134
+#-- zf221008.1300
 #--
 # sources: 
 # ...
@@ -63,6 +63,11 @@ api:
 ota:
   password: !secret ota_password
 
+# WEB Server
+web_server:
+  port: 80
+
+
 # Définition des Switch's
 switch:
   - platform: gpio
@@ -74,12 +79,8 @@ switch:
   - platform: restart
     name: "batt_meter1 Restart"
 
-# WEB Server
-web_server:
-  port: 80
 
-
-# Sensors
+# Définition des Sensors
 sensor:
   - platform: wifi_signal
     name: "batt_meter1 Signal Wi-Fi"
@@ -98,7 +99,7 @@ sensor:
     unit_of_measurement: "V"
 
 
-# Sensors text
+# Définition des Sensors text
 text_sensor:
   - platform: version
     name: "batt_meter1 Version 1150"
@@ -124,7 +125,3 @@ number:
     initial_value: 0.4
     unit_of_measurement: "V"
     id: batt_meter1_consigne_alarme_low
-
-
-
-
