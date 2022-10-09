@@ -2,7 +2,7 @@
 #-- th2.yaml
 #-- Petit code pour monitorer la température et l'humidité dans une pièce
 #-- location: xxx
-#-- zf221008.1437
+#-- zf221009.1736
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -51,8 +51,8 @@ logger:
     level: VERBOSE
 
 # Enable Home Assistant API
-api:
-  password: !secret api_password
+#api:
+#  password: !secret api_password
 
 ota:
   password: !secret ota_password
@@ -60,6 +60,18 @@ ota:
 # WEB Server
 web_server:
   port: 80
+
+
+
+
+# MQTT server
+mqtt:
+  broker:  !secret mqtt_server_dev
+  port:  !secret mqtt_port_dev
+  username:  !secret mqtt_user_dev
+  password:  !secret mqtt_password_dev
+
+
 
 
 # I2C conf
