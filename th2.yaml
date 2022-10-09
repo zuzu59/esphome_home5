@@ -2,7 +2,7 @@
 #-- th2.yaml
 #-- Petit code pour monitorer la température et l'humidité dans une pièce
 #-- location: xxx
-#-- zf221009.1736
+#-- zf221009.1959
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -48,7 +48,27 @@ captive_portal:
 
 # Enable logging
 logger:
-    level: VERBOSE
+  level: DEBUG
+  logs:
+    logger: INFO
+    adc: INFO
+    captive_portal: INFO
+    deep_sleep: INFO
+    htu21d: INFO
+    i2c: INFO
+    ota: INFO
+    restart: INFO
+    sensor: INFO
+    switch: INFO
+    switch.gpio: INFO
+    uptime.sensor: INFO
+    web_server: INFO
+    wifi_signal.sensor: INFO
+    mqtt: INFO
+    mqtt.component: INFO
+    mqtt.client: INFO
+    mqtt.switch: INFO
+    mqtt.sensor: INFO
 
 # Enable Home Assistant API
 #api:
