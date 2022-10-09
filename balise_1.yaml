@@ -1,0 +1,143 @@
+#------------------------------
+#-- balise_1.yaml
+#-- Petit code pour faire justeune petite balise indiquant le bon fonctionnement du WIFI pour St-Luc
+#-- C'est aussi pour tester la possibilité d'avoir des ESPhome à St-Luc
+#-- Il faut publier sur mqtt 'balise_1/switch/balise_1_led/command' = ON/OFF pour allumer/éteindre la LED !
+#
+#-- location: xxx
+#-- zf221009.2136
+#--
+# sources: 
+# ...
+
+esphome:
+  name: balise_1
+  on_boot:
+  - switch.turn_off: led
+
+esp8266:
+  board: d1_mini
+
+# Configuration WIFI
+wifi:
+  ssid: !secret wifi_ssid_3G_zf2
+  password: !secret wifi_pass_3G_zf2
+
+  # networks:
+  
+  #   - ssid: !secret wifi_ssid_apzuzu7
+  #   - password: !secret wifi_pass_apzuzu7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6
+  #   - password: !secret wifi_pass_apzuzu6
+
+  #   - ssid: !secret wifi_ssid_3G_zf
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3G_zf2
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3g_s7
+  #   - password: !secret wifi_pass_3g_s7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
+  #   - password: !secret wifi_pass_apzuzu6_EXT
+
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "esp32-ble-hub1 Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+  level: DEBUG
+  logs:
+    logger: INFO
+    adc: INFO
+    captive_portal: INFO
+    deep_sleep: INFO
+    htu21d: INFO
+    i2c: INFO
+    ota: INFO
+    restart: INFO
+    sensor: INFO
+    switch: INFO
+    switch.gpio: INFO
+    uptime.sensor: INFO
+    web_server: INFO
+    wifi_signal.sensor: INFO
+    mqtt: INFO
+    mqtt.component: INFO
+    mqtt.client: INFO
+    mqtt.switch: INFO
+    mqtt.sensor: INFO
+
+
+# Enable Home Assistant API
+#api:
+#  password: !secret api_password
+
+ota:
+  password: !secret ota_password
+
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "balise_1 LED"
+    inverted: True
+    id: led
+    pin: D4
+
+  - platform: restart
+    name: "balise_1 Restart"
+
+# WEB Server
+web_server:
+  port: 80
+
+
+# MQTT server
+mqtt:
+  broker:  !secret mqtt_server_dev
+  port:  !secret mqtt_port_dev
+  username:  !secret mqtt_user_dev
+  password:  !secret mqtt_password_dev
+
+
+# Sensors
+sensor:
+  - platform: wifi_signal
+    name: "balise_1 Signal Wi-Fi"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "balise_1 uptime"
+    update_interval: 15s
+
+# valeur brute en volts de l'ADC
+  - platform: adc
+    pin: VCC
+    name: "balise_1 brut en volts"
+    id: balise_1_brut_en_volts
+    update_interval: 15s
+    unit_of_measurement: "V"
+
+
+# Sensors text
+text_sensor:
+  - platform: version
+    name: "balise_1 Version 1150"
+
+  - platform: wifi_info
+    ip_address:
+      name: balise_1 IP Address
+      id: wifi_ip
+    ssid:
+      name: balise_1 Connected SSID
+      id: wifi_ssid
+    scan_results:
+      name: balise_1 Latest Scan Results
