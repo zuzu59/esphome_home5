@@ -5,7 +5,7 @@
 #-- Il faut publier sur mqtt 'balise_1/switch/balise_1_led/command' = ON/OFF pour allumer/éteindre la LED !
 #
 #-- location: xxx
-#-- zf221009.2136
+#-- zf221010.1016
 #--
 # sources: 
 # ...
@@ -20,8 +20,8 @@ esp8266:
 
 # Configuration WIFI
 wifi:
-  ssid: !secret wifi_ssid_3G_zf2
-  password: !secret wifi_pass_3G_zf2
+  ssid: !secret wifi_ssid_3G_domo
+  password: !secret wifi_pass_3G_domo
 
   # networks:
   
