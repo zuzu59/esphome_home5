@@ -2,7 +2,7 @@
 #-- th4.yaml
 #-- Petit code pour monitorer la température et l'humidité dans une pièce
 #-- location: xxx
-#-- zf221009.1959
+#-- zf221015.1757
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -15,8 +15,8 @@ esp8266:
 
 # Configuration WIFI
 wifi:
-  ssid: !secret wifi_ssid_3G_zf2
-  password: !secret wifi_pass_3G_zf2
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
 
   # networks:
   
@@ -71,8 +71,8 @@ logger:
     mqtt.sensor: INFO
 
 # Enable Home Assistant API
-#api:
-#  password: !secret api_password
+api:
+ password: !secret api_password
 
 ota:
   password: !secret ota_password
@@ -81,18 +81,12 @@ ota:
 web_server:
   port: 80
 
-
-
-
-# MQTT server
-mqtt:
-  broker:  !secret mqtt_server_dev
-  port:  !secret mqtt_port_dev
-  username:  !secret mqtt_user_dev
-  password:  !secret mqtt_password_dev
-
-
-
+# # MQTT server
+# mqtt:
+#   broker:  !secret mqtt_server_dev
+#   port:  !secret mqtt_port_dev
+#   username:  !secret mqtt_user_dev
+#   password:  !secret mqtt_password_dev
 
 # I2C conf
 i2c:
