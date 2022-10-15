@@ -1,8 +1,8 @@
 #------------------------------
 #-- th3.yaml
 #-- Petit code pour monitorer la température et l'humidité dans une pièce
-#-- location: xxx
-#-- zf221015.1757
+#-- location: salon
+#-- zf221015.1820
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
