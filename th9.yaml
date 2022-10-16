@@ -2,13 +2,17 @@
 #-- th9.yaml
 #-- Petit code pour monitorer la température et l'humidité dans une pièce
 #-- location: salle de bain
-#-- zf221015.1820
+#-- Si la pin D2 est à GND, alors part en dsleep pour une certaine durée
+#-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
+#-- zf221016.1025
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
 
 esphome:
   name: th9
+  on_boot:
+  - switch.turn_on: led
 
 esp8266:
   board: d1_mini
@@ -70,9 +74,9 @@ logger:
     mqtt.switch: INFO
     mqtt.sensor: INFO
 
-# Enable Home Assistant API
-api:
- password: !secret api_password
+# # Enable Home Assistant API
+# api:
+#  password: !secret api_password
 
 ota:
   password: !secret ota_password
@@ -81,12 +85,12 @@ ota:
 web_server:
   port: 80
 
-# # MQTT server
-# mqtt:
-#   broker:  !secret mqtt_server_dev
-#   port:  !secret mqtt_port_dev
-#   username:  !secret mqtt_user_dev
-#   password:  !secret mqtt_password_dev
+# MQTT server
+mqtt:
+  broker:  !secret mqtt_server_dev
+  port:  !secret mqtt_port_dev
+  username:  !secret mqtt_user_dev
+  password:  !secret mqtt_password_dev
 
 # I2C conf
 i2c:
@@ -112,6 +116,22 @@ sensor:
   - platform: wifi_signal
     name: "th9 Signal Wi-Fi"
     update_interval: 60s
+    on_value:
+      if:
+        condition:
+          mqtt.connected:
+        then:
+          - logger.log: Je suis connected sur le mqtt et j'envoie la sauce !
+          - if:
+              condition:
+                lambda: 'return id(th9_sleep_mode).state == 1;'
+              then:
+                - delay: 1s
+                - logger.log: On me demande de dormir !
+                - deep_sleep.enter: deep_sleep_1
+        else:
+          - logger.log: Erreur 007 *********************************************************
+          - deep_sleep.enter: deep_sleep_1
 
   - platform: uptime
     name: "th9 uptime"
@@ -123,6 +143,17 @@ sensor:
     humidity:
       name: "th9 Humidité"
     update_interval: 15s
+
+
+# Définition des binary sensor
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D2
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "th9 sleep mode"
+    id: th9_sleep_mode
 
 
 # Définition des Sensors text
@@ -138,3 +169,9 @@ text_sensor:
       name: th9 Connected SSID
       id: wifi_ssid
 
+
+# Deep Sleep
+deep_sleep:
+#  run_duration: 5s
+  sleep_duration: 60s
+  id: deep_sleep_1
