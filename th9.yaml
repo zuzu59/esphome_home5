@@ -4,10 +4,11 @@
 #-- location: salle de bain
 #-- Si la pin D2 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- zf221017.1556
+#-- zf221017.1720
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
+# Calcul de la durée sur une batterie: https://docs.google.com/spreadsheets/d/1I6s_R04LjGxCB0hrcvogGHNeITDwfXjM05hJhuqGkoU/edit#gid=1470557238
 
 esphome:
   name: th9
@@ -216,5 +217,5 @@ text_sensor:
 # Deep Sleep
 deep_sleep:
 #  run_duration: 5s
-  sleep_duration: 10s
+  sleep_duration: 300s
   id: deep_sleep_1
