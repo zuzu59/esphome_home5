@@ -4,7 +4,7 @@
 #-- location: salle de bain
 #-- Si la pin D2 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- zf221017.1351
+#-- zf221017.1556
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -138,17 +138,55 @@ sensor:
     name: "th9 uptime"
     update_interval: 15s
 
+# température et humidité
   - platform: htu21d
     temperature:
       name: "th9 Température"
     humidity:
       name: "th9 Humidité"
+      accuracy_decimals: 0
     update_interval: 15s
 
+# tension VCC à l'intérieur de l'ESP
   - platform: adc
     pin: VCC
     name: "th9 VCC Voltage"
-    update_interval: 3s
+    id: th9_vcc_voltage
+    update_interval: 2s
+    unit_of_measurement: "V"
+    accuracy_decimals: 3
+    internal: true
+
+# tension de la batterie
+  - platform: template
+    name: "th9 BAT Voltage"
+    id: th9_bat_voltage
+    update_interval: 2s
+    unit_of_measurement: "V"
+    accuracy_decimals: 3
+    lambda: return id(th9_vcc_voltage).state + 1.24 ;
+
+# capacité de la batterie
+  - platform: template
+    name: "th9 BAT capacity"
+    update_interval: 2s
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    lambda: return id(th9_bat_voltage).state ;
+    filters:
+      - calibrate_linear:
+          - 2.50 -> 0.00
+          - 3.50 -> 10.00
+          - 3.70 -> 20.00
+          - 3.72 -> 30.00
+          - 3.74 -> 40.00
+          - 3.76 -> 50.00
+          - 3.78 -> 60.00
+          - 3.80 -> 70.00
+          - 3.82 -> 80.00
+          - 3.85 -> 90.00
+          - 4.20 -> 100.00
+
 
 # Définition des binary sensor
 binary_sensor:
