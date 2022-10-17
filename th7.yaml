@@ -2,8 +2,8 @@
 #-- th7.yaml
 #-- Petit code mini manilste pour mesurer la température et l'humidité
 #-- Lit la tmpérature et l'humidité du capteur HTU21D
-#-- location: salon sur HP basse
-#-- zf210720.1023, zf220302.1155
+#-- location: hall rez
+#-- zf210720.1023, zf220302.1155, zf221017.2307
 #--
 
 
