@@ -1,12 +1,9 @@
-
 #------------------------------
 #-- th-fsd58.yaml
 #-- Petit code pour la formation IoT de la FSD de mars 2021
 #-- Lit la tmpérature et l'humidité du capteur HTU21D et se connecte sur le broker MQTT
-#-- zf210611.0720, zf220503.0940
+#-- zf210611.0720, zf220503.0940, zf221018.0031
 #--
-
-
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
 # https://esphome.io/components/mqtt.html
@@ -18,29 +15,8 @@ esphome:
 
 # Configuration WIFI
 wifi:
-#   ssid: !secret wifi_ssid_apzuzu7
-#   password: !secret wifi_pass_apzuzu7
-
-  networks:
-  
-    - ssid: !secret wifi_ssid_apzuzu7
-    - password: !secret wifi_pass_apzuzu7
-    
-    - ssid: !secret wifi_ssid_apzuzu6
-    - password: !secret wifi_pass_apzuzu6
-    
-    - ssid: !secret wifi_ssid_3G_zf
-    - password: !secret wifi_pass_3G_zf2
-    
-    - ssid: !secret wifi_ssid_3G_zf2
-    - password: !secret wifi_pass_3G_zf2
-    
-    - ssid: !secret wifi_ssid_3g_s7
-    - password: !secret wifi_pass_3g_s7
-    
-    - ssid: !secret wifi_ssid_apzuzu6_EXT
-    - password: !secret wifi_pass_apzuzu6_EXT
-
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
@@ -51,49 +27,34 @@ captive_portal:
 
 # Enable logging
 logger:
-#    level: VERBOSE
+  level: DEBUG
+  logs:
+    logger: INFO
+    adc: INFO
+    captive_portal: INFO
+    deep_sleep: INFO
+    htu21d: INFO
+    i2c: INFO
+    ota: INFO
+    restart: INFO
+    sensor: INFO
+    switch: INFO
+    switch.gpio: INFO
+    uptime.sensor: INFO
+    web_server: INFO
+    wifi_signal.sensor: INFO
+    mqtt: INFO
+    mqtt.component: INFO
+    mqtt.client: INFO
+    mqtt.switch: INFO
+    mqtt.sensor: INFO
 
-# Enable Home Assistant API
-api:
-  password: !secret api_password
+# # Enable Home Assistant API
+# api:
+#   password: !secret api_password
 
 ota:
   password: !secret ota_password
-
-# Définition des Switch's
-switch:
-  - platform: gpio
-    name: "th-fsd58 LED"
-    inverted: True
-    id: led
-    pin: D4
-
-  - platform: restart
-    name: "th-fsd58 Restart"
-
-# Définition du bouton physique
-binary_sensor:
-  - platform: gpio
-    pin:
-      number: D3
-      mode: INPUT_PULLUP
-      inverted: True
-    name: "th-fsd58 button"
-    on_press:
-      - switch.toggle: led
-
-# Définitions des texts sensors
-text_sensor:
-  - platform: version
-    name: "th-fsd58 Version"
-
-  - platform: wifi_info
-    ip_address:
-      name: th-fsd58 IP Address
-      id: wifi_ip
-    ssid:
-      name: th-fsd58 Connected SSID
-      id: wifi_ssid
 
 # WEB Server
 web_server:
@@ -106,12 +67,35 @@ mqtt:
   username:  !secret mqtt_user_dev
   password:  !secret mqtt_password_dev
 
-
-
 # I2C conf
 i2c:
   sda: D5
   scl: D6
+
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "th-fsd58 LED"
+    inverted: True
+    id: led
+    pin: D4
+
+  - platform: restart
+    name: "th-fsd58 Restart"
+
+
+# Définition du bouton physique
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D3
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "th-fsd58 button"
+    on_press:
+      - switch.toggle: led
+
 
 # Sensors
 sensor:
@@ -128,16 +112,19 @@ sensor:
       name: "th-fsd58 Température"
     humidity:
       name: "th-fsd58 Humidité"
-    update_interval: 5s
-
-######### juste là pour changer l'harmonique du CPU qui interagit avec le WIFI sur mes NodeMCU lowcost :-(
-  - platform: homeassistant
-    name: "th-fsd58 toto tutu"
-    entity_id: sensor.toto_tutu
-    id: th_fsd58_toto_tutu
-    internal: true
-#########
+    update_interval: 15s
 
 
+# Définition des Sensors text
+text_sensor:
+  - platform: version
+    name: "th-fsd58 Version 1352"
 
+  - platform: wifi_info
+    ip_address:
+      name: th-fsd58 IP Address
+      id: wifi_ip
+    ssid:
+      name: th-fsd58 Connected SSID
+      id: wifi_ssid
 
