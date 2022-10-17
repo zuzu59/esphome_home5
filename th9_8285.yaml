@@ -1,0 +1,177 @@
+#------------------------------
+#-- th9_8285.yaml
+#-- Petit code pour monitorer la température et l'humidité dans une pièce
+#-- location: salle de bain
+#-- Si la pin GPIO13 (D7) est à GND, alors part en dsleep pour une certaine durée
+#-- ATTENTION, il faut relier la pin GPIO16 (D0) à RST pour qu'il puisse sortir du dsleep mode !
+#-- zf221017.1131
+#--
+# sources: 
+# https://esphome.io/components/sensor/htu21d.html
+
+esphome:
+  name: th9_8285
+  on_boot:
+  - switch.turn_on: led
+
+esp8266:
+  board: esp8285
+
+# Configuration WIFI
+wifi:
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
+
+  # networks:
+  
+  #   - ssid: !secret wifi_ssid_apzuzu7
+  #   - password: !secret wifi_pass_apzuzu7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6
+  #   - password: !secret wifi_pass_apzuzu6
+
+  #   - ssid: !secret wifi_ssid_3G_zf
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3G_zf2
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3g_s7
+  #   - password: !secret wifi_pass_3g_s7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
+  #   - password: !secret wifi_pass_apzuzu6_EXT
+
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "esp32-ble-hub1 Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+  level: DEBUG
+  logs:
+    logger: INFO
+    adc: INFO
+    captive_portal: INFO
+    deep_sleep: INFO
+    htu21d: INFO
+    i2c: INFO
+    ota: INFO
+    restart: INFO
+    sensor: INFO
+    switch: INFO
+    switch.gpio: INFO
+    uptime.sensor: INFO
+    web_server: INFO
+    wifi_signal.sensor: INFO
+    mqtt: INFO
+    mqtt.component: INFO
+    mqtt.client: INFO
+    mqtt.switch: INFO
+    mqtt.sensor: INFO
+
+# # Enable Home Assistant API
+# api:
+#  password: !secret api_password
+
+ota:
+  password: !secret ota_password
+
+# WEB Server
+web_server:
+  port: 80
+
+# MQTT server
+mqtt:
+  broker:  !secret mqtt_server_dev
+  port:  !secret mqtt_port_dev
+  username:  !secret mqtt_user_dev
+  password:  !secret mqtt_password_dev
+
+# I2C conf
+i2c:
+  sda: GPIO4
+  scl: GPIO14
+#  frequency: 10khz
+
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "th9_8285 LED"
+    inverted: True
+    id: led
+    pin: GPIO2
+
+  - platform: restart
+    name: "th9_8285 Restart"
+
+
+# Définition des Sensors
+sensor:
+  - platform: wifi_signal
+    name: "th9_8285 Signal Wi-Fi"
+    update_interval: 60s
+    on_value:
+      if:
+        condition:
+          mqtt.connected:
+        then:
+          - logger.log: Je suis connected sur le mqtt et j'envoie la sauce !
+          - if:
+              condition:
+                lambda: 'return id(th9_8285_sleep_mode).state == 1;'
+              then:
+                - delay: 1s
+                - logger.log: On me demande de dormir !
+                - deep_sleep.enter: deep_sleep_1
+        else:
+          - logger.log: Erreur 007 *********************************************************
+          - deep_sleep.enter: deep_sleep_1
+
+  - platform: uptime
+    name: "th9_8285 uptime"
+    update_interval: 15s
+
+  - platform: htu21d
+    temperature:
+      name: "th9_8285 Température"
+    humidity:
+      name: "th9_8285 Humidité"
+    update_interval: 15s
+
+
+# Définition des binary sensor
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO13
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "th9_8285 sleep mode"
+    id: th9_8285_sleep_mode
+
+
+# Définition des Sensors text
+text_sensor:
+  - platform: version
+    name: "th9_8285 Version 1140"
+
+  - platform: wifi_info
+    ip_address:
+      name: th9_8285 IP Address
+      id: wifi_ip
+    ssid:
+      name: th9_8285 Connected SSID
+      id: wifi_ssid
+
+
+# Deep Sleep
+deep_sleep:
+#  run_duration: 5s
+  sleep_duration: 600s
+  id: deep_sleep_1
