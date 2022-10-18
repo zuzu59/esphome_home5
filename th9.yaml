@@ -4,7 +4,7 @@
 #-- location: salle de bain
 #-- Si la pin D2 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- zf221017.1720
+#-- zf221018.2258
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -112,6 +112,11 @@ switch:
   - platform: restart
     name: "th9 Restart"
 
+  - platform: shutdown
+    name: "th9 Shutdown"
+    id: th9_shutdown
+    internal: true
+
 
 # Définition des Sensors
 sensor:
@@ -145,7 +150,7 @@ sensor:
       name: "th9 Température"
     humidity:
       name: "th9 Humidité"
-      accuracy_decimals: 0
+#      accuracy_decimals: 0
     update_interval: 15s
 
 # tension VCC à l'intérieur de l'ESP
@@ -166,6 +171,15 @@ sensor:
     unit_of_measurement: "V"
     accuracy_decimals: 3
     lambda: return id(th9_vcc_voltage).state + 1.24 ;
+    # fonction BMS, shutdown si < 3.0 Volts !
+    on_value:
+      - if:
+          condition:
+            lambda: 'return id(th9_bat_voltage).state < 3.0 ;'
+          then:
+            - logger.log: "The sensor value is below 3.0 Volts !"
+            - delay: 15s
+            - switch.turn_on: th9_shutdown
 
 # capacité de la batterie
   - platform: template
@@ -217,5 +231,5 @@ text_sensor:
 # Deep Sleep
 deep_sleep:
 #  run_duration: 5s
-  sleep_duration: 300s
+  sleep_duration: 60s
   id: deep_sleep_1
