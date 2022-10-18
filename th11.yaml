@@ -1,0 +1,235 @@
+#------------------------------
+#-- th11.yaml
+#-- Petit code pour monitorer la température et l'humidité dans une pièce
+#-- location: bureau Vreni
+#-- Si la pin D2 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
+#-- zf221018.2337
+#--
+# sources: 
+# https://esphome.io/components/sensor/htu21d.html
+# Calcul de la durée sur une batterie: https://docs.google.com/spreadsheets/d/1I6s_R04LjGxCB0hrcvogGHNeITDwfXjM05hJhuqGkoU/edit#gid=1470557238
+
+esphome:
+  name: th11
+  on_boot:
+  - switch.turn_on: led
+
+esp8266:
+  board: d1_mini
+
+# Configuration WIFI
+wifi:
+  fast_connect: true
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
+
+  # networks:
+  
+  #   - ssid: !secret wifi_ssid_apzuzu7
+  #   - password: !secret wifi_pass_apzuzu7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6
+  #   - password: !secret wifi_pass_apzuzu6
+
+  #   - ssid: !secret wifi_ssid_3G_zf
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3G_zf2
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3g_s7
+  #   - password: !secret wifi_pass_3g_s7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
+  #   - password: !secret wifi_pass_apzuzu6_EXT
+
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "esp32-ble-hub1 Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+  level: DEBUG
+  logs:
+    logger: INFO
+    adc: INFO
+    captive_portal: INFO
+    deep_sleep: INFO
+    htu21d: INFO
+    i2c: INFO
+    ota: INFO
+    restart: INFO
+    sensor: INFO
+    switch: INFO
+    switch.gpio: INFO
+    uptime.sensor: INFO
+    web_server: INFO
+    wifi_signal.sensor: INFO
+    mqtt: INFO
+    mqtt.component: INFO
+    mqtt.client: INFO
+    mqtt.switch: INFO
+    mqtt.sensor: INFO
+
+# # Enable Home Assistant API
+# api:
+#  password: !secret api_password
+
+ota:
+  password: !secret ota_password
+
+# WEB Server
+web_server:
+  port: 80
+
+# MQTT server
+mqtt:
+  broker:  !secret mqtt_server_dev
+  port:  !secret mqtt_port_dev
+  username:  !secret mqtt_user_dev
+  password:  !secret mqtt_password_dev
+
+# I2C conf
+i2c:
+  sda: D2
+  scl: D1
+#  frequency: 10khz
+
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "th11 LED"
+    inverted: True
+    id: led
+    pin: D4
+
+  - platform: restart
+    name: "th11 Restart"
+
+  - platform: shutdown
+    name: "th11 Shutdown"
+    id: th11_shutdown
+    internal: true
+
+
+# Définition des Sensors
+sensor:
+  - platform: wifi_signal
+    name: "th11 Signal Wi-Fi"
+    update_interval: 60s
+    on_value:
+      if:
+        condition:
+          mqtt.connected:
+        then:
+          - logger.log: Je suis connected sur le mqtt et j'envoie la sauce !
+          - if:
+              condition:
+                lambda: 'return id(th11_sleep_mode).state == 1;'
+              then:
+                - delay: 1s
+                - logger.log: On me demande de dormir !
+                - deep_sleep.enter: deep_sleep_1
+        else:
+          - logger.log: Erreur 007 *********************************************************
+          - deep_sleep.enter: deep_sleep_1
+
+  - platform: uptime
+    name: "th11 uptime"
+    update_interval: 15s
+
+# température et humidité
+  - platform: htu21d
+    temperature:
+      name: "th11 Température"
+    humidity:
+      name: "th11 Humidité"
+#      accuracy_decimals: 0
+    update_interval: 15s
+
+# tension VCC à l'intérieur de l'ESP
+  - platform: adc
+    pin: VCC
+    name: "th11 VCC Voltage"
+    id: th11_vcc_voltage
+    update_interval: 2s
+    unit_of_measurement: "V"
+    accuracy_decimals: 3
+    internal: true
+
+# tension de la batterie
+  - platform: template
+    name: "th11 BAT Voltage"
+    id: th11_bat_voltage
+    update_interval: 2s
+    unit_of_measurement: "V"
+    accuracy_decimals: 3
+    lambda: return id(th11_vcc_voltage).state + 1.24 ;
+    # fonction BMS, shutdown si < 3.0 Volts !
+    on_value:
+      - if:
+          condition:
+            lambda: 'return id(th11_bat_voltage).state < 3.0 ;'
+          then:
+            - logger.log: "The sensor value is below 3.0 Volts !"
+            - delay: 15s
+            - switch.turn_on: th11_shutdown
+
+# capacité de la batterie
+  - platform: template
+    name: "th11 BAT capacity"
+    update_interval: 2s
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    lambda: return id(th11_bat_voltage).state ;
+    filters:
+      - calibrate_linear:
+          - 2.50 -> 0.00
+          - 3.50 -> 10.00
+          - 3.70 -> 20.00
+          - 3.72 -> 30.00
+          - 3.74 -> 40.00
+          - 3.76 -> 50.00
+          - 3.78 -> 60.00
+          - 3.80 -> 70.00
+          - 3.82 -> 80.00
+          - 3.85 -> 90.00
+          - 4.20 -> 100.00
+
+
+# Définition des binary sensor
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D7
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "th11 sleep mode"
+    id: th11_sleep_mode
+
+
+# Définition des Sensors text
+text_sensor:
+  - platform: version
+    name: "th11 Version 1352"
+
+  - platform: wifi_info
+    ip_address:
+      name: th11 IP Address
+      id: wifi_ip
+    ssid:
+      name: th11 Connected SSID
+      id: wifi_ssid
+
+
+# Deep Sleep
+deep_sleep:
+#  run_duration: 5s
+  sleep_duration: 300s
+  id: deep_sleep_1
