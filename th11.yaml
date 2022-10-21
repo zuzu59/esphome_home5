@@ -4,7 +4,7 @@
 #-- location: bureau Vreni
 #-- Si la pin D2 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- zf221021.1608
+#-- zf221021.1651
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -93,6 +93,8 @@ mqtt:
   port:  !secret mqtt_port_dev
   username:  !secret mqtt_user_dev
   password:  !secret mqtt_password_dev
+  birth_message:
+  will_message:
 
 # I2C conf
 i2c:
@@ -120,15 +122,15 @@ switch:
 
 # Définition des Scripts
 script:
-    # fonction BMS, shutdown si < xx.0 Volts !
+    # fonction BMS, shutdown si < 3.3 Volts !
   - id: my_bms
     mode: restart
     then:
       if:
         condition:
-          lambda: 'return id(th11_bat_voltage).state < 3.5 ;'
+          lambda: 'return id(th11_bat_voltage).state < 3.3 ;'
         then:
-          - logger.log: "The sensor value is below 3.5 Volts !"
+          - logger.log: "The sensor value is below 3.3 Volts !"
           - delay: 1s
           - switch.turn_on: th11_shutdown
 
