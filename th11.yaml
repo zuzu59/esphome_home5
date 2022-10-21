@@ -4,7 +4,7 @@
 #-- location: bureau Vreni
 #-- Si la pin D2 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- zf221021.1414
+#-- zf221021.1608
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -126,9 +126,9 @@ script:
     then:
       if:
         condition:
-          lambda: 'return id(th11_bat_voltage).state < 3.0 ;'
+          lambda: 'return id(th11_bat_voltage).state < 3.5 ;'
         then:
-          - logger.log: "The sensor value is below xx.0 Volts !"
+          - logger.log: "The sensor value is below 3.5 Volts !"
           - delay: 1s
           - switch.turn_on: th11_shutdown
 
@@ -198,17 +198,20 @@ sensor:
     lambda: return id(th11_bat_voltage).state ;
     filters:
       - calibrate_linear:
-          - 2.50 -> 0.00
-          - 3.50 -> 10.00
-          - 3.70 -> 20.00
-          - 3.72 -> 30.00
-          - 3.74 -> 40.00
-          - 3.76 -> 50.00
-          - 3.78 -> 60.00
-          - 3.80 -> 70.00
-          - 3.82 -> 80.00
-          - 3.85 -> 90.00
-          - 4.20 -> 100.00
+          - 3.5 -> 0.0
+          - 4.0 -> 100.0
+      # filtre la valeur minimale
+      - lambda: |-
+          if (x >= 0) 
+            return x;
+          else 
+            return 0;
+      # filtre la valeur maximale
+      - lambda: |-
+          if (x <= 100) 
+            return x;
+          else 
+            return 100;
 
 
 # Définition des binary sensor
@@ -239,5 +242,5 @@ text_sensor:
 # Deep Sleep
 deep_sleep:
 #  run_duration: 5s
-  sleep_duration: 300s
+  sleep_duration: 60s
   id: deep_sleep_1
