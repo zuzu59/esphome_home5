@@ -4,7 +4,7 @@
 #-- location: salle de douche
 #-- Si la pin D2 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- zf221018.2335
+#-- zf221021.1709
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -93,6 +93,8 @@ mqtt:
   port:  !secret mqtt_port_dev
   username:  !secret mqtt_user_dev
   password:  !secret mqtt_password_dev
+  birth_message:
+  will_message:
 
 # I2C conf
 i2c:
@@ -118,17 +120,34 @@ switch:
     internal: true
 
 
+# Définition des Scripts
+script:
+    # fonction BMS, shutdown si < 3.3 Volts !
+  - id: my_bms
+    mode: restart
+    then:
+      if:
+        condition:
+          lambda: 'return id(th10_bat_voltage).state < 3.3 ;'
+        then:
+          - logger.log: "The sensor value is below 3.3 Volts !"
+          - delay: 1s
+          - switch.turn_on: th10_shutdown
+
+
 # Définition des Sensors
 sensor:
   - platform: wifi_signal
     name: "th10 Signal Wi-Fi"
-    update_interval: 60s
+    update_interval: 5s
     on_value:
       if:
         condition:
           mqtt.connected:
         then:
           - logger.log: Je suis connected sur le mqtt et j'envoie la sauce !
+          - delay: 1s
+          - script.execute: my_bms
           - if:
               condition:
                 lambda: 'return id(th10_sleep_mode).state == 1;'
@@ -170,17 +189,8 @@ sensor:
     update_interval: 2s
     unit_of_measurement: "V"
     accuracy_decimals: 3
-    lambda: return id(th10_vcc_voltage).state + 1.24 ;
-    # fonction BMS, shutdown si < 3.0 Volts !
-    on_value:
-      - if:
-          condition:
-            lambda: 'return id(th10_bat_voltage).state < 3.0 ;'
-          then:
-            - logger.log: "The sensor value is below 3.0 Volts !"
-            - delay: 15s
-            - switch.turn_on: th10_shutdown
-
+    lambda: return id(th10_vcc_voltage).state + 1.258 ;
+ 
 # capacité de la batterie
   - platform: template
     name: "th10 BAT capacity"
@@ -190,17 +200,20 @@ sensor:
     lambda: return id(th10_bat_voltage).state ;
     filters:
       - calibrate_linear:
-          - 2.50 -> 0.00
-          - 3.50 -> 10.00
-          - 3.70 -> 20.00
-          - 3.72 -> 30.00
-          - 3.74 -> 40.00
-          - 3.76 -> 50.00
-          - 3.78 -> 60.00
-          - 3.80 -> 70.00
-          - 3.82 -> 80.00
-          - 3.85 -> 90.00
-          - 4.20 -> 100.00
+          - 3.5 -> 0.0
+          - 4.0 -> 100.0
+      # filtre la valeur minimale
+      - lambda: |-
+          if (x >= 0) 
+            return x;
+          else 
+            return 0;
+      # filtre la valeur maximale
+      - lambda: |-
+          if (x <= 100) 
+            return x;
+          else 
+            return 100;
 
 
 # Définition des binary sensor
@@ -231,5 +244,5 @@ text_sensor:
 # Deep Sleep
 deep_sleep:
 #  run_duration: 5s
-  sleep_duration: 300s
+  sleep_duration: 60s
   id: deep_sleep_1
