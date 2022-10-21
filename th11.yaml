@@ -4,7 +4,7 @@
 #-- location: bureau Vreni
 #-- Si la pin D2 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- zf221018.2337
+#-- zf221021.1414
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -118,17 +118,34 @@ switch:
     internal: true
 
 
+# Définition des Scripts
+script:
+    # fonction BMS, shutdown si < xx.0 Volts !
+  - id: my_bms
+    mode: restart
+    then:
+      if:
+        condition:
+          lambda: 'return id(th11_bat_voltage).state < 3.0 ;'
+        then:
+          - logger.log: "The sensor value is below xx.0 Volts !"
+          - delay: 1s
+          - switch.turn_on: th11_shutdown
+
+
 # Définition des Sensors
 sensor:
   - platform: wifi_signal
     name: "th11 Signal Wi-Fi"
-    update_interval: 60s
+    update_interval: 5s
     on_value:
       if:
         condition:
           mqtt.connected:
         then:
           - logger.log: Je suis connected sur le mqtt et j'envoie la sauce !
+          - delay: 1s
+          - script.execute: my_bms
           - if:
               condition:
                 lambda: 'return id(th11_sleep_mode).state == 1;'
@@ -170,17 +187,8 @@ sensor:
     update_interval: 2s
     unit_of_measurement: "V"
     accuracy_decimals: 3
-    lambda: return id(th11_vcc_voltage).state + 1.24 ;
-    # fonction BMS, shutdown si < 3.0 Volts !
-    on_value:
-      - if:
-          condition:
-            lambda: 'return id(th11_bat_voltage).state < 3.0 ;'
-          then:
-            - logger.log: "The sensor value is below 3.0 Volts !"
-            - delay: 15s
-            - switch.turn_on: th11_shutdown
-
+    lambda: return id(th11_vcc_voltage).state + 1.108 ;
+ 
 # capacité de la batterie
   - platform: template
     name: "th11 BAT capacity"
