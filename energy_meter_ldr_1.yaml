@@ -1,21 +1,24 @@
 #------------------------------
-#-- nrj_meter_ldr_1.yaml
+#-- energy_meter_ldr_1.yaml
 #-- Petit code générique minimaliste pour des projets à base d'esp mini d1
 #-- blablabla
-#-- location: xxx
-#-- zf221023.1933
+#-- location: tableau électrique
+#-- zf221023.2356
 #--
 # sources: 
-# ...
+# https://esphome.io/components/sensor/pulse_meter.html#converting-units  
+# https://esphome.io/cookbook/power_meter.html
+
 
 esphome:
-  name: nrj_meter_ldr_1
+  name: energy_meter_ldr_1
 
 esp8266:
   board: d1_mini
 
 # Configuration WIFI
 wifi:
+  fast_connect: true
   ssid: !secret wifi_ssid_apzuzu7
   password: !secret wifi_pass_apzuzu7
 
@@ -49,7 +52,7 @@ captive_portal:
 
 # Enable logging
 logger:
-    level: VERBOSE
+    # level: VERBOSE
 
 # Enable Home Assistant API
 api:
@@ -66,49 +69,54 @@ web_server:
 # Définition des Switch's
 switch:
   - platform: gpio
-    name: "nrj_meter_ldr_1 LED"
+    name: "energy_meter_ldr_1 LED"
     inverted: True
     id: led
     pin: D4
 
   - platform: restart
-    name: "nrj_meter_ldr_1 Restart"
+    name: "energy_meter_ldr_1 Restart"
 
 
 # Définition des Sensors
 sensor:
   - platform: wifi_signal
-    name: "nrj_meter_ldr_1 Signal Wi-Fi"
+    name: "energy_meter_ldr_1 Signal Wi-Fi"
     update_interval: 60s
 
   - platform: uptime
-    name: "nrj_meter_ldr_1 uptime"
-    update_interval: 60s
+    name: "energy_meter_ldr_1 uptime"
+    update_interval: 15s
 
-  - platform: pulse_counter
+  # - platform: pulse_counter
+  - platform: pulse_meter
     name: 'NRJ Meter LDR 1 Power'
-    id: nrj_meter_ldr_1_power
+    id: energy_meter_ldr_1_power
     pin: D1
     unit_of_measurement: 'W'
-    update_interval: 10s    # Très important car c'est ici que l'on intègre sur une minute !
+    accuracy_decimals: 0
+
+    # update_interval: 10s    # Très important car c'est ici que l'on intègre sur une minute !
+    internal_filter: 5ms
+    internal_filter_mode: pulse
     filters:
-      - multiply: 1       # Facteur de conversion durée impulsion / litres minutes
-      # - sliding_window_moving_average:
-      #     window_size: 5
-      #     send_every: 5
+      - multiply: 60       # Facteur de conversion durée impulsion (60s/1000 pulses per kWh)
+      - sliding_window_moving_average:
+          window_size: 3
+          send_every: 3
 
 
 # Définition des Sensors text
 text_sensor:
   - platform: version
-    name: "nrj_meter_ldr_1 Version 1150"
+    name: "energy_meter_ldr_1 Version 2311"
 
   - platform: wifi_info
     ip_address:
-      name: nrj_meter_ldr_1 IP Address
+      name: energy_meter_ldr_1 IP Address
       id: wifi_ip
     ssid:
-      name: nrj_meter_ldr_1 Connected SSID
+      name: energy_meter_ldr_1 Connected SSID
       id: wifi_ssid
 
 
@@ -117,10 +125,10 @@ binary_sensor:
   - platform: gpio
     name: "NRJ Meter LDR 1"
     pin:
-      number: D1
+      number: D2
       mode: INPUT_PULLUP
-      inverted: True
+      # inverted: True
     on_press:
       - switch.turn_on: led
-      - delay: 2s
+      - delay: 0.5s
       - switch.turn_off: led
