@@ -1,0 +1,219 @@
+#------------------------------
+#-- partcl_fines_1.yaml
+#-- Petit code pour mesurer des particules fines
+#-- Envoie sur le résultat sur un mqtt broker
+#-- location: démo mobile pour l'instant
+#-- zf221022.1701
+#--
+# sources: 
+# https://esphome.io/components/sensor/sps30.html
+
+esphome:
+  name: partcl_fines_1
+  on_boot:
+  - switch.turn_on: led
+
+esp8266:
+  board: d1_mini
+
+# Configuration WIFI
+wifi:
+  # ssid: !secret wifi_ssid_3G_zf2
+  # password: !secret wifi_pass_3G_zf2
+
+  networks:
+  
+    - ssid: !secret wifi_ssid_apzuzu7
+    - password: !secret wifi_pass_apzuzu7
+    
+    - ssid: !secret wifi_ssid_apzuzu6
+    - password: !secret wifi_pass_apzuzu6
+
+    - ssid: !secret wifi_ssid_3g_s7
+    - password: !secret wifi_pass_3g_s7
+
+  #   - ssid: !secret wifi_ssid_3G_zf
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3G_zf2
+  #   - password: !secret wifi_pass_3G_zf2
+   
+  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
+  #   - password: !secret wifi_pass_apzuzu6_EXT
+
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "esp32-ble-hub1 Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+  level: DEBUG
+  logs:
+    logger: INFO
+    adc: INFO
+    captive_portal: INFO
+    deep_sleep: INFO
+    htu21d: INFO
+    i2c: INFO
+    ota: INFO
+    restart: INFO
+    sensor: INFO
+    switch: INFO
+    switch.gpio: INFO
+    uptime.sensor: INFO
+    web_server: INFO
+    wifi_signal.sensor: INFO
+    mqtt: INFO
+    mqtt.component: INFO
+    mqtt.client: INFO
+    mqtt.switch: INFO
+    mqtt.sensor: INFO
+
+# # Enable Home Assistant API
+# api:
+#   password: !secret api_password
+
+ota:
+  password: !secret ota_password
+
+# WEB Server
+web_server:
+  port: 80
+
+# MQTT server
+mqtt:
+  broker:  !secret mqtt_server_dev
+  port:  !secret mqtt_port_dev
+  username:  !secret mqtt_user_dev
+  password:  !secret mqtt_password_dev
+  birth_message:
+  will_message:
+
+# I2C conf
+i2c:
+  sda: D2
+  scl: D1
+#  frequency: 10khz
+
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "partcl_fines_1 LED"
+    inverted: True
+    id: led
+    pin: D4
+
+  - platform: restart
+    name: "partcl_fines_1 Restart"
+
+  - platform: shutdown
+    name: "partcl_fines_1 Shutdown"
+    id: partcl_fines_1_shutdown
+    internal: true
+
+
+# Définition des Scripts
+script:
+    # fonction BMS, shutdown si < 3.3 Volts !
+  - id: my_bms
+    mode: restart
+    then:
+      if:
+        condition:
+          lambda: 'return id(partcl_fines_1_bat_voltage).state < 3.3 ;'
+        then:
+          - logger.log: "The sensor value is below 3.3 Volts !"
+          - delay: 1s
+          - switch.turn_on: partcl_fines_1_shutdown
+
+
+# Définition des Sensors
+sensor:
+  - platform: wifi_signal
+    name: "partcl_fines_1 Signal Wi-Fi"
+    update_interval: 5s
+    on_value:
+      if:
+        condition:
+          mqtt.connected:
+        then:
+          - logger.log: Je suis connected sur le mqtt et j'envoie la sauce !
+          - delay: 1s
+          - script.execute: my_bms
+        #   - if:
+        #       condition:
+        #         lambda: 'return id(partcl_fines_1_sleep_mode).state == 1;'
+        #       then:
+        #         - delay: 1s
+        #         - logger.log: On me demande de dormir !
+        #         - deep_sleep.enter: deep_sleep_1
+        # else:
+        #   - logger.log: Erreur 007 *********************************************************
+        #   - deep_sleep.enter: deep_sleep_1
+
+  - platform: uptime
+    name: "partcl_fines_1 uptime"
+    update_interval: 15s
+
+# tension VCC à l'intérieur de l'ESP
+  - platform: adc
+    pin: VCC
+    name: "partcl_fines_1 VCC Voltage"
+    id: partcl_fines_1_vcc_voltage
+    update_interval: 2s
+    unit_of_measurement: "V"
+    accuracy_decimals: 3
+    internal: true
+
+# tension de la batterie
+  - platform: template
+    name: "partcl_fines_1 BAT Voltage"
+    id: partcl_fines_1_bat_voltage
+    update_interval: 2s
+    unit_of_measurement: "V"
+    accuracy_decimals: 3
+    lambda: return id(partcl_fines_1_vcc_voltage).state + 1.148 ;
+ 
+# capacité de la batterie
+  - platform: template
+    name: "partcl_fines_1 BAT capacity"
+    update_interval: 2s
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    lambda: return id(partcl_fines_1_bat_voltage).state ;
+    filters:
+      - calibrate_linear:
+          - 3.5 -> 0.0
+          - 4.0 -> 100.0
+      # filtre la valeur minimale
+      - lambda: |-
+          if (x >= 0) 
+            return x;
+          else 
+            return 0;
+      # filtre la valeur maximale
+      - lambda: |-
+          if (x <= 100) 
+            return x;
+          else 
+            return 100;
+
+
+# Définition des Sensors text
+text_sensor:
+  - platform: version
+    name: "partcl_fines_1 Version 1659"
+
+  - platform: wifi_info
+    ip_address:
+      name: partcl_fines_1 IP Address
+      id: wifi_ip
+    ssid:
+      name: partcl_fines_1 Connected SSID
+      id: wifi_ssid
+
