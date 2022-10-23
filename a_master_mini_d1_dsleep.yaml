@@ -1,5 +1,5 @@
 #------------------------------
-#-- a-master-mini-d1.yaml
+#-- a_master_mini_d1_dsleep.yaml
 #-- Petit code générique pour mini d1 avec dsleep à dupliquer
 #-- location: ...
 #-- Si la pin D2 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
@@ -11,7 +11,7 @@
 # Calcul de la durée sur une batterie: https://docs.google.com/spreadsheets/d/1I6s_R04LjGxCB0hrcvogGHNeITDwfXjM05hJhuqGkoU/edit#gid=1470557238
 
 esphome:
-  name: a-master-mini-d1
+  name: a_master_mini_d1_dsleep
   on_boot:
   - switch.turn_on: led
 
@@ -106,17 +106,17 @@ i2c:
 # Définition des Switch's
 switch:
   - platform: gpio
-    name: "a-master-mini-d1 LED"
+    name: "a_master_mini_d1_dsleep LED"
     inverted: True
     id: led
     pin: D4
 
   - platform: restart
-    name: "a-master-mini-d1 Restart"
+    name: "a_master_mini_d1_dsleep Restart"
 
   - platform: shutdown
-    name: "a-master-mini-d1 Shutdown"
-    id: a-master-mini-d1_shutdown
+    name: "a_master_mini_d1_dsleep Shutdown"
+    id: a_master_mini_d1_dsleep_shutdown
     internal: true
 
 
@@ -128,17 +128,17 @@ script:
     then:
       if:
         condition:
-          lambda: 'return id(a-master-mini-d1_bat_voltage).state < 3.3 ;'
+          lambda: 'return id(a_master_mini_d1_dsleep_bat_voltage).state < 3.3 ;'
         then:
           - logger.log: "The sensor value is below 3.3 Volts !"
           - delay: 1s
-          - switch.turn_on: a-master-mini-d1_shutdown
+          - switch.turn_on: a_master_mini_d1_dsleep_shutdown
 
 
 # Définition des Sensors
 sensor:
   - platform: wifi_signal
-    name: "a-master-mini-d1 Signal Wi-Fi"
+    name: "a_master_mini_d1_dsleep Signal Wi-Fi"
     update_interval: 5s
     on_value:
       if:
@@ -150,7 +150,7 @@ sensor:
           - script.execute: my_bms
           - if:
               condition:
-                lambda: 'return id(a-master-mini-d1_sleep_mode).state == 1;'
+                lambda: 'return id(a_master_mini_d1_dsleep_sleep_mode).state == 1;'
               then:
                 - delay: 1s
                 - logger.log: On me demande de dormir !
@@ -160,23 +160,23 @@ sensor:
           - deep_sleep.enter: deep_sleep_1
 
   - platform: uptime
-    name: "a-master-mini-d1 uptime"
+    name: "a_master_mini_d1_dsleep uptime"
     update_interval: 15s
 
 # température et humidité
   - platform: htu21d
     temperature:
-      name: "a-master-mini-d1 Température"
+      name: "a_master_mini_d1_dsleep Température"
     humidity:
-      name: "a-master-mini-d1 Humidité"
+      name: "a_master_mini_d1_dsleep Humidité"
 #      accuracy_decimals: 0
     update_interval: 15s
 
 # tension VCC à l'intérieur de l'ESP
   - platform: adc
     pin: VCC
-    name: "a-master-mini-d1 VCC Voltage"
-    id: a-master-mini-d1_vcc_voltage
+    name: "a_master_mini_d1_dsleep VCC Voltage"
+    id: a_master_mini_d1_dsleep_vcc_voltage
     update_interval: 2s
     unit_of_measurement: "V"
     accuracy_decimals: 3
@@ -184,20 +184,20 @@ sensor:
 
 # tension de la batterie
   - platform: template
-    name: "a-master-mini-d1 BAT Voltage"
-    id: a-master-mini-d1_bat_voltage
+    name: "a_master_mini_d1_dsleep BAT Voltage"
+    id: a_master_mini_d1_dsleep_bat_voltage
     update_interval: 2s
     unit_of_measurement: "V"
     accuracy_decimals: 3
-    lambda: return id(a-master-mini-d1_vcc_voltage).state + 1.396 ;
+    lambda: return id(a_master_mini_d1_dsleep_vcc_voltage).state + 1.396 ;
  
 # capacité de la batterie
   - platform: template
-    name: "a-master-mini-d1 BAT capacity"
+    name: "a_master_mini_d1_dsleep BAT capacity"
     update_interval: 2s
     unit_of_measurement: "%"
     accuracy_decimals: 0
-    lambda: return id(a-master-mini-d1_bat_voltage).state ;
+    lambda: return id(a_master_mini_d1_dsleep_bat_voltage).state ;
     filters:
       - calibrate_linear:
           - 3.5 -> 0.0
@@ -223,21 +223,21 @@ binary_sensor:
       number: D7
       mode: INPUT_PULLUP
       inverted: True
-    name: "a-master-mini-d1 sleep mode"
-    id: a-master-mini-d1_sleep_mode
+    name: "a_master_mini_d1_dsleep sleep mode"
+    id: a_master_mini_d1_dsleep_sleep_mode
 
 
 # Définition des Sensors text
 text_sensor:
   - platform: version
-    name: "a-master-mini-d1 Version 1352"
+    name: "a_master_mini_d1_dsleep Version 1352"
 
   - platform: wifi_info
     ip_address:
-      name: a-master-mini-d1 IP Address
+      name: a_master_mini_d1_dsleep IP Address
       id: wifi_ip
     ssid:
-      name: a-master-mini-d1 Connected SSID
+      name: a_master_mini_d1_dsleep Connected SSID
       id: wifi_ssid
 
 

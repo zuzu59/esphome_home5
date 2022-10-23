@@ -1,5 +1,5 @@
 #------------------------------
-#-- a-master-mini-d1.yaml
+#-- a_master_mini_d1.yaml
 #-- Petit code générique minimaliste pour des projets à base d'esp mini d1
 #-- blablabla
 #-- location: xxx
@@ -9,7 +9,7 @@
 # ...
 
 esphome:
-  name: a-master-mini-d1
+  name: a_master_mini_d1
 
 esp8266:
   board: d1_mini
@@ -66,44 +66,44 @@ web_server:
 # Définition des Switch's
 switch:
   - platform: gpio
-    name: "a-master-mini-d1 LED"
+    name: "a_master_mini_d1 LED"
     inverted: True
     id: led
     pin: D4
 
   - platform: restart
-    name: "a-master-mini-d1 Restart"
+    name: "a_master_mini_d1 Restart"
 
 
 # Définition des Sensors
 sensor:
   - platform: wifi_signal
-    name: "a-master-mini-d1 Signal Wi-Fi"
+    name: "a_master_mini_d1 Signal Wi-Fi"
     update_interval: 60s
 
   - platform: uptime
-    name: "a-master-mini-d1 uptime"
+    name: "a_master_mini_d1 uptime"
     update_interval: 60s
 
 
 # Définition des Sensors text
 text_sensor:
   - platform: version
-    name: "a-master-mini-d1 Version 1150"
+    name: "a_master_mini_d1 Version 1150"
 
   - platform: wifi_info
     ip_address:
-      name: a-master-mini-d1 IP Address
+      name: a_master_mini_d1 IP Address
       id: wifi_ip
     ssid:
-      name: a-master-mini-d1 Connected SSID
+      name: a_master_mini_d1 Connected SSID
       id: wifi_ssid
 
 
 # Définition des inputs numbers
 number:
   - platform: template
-    name: "a-master-mini-d1 consigne alarme low"
+    name: "a_master_mini_d1 consigne alarme low"
     restore_value: true
     optimistic: true
     min_value: 0.0
@@ -111,4 +111,4 @@ number:
     step: 0.01
     initial_value: 0.4
     unit_of_measurement: "V"
-    id: a-master-mini-d1_consigne_alarme_low
+    id: a_master_mini_d1_consigne_alarme_low
