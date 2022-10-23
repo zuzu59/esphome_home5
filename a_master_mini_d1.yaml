@@ -16,8 +16,8 @@ esp8266:
 
 # Configuration WIFI
 wifi:
-  ssid: !secret wifi_ssid_3G_zf2
-  password: !secret wifi_pass_3G_zf2
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
 
   # networks:
   
