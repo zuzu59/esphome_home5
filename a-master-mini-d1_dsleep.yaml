@@ -1,0 +1,248 @@
+#------------------------------
+#-- a-master-mini-d1.yaml
+#-- Petit code générique pour mini d1 avec dsleep à dupliquer
+#-- location: ...
+#-- Si la pin D2 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
+#-- zf221023.1152
+#--
+# sources: 
+# https://esphome.io/components/sensor/htu21d.html
+# Calcul de la durée sur une batterie: https://docs.google.com/spreadsheets/d/1I6s_R04LjGxCB0hrcvogGHNeITDwfXjM05hJhuqGkoU/edit#gid=1470557238
+
+esphome:
+  name: a-master-mini-d1
+  on_boot:
+  - switch.turn_on: led
+
+esp8266:
+  board: d1_mini
+
+# Configuration WIFI
+wifi:
+  fast_connect: true
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
+
+  # networks:
+  
+  #   - ssid: !secret wifi_ssid_apzuzu7
+  #   - password: !secret wifi_pass_apzuzu7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6
+  #   - password: !secret wifi_pass_apzuzu6
+
+  #   - ssid: !secret wifi_ssid_3G_zf
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3G_zf2
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3g_s7
+  #   - password: !secret wifi_pass_3g_s7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
+  #   - password: !secret wifi_pass_apzuzu6_EXT
+
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "esp32-ble-hub1 Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+  level: DEBUG
+  logs:
+    logger: INFO
+    adc: INFO
+    captive_portal: INFO
+    deep_sleep: INFO
+    htu21d: INFO
+    i2c: INFO
+    ota: INFO
+    restart: INFO
+    sensor: INFO
+    switch: INFO
+    switch.gpio: INFO
+    uptime.sensor: INFO
+    web_server: INFO
+    wifi_signal.sensor: INFO
+    mqtt: INFO
+    mqtt.component: INFO
+    mqtt.client: INFO
+    mqtt.switch: INFO
+    mqtt.sensor: INFO
+
+# # Enable Home Assistant API
+# api:
+#  password: !secret api_password
+
+ota:
+  password: !secret ota_password
+
+# WEB Server
+web_server:
+  port: 80
+
+# MQTT server
+mqtt:
+  broker:  !secret mqtt_server_dev
+  port:  !secret mqtt_port_dev
+  username:  !secret mqtt_user_dev
+  password:  !secret mqtt_password_dev
+  birth_message:
+  will_message:
+
+# I2C conf
+i2c:
+  sda: D2
+  scl: D1
+#  frequency: 10khz
+
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "a-master-mini-d1 LED"
+    inverted: True
+    id: led
+    pin: D4
+
+  - platform: restart
+    name: "a-master-mini-d1 Restart"
+
+  - platform: shutdown
+    name: "a-master-mini-d1 Shutdown"
+    id: a-master-mini-d1_shutdown
+    internal: true
+
+
+# Définition des Scripts
+script:
+    # fonction BMS, shutdown si < 3.3 Volts !
+  - id: my_bms
+    mode: restart
+    then:
+      if:
+        condition:
+          lambda: 'return id(a-master-mini-d1_bat_voltage).state < 3.3 ;'
+        then:
+          - logger.log: "The sensor value is below 3.3 Volts !"
+          - delay: 1s
+          - switch.turn_on: a-master-mini-d1_shutdown
+
+
+# Définition des Sensors
+sensor:
+  - platform: wifi_signal
+    name: "a-master-mini-d1 Signal Wi-Fi"
+    update_interval: 5s
+    on_value:
+      if:
+        condition:
+          mqtt.connected:
+        then:
+          - logger.log: Je suis connected sur le mqtt et j'envoie la sauce !
+          - delay: 1s
+          - script.execute: my_bms
+          - if:
+              condition:
+                lambda: 'return id(a-master-mini-d1_sleep_mode).state == 1;'
+              then:
+                - delay: 1s
+                - logger.log: On me demande de dormir !
+                - deep_sleep.enter: deep_sleep_1
+        else:
+          - logger.log: Erreur 007 *********************************************************
+          - deep_sleep.enter: deep_sleep_1
+
+  - platform: uptime
+    name: "a-master-mini-d1 uptime"
+    update_interval: 15s
+
+# température et humidité
+  - platform: htu21d
+    temperature:
+      name: "a-master-mini-d1 Température"
+    humidity:
+      name: "a-master-mini-d1 Humidité"
+#      accuracy_decimals: 0
+    update_interval: 15s
+
+# tension VCC à l'intérieur de l'ESP
+  - platform: adc
+    pin: VCC
+    name: "a-master-mini-d1 VCC Voltage"
+    id: a-master-mini-d1_vcc_voltage
+    update_interval: 2s
+    unit_of_measurement: "V"
+    accuracy_decimals: 3
+    internal: true
+
+# tension de la batterie
+  - platform: template
+    name: "a-master-mini-d1 BAT Voltage"
+    id: a-master-mini-d1_bat_voltage
+    update_interval: 2s
+    unit_of_measurement: "V"
+    accuracy_decimals: 3
+    lambda: return id(a-master-mini-d1_vcc_voltage).state + 1.396 ;
+ 
+# capacité de la batterie
+  - platform: template
+    name: "a-master-mini-d1 BAT capacity"
+    update_interval: 2s
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    lambda: return id(a-master-mini-d1_bat_voltage).state ;
+    filters:
+      - calibrate_linear:
+          - 3.5 -> 0.0
+          - 4.0 -> 100.0
+      # filtre la valeur minimale
+      - lambda: |-
+          if (x >= 0) 
+            return x;
+          else 
+            return 0;
+      # filtre la valeur maximale
+      - lambda: |-
+          if (x <= 100) 
+            return x;
+          else 
+            return 100;
+
+
+# Définition des binary sensor
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D7
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "a-master-mini-d1 sleep mode"
+    id: a-master-mini-d1_sleep_mode
+
+
+# Définition des Sensors text
+text_sensor:
+  - platform: version
+    name: "a-master-mini-d1 Version 1352"
+
+  - platform: wifi_info
+    ip_address:
+      name: a-master-mini-d1 IP Address
+      id: wifi_ip
+    ssid:
+      name: a-master-mini-d1 Connected SSID
+      id: wifi_ssid
+
+
+# Deep Sleep
+deep_sleep:
+#  run_duration: 5s
+  sleep_duration: 60s
+  id: deep_sleep_1
