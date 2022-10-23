@@ -2,17 +2,21 @@
 #-- batmon_d1_1.yaml
 #-- Petit code pour monitorer une batterie
 #-- Lit le port ADC0 et l'envoie sur un mqtt broker
+#-- Afin de pouvoir lire des tensions >3.3V, il y a un diviseur résistif R1/R2 de 150kR/10R !
+#-- Il y a donc un facteur de correction de 50 environ avec une plage de mesure de 0V à 48V
 #-- location: garage
 #-- Si la pin D2 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- zf221023.1155
+#-- ATTENTION, comme il n'y a qu'un seul convertisseur ADC sur l'ESP8266, il n'y a plus la fonction BMS et indicateur de capacité !
+#-- zf221023.1301
 #--
 # sources: 
 # https://esphome.io/components/sensor/adc.html
+# https://www.digikey.fr/fr/resources/conversion-calculators/conversion-calculator-voltage-divider
 # Calcul de la durée sur une batterie: https://docs.google.com/spreadsheets/d/1I6s_R04LjGxCB0hrcvogGHNeITDwfXjM05hJhuqGkoU/edit#gid=1470557238
 
 esphome:
-  name: a-master-mini-d1
+  name: batmon_d1_1
   on_boot:
   - switch.turn_on: led
 
@@ -97,49 +101,28 @@ mqtt:
   birth_message:
   will_message:
 
-# I2C conf
-i2c:
-  sda: D2
-  scl: D1
-#  frequency: 10khz
-
 
 # Définition des Switch's
 switch:
   - platform: gpio
-    name: "a-master-mini-d1 LED"
+    name: "batmon_d1_1 LED"
     inverted: True
     id: led
     pin: D4
 
   - platform: restart
-    name: "a-master-mini-d1 Restart"
+    name: "batmon_d1_1 Restart"
 
   - platform: shutdown
-    name: "a-master-mini-d1 Shutdown"
-    id: a-master-mini-d1_shutdown
+    name: "batmon_d1_1 Shutdown"
+    id: batmon_d1_1_shutdown
     internal: true
-
-
-# Définition des Scripts
-script:
-    # fonction BMS, shutdown si < 3.3 Volts !
-  - id: my_bms
-    mode: restart
-    then:
-      if:
-        condition:
-          lambda: 'return id(a-master-mini-d1_bat_voltage).state < 3.3 ;'
-        then:
-          - logger.log: "The sensor value is below 3.3 Volts !"
-          - delay: 1s
-          - switch.turn_on: a-master-mini-d1_shutdown
 
 
 # Définition des Sensors
 sensor:
   - platform: wifi_signal
-    name: "a-master-mini-d1 Signal Wi-Fi"
+    name: "batmon_d1_1 Signal Wi-Fi"
     update_interval: 5s
     on_value:
       if:
@@ -148,10 +131,9 @@ sensor:
         then:
           - logger.log: Je suis connected sur le mqtt et j'envoie la sauce !
           - delay: 1s
-          - script.execute: my_bms
           - if:
               condition:
-                lambda: 'return id(a-master-mini-d1_sleep_mode).state == 1;'
+                lambda: 'return id(batmon_d1_1_sleep_mode).state == 1;'
               then:
                 - delay: 1s
                 - logger.log: On me demande de dormir !
@@ -161,75 +143,29 @@ sensor:
           - deep_sleep.enter: deep_sleep_1
 
   - platform: uptime
-    name: "a-master-mini-d1 uptime"
+    name: "batmon_d1_1 uptime"
     update_interval: 15s
-
-# température et humidité
-  - platform: htu21d
-    temperature:
-      name: "a-master-mini-d1 Température"
-    humidity:
-      name: "a-master-mini-d1 Humidité"
-#      accuracy_decimals: 0
-    update_interval: 15s
-
-# tension VCC à l'intérieur de l'ESP
-  - platform: adc
-    pin: VCC
-    name: "a-master-mini-d1 VCC Voltage"
-    id: a-master-mini-d1_vcc_voltage
-    update_interval: 2s
-    unit_of_measurement: "V"
-    accuracy_decimals: 3
-    internal: true
-
-# tension de la batterie
-  - platform: template
-    name: "a-master-mini-d1 BAT Voltage"
-    id: a-master-mini-d1_bat_voltage
-    update_interval: 2s
-    unit_of_measurement: "V"
-    accuracy_decimals: 3
-    lambda: return id(a-master-mini-d1_vcc_voltage).state + 1.396 ;
- 
-# capacité de la batterie
-  - platform: template
-    name: "a-master-mini-d1 BAT capacity"
-    update_interval: 2s
-    unit_of_measurement: "%"
-    accuracy_decimals: 0
-    lambda: return id(a-master-mini-d1_bat_voltage).state ;
-    filters:
-      - calibrate_linear:
-          - 3.5 -> 0.0
-          - 4.0 -> 100.0
-      # filtre la valeur minimale
-      - lambda: |-
-          if (x >= 0) 
-            return x;
-          else 
-            return 0;
-      # filtre la valeur maximale
-      - lambda: |-
-          if (x <= 100) 
-            return x;
-          else 
-            return 100;
-
-
 
 # valeur brute en volts de l'ADC
   - platform: adc
     pin: A0
-    name: "batmon_d1_1 ADC en volts"
-    id: batmon_d1_1_adc_en_volts
+    name: "batmon_d1_1 ADC brut"
+    id: batmon_d1_1_adc_brut
     update_interval: 2s
     unit_of_measurement: "V"
+    accuracy_decimals: 3
 
-
-
-
-
+# valeur corrigée en volts de l'ADC
+  - platform: template
+    name: "batmon_d1_1 ADC Voltage"
+    id: batmon_d1_1_adc_voltage
+    update_interval: 2s
+    unit_of_measurement: "V"
+    accuracy_decimals: 2
+    lambda: return id(batmon_d1_1_adc_brut).state ;
+    filters:
+    - multiply: 51.2
+    - offset: -0.150
 
 
 # Définition des binary sensor
@@ -239,21 +175,21 @@ binary_sensor:
       number: D7
       mode: INPUT_PULLUP
       inverted: True
-    name: "a-master-mini-d1 sleep mode"
-    id: a-master-mini-d1_sleep_mode
+    name: "batmon_d1_1 sleep mode"
+    id: batmon_d1_1_sleep_mode
 
 
 # Définition des Sensors text
 text_sensor:
   - platform: version
-    name: "a-master-mini-d1 Version 1352"
+    name: "batmon_d1_1 Version 1352"
 
   - platform: wifi_info
     ip_address:
-      name: a-master-mini-d1 IP Address
+      name: batmon_d1_1 IP Address
       id: wifi_ip
     ssid:
-      name: a-master-mini-d1 Connected SSID
+      name: batmon_d1_1 Connected SSID
       id: wifi_ssid
 
 
