@@ -2,9 +2,9 @@
 #-- th10.yaml
 #-- Petit code pour monitorer la température et l'humidité dans une pièce
 #-- location: salle de douche
-#-- Si la pin D2 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- zf221021.1709
+#-- zf221023.1308
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
