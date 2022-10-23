@@ -1,20 +1,15 @@
-zf221007.1153
-je ne sais pas pourquoi, mais le code ESPhome ne veut pas de tiret dans ses id's mais le nom d'un device ESPhome ne devrait avoir que des tirets
-
-
-
 #------------------------------
-#-- batt_meter1.yaml
-#-- Petit code pour monitorer une batterie
-#-- Lit le port ADC0 et l'envoie sur un mqtt broker
+#-- a-master-mini-d1.yaml
+#-- Petit code générique minimaliste pour des projets à base d'esp mini d1
+#-- blablabla
 #-- location: xxx
-#-- zf221008.1300
+#-- zf221023.1151
 #--
 # sources: 
 # ...
 
 esphome:
-  name: batt_meter1
+  name: a-master-mini-d1
 
 esp8266:
   board: d1_mini
@@ -71,52 +66,44 @@ web_server:
 # Définition des Switch's
 switch:
   - platform: gpio
-    name: "batt_meter1 LED"
+    name: "a-master-mini-d1 LED"
     inverted: True
     id: led
     pin: D4
 
   - platform: restart
-    name: "batt_meter1 Restart"
+    name: "a-master-mini-d1 Restart"
 
 
 # Définition des Sensors
 sensor:
   - platform: wifi_signal
-    name: "batt_meter1 Signal Wi-Fi"
+    name: "a-master-mini-d1 Signal Wi-Fi"
     update_interval: 60s
 
   - platform: uptime
-    name: "batt_meter1 uptime"
+    name: "a-master-mini-d1 uptime"
     update_interval: 60s
-
-# valeur brute en volts de l'ADC
-  - platform: adc
-    pin: A0
-    name: "batt_meter1 brut en volts"
-    id: batt_meter1_brut_en_volts
-    update_interval: 2s
-    unit_of_measurement: "V"
 
 
 # Définition des Sensors text
 text_sensor:
   - platform: version
-    name: "batt_meter1 Version 1150"
+    name: "a-master-mini-d1 Version 1150"
 
   - platform: wifi_info
     ip_address:
-      name: batt_meter1 IP Address
+      name: a-master-mini-d1 IP Address
       id: wifi_ip
     ssid:
-      name: batt_meter1 Connected SSID
+      name: a-master-mini-d1 Connected SSID
       id: wifi_ssid
 
 
 # Définition des inputs numbers
 number:
   - platform: template
-    name: "batt_meter1 consigne alarme low"
+    name: "a-master-mini-d1 consigne alarme low"
     restore_value: true
     optimistic: true
     min_value: 0.0
@@ -124,4 +111,4 @@ number:
     step: 0.01
     initial_value: 0.4
     unit_of_measurement: "V"
-    id: batt_meter1_consigne_alarme_low
+    id: a-master-mini-d1_consigne_alarme_low
