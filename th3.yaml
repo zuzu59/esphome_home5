@@ -2,19 +2,25 @@
 #-- th3.yaml
 #-- Petit code pour monitorer la température et l'humidité dans une pièce
 #-- location: salon
-#-- zf221015.1820
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
+#-- zf221023.1717
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
+# Calcul de la durée sur une batterie: https://docs.google.com/spreadsheets/d/1I6s_R04LjGxCB0hrcvogGHNeITDwfXjM05hJhuqGkoU/edit#gid=1470557238
 
 esphome:
   name: th3
+  on_boot:
+  - switch.turn_on: led
 
 esp8266:
   board: d1_mini
 
 # Configuration WIFI
 wifi:
+  fast_connect: true
   ssid: !secret wifi_ssid_apzuzu7
   password: !secret wifi_pass_apzuzu7
 
@@ -70,9 +76,9 @@ logger:
     mqtt.switch: INFO
     mqtt.sensor: INFO
 
-# Enable Home Assistant API
-api:
- password: !secret api_password
+# # Enable Home Assistant API
+# api:
+#  password: !secret api_password
 
 ota:
   password: !secret ota_password
@@ -81,17 +87,20 @@ ota:
 web_server:
   port: 80
 
-# # MQTT server
-# mqtt:
-#   broker:  !secret mqtt_server_dev
-#   port:  !secret mqtt_port_dev
-#   username:  !secret mqtt_user_dev
-#   password:  !secret mqtt_password_dev
+# MQTT server
+mqtt:
+  broker:  !secret mqtt_server_dev
+  port:  !secret mqtt_port_dev
+  username:  !secret mqtt_user_dev
+  password:  !secret mqtt_password_dev
+  birth_message:
+  will_message:
 
 # I2C conf
 i2c:
-  sda: D5
-  scl: D6
+  sda: D2
+  scl: D1
+#  frequency: 10khz
 
 
 # Définition des Switch's
@@ -105,29 +114,123 @@ switch:
   - platform: restart
     name: "th3 Restart"
 
+  - platform: shutdown
+    name: "th3 Shutdown"
+    id: th3_shutdown
+    internal: true
+
+
+# Définition des Scripts
+script:
+    # fonction BMS, shutdown si < 3.3 Volts !
+  - id: my_bms
+    mode: restart
+    then:
+      if:
+        condition:
+          lambda: 'return id(th3_bat_voltage).state < 3.3 ;'
+        then:
+          - logger.log: "The sensor value is below 3.3 Volts !"
+          - delay: 1s
+          - switch.turn_on: th3_shutdown
+
 
 # Définition des Sensors
 sensor:
   - platform: wifi_signal
     name: "th3 Signal Wi-Fi"
-    update_interval: 60s
+    update_interval: 5s
+    on_value:
+      if:
+        condition:
+          mqtt.connected:
+        then:
+          - logger.log: Je suis connected sur le mqtt et j'envoie la sauce !
+          - delay: 1s
+          - script.execute: my_bms
+          - if:
+              condition:
+                lambda: 'return id(th3_sleep_mode).state == 1;'
+              then:
+                - delay: 1s
+                - logger.log: On me demande de dormir !
+                - deep_sleep.enter: deep_sleep_1
+        else:
+          - logger.log: Erreur 007 *********************************************************
+          - deep_sleep.enter: deep_sleep_1
 
   - platform: uptime
     name: "th3 uptime"
-    update_interval: 60s
+    update_interval: 15s
 
+# température et humidité
   - platform: htu21d
     temperature:
       name: "th3 Température"
     humidity:
       name: "th3 Humidité"
+#      accuracy_decimals: 0
     update_interval: 15s
+
+# tension VCC à l'intérieur de l'ESP
+  - platform: adc
+    pin: VCC
+    name: "th3 VCC Voltage"
+    id: th3_vcc_voltage
+    update_interval: 2s
+    unit_of_measurement: "V"
+    accuracy_decimals: 3
+    internal: true
+
+# tension de la batterie
+  - platform: template
+    name: "th3 BAT Voltage"
+    id: th3_bat_voltage
+    update_interval: 2s
+    unit_of_measurement: "V"
+    accuracy_decimals: 3
+    lambda: return id(th3_vcc_voltage).state + 1.285 -0.032 ;
+ 
+# capacité de la batterie
+  - platform: template
+    name: "th3 BAT capacity"
+    update_interval: 2s
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    lambda: return id(th3_bat_voltage).state ;
+    filters:
+      - calibrate_linear:
+          - 3.5 -> 0.0
+          - 4.0 -> 100.0
+      # filtre la valeur minimale
+      - lambda: |-
+          if (x >= 0) 
+            return x;
+          else 
+            return 0;
+      # filtre la valeur maximale
+      - lambda: |-
+          if (x <= 100) 
+            return x;
+          else 
+            return 100;
+
+
+# Définition des binary sensor
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D7
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "th3 sleep mode"
+    id: th3_sleep_mode
 
 
 # Définition des Sensors text
 text_sensor:
   - platform: version
-    name: "th3 Version 1257"
+    name: "th3 Version 1352"
 
   - platform: wifi_info
     ip_address:
@@ -137,3 +240,9 @@ text_sensor:
       name: th3 Connected SSID
       id: wifi_ssid
 
+
+# Deep Sleep
+deep_sleep:
+#  run_duration: 5s
+  sleep_duration: 60s
+  id: deep_sleep_1
