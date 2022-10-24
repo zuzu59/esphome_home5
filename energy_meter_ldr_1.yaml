@@ -3,7 +3,7 @@
 #-- Petit code générique minimaliste pour des projets à base d'esp mini d1
 #-- blablabla
 #-- location: tableau électrique
-#-- zf221023.2356
+#-- zf221025.0133
 #--
 # sources: 
 # https://esphome.io/components/sensor/pulse_meter.html#converting-units  
@@ -88,22 +88,22 @@ sensor:
     name: "energy_meter_ldr_1 uptime"
     update_interval: 15s
 
-  # - platform: pulse_counter
   - platform: pulse_meter
-    name: 'NRJ Meter LDR 1 Power'
+    name: 'energy_meter_ldr_1_power'
     id: energy_meter_ldr_1_power
     pin: D1
     unit_of_measurement: 'W'
+    state_class: measurement
+    device_class: power
     accuracy_decimals: 0
-
-    # update_interval: 10s    # Très important car c'est ici que l'on intègre sur une minute !
-    internal_filter: 5ms
-    internal_filter_mode: pulse
+    internal_filter: 50ms
+    internal_filter_mode: edge
+    timeout: 100s
     filters:
-      - multiply: 60       # Facteur de conversion durée impulsion (60s/1000 pulses per kWh)
-      - sliding_window_moving_average:
-          window_size: 3
-          send_every: 3
+      - multiply: 60       # Facteur de conversion durée impulsion (1000 pulses per kWh)
+      # - sliding_window_moving_average:
+      #     window_size: 3
+      #     send_every: 3
 
 
 # Définition des Sensors text
@@ -123,12 +123,11 @@ text_sensor:
 # Définition des binary sensors
 binary_sensor:
   - platform: gpio
-    name: "NRJ Meter LDR 1"
+    name: "energy_meter_ldr_1_pulse"
     pin:
       number: D2
-      mode: INPUT_PULLUP
-      # inverted: True
+      inverted: true
     on_press:
       - switch.turn_on: led
-      - delay: 0.5s
+      - delay: 100ms
       - switch.turn_off: led
