@@ -4,7 +4,7 @@
 #-- location: salon
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- zf221023.1717
+#-- zf221024.2236
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -13,7 +13,8 @@
 esphome:
   name: th3
   on_boot:
-  - switch.turn_on: led
+  # - switch.turn_on: led
+  - switch.turn_off: led
 
 esp8266:
   board: d1_mini
