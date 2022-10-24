@@ -2,7 +2,7 @@
 #-- th2.yaml
 #-- Petit code pour monitorer la température et l'humidité dans une pièce
 #-- location: garage porte nord
-#-- zf221015.1652
+#-- zf221024.1507
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -48,27 +48,7 @@ captive_portal:
 
 # Enable logging
 logger:
-  level: DEBUG
-  logs:
-    logger: INFO
-    adc: INFO
-    captive_portal: INFO
-    deep_sleep: INFO
-    htu21d: INFO
-    i2c: INFO
-    ota: INFO
-    restart: INFO
-    sensor: INFO
-    switch: INFO
-    switch.gpio: INFO
-    uptime.sensor: INFO
-    web_server: INFO
-    wifi_signal.sensor: INFO
-    mqtt: INFO
-    mqtt.component: INFO
-    mqtt.client: INFO
-    mqtt.switch: INFO
-    mqtt.sensor: INFO
+    # level: VERBOSE
 
 # Enable Home Assistant API
 api:
@@ -81,18 +61,10 @@ ota:
 web_server:
   port: 80
 
-# # MQTT server
-# mqtt:
-#   broker:  !secret mqtt_server_dev
-#   port:  !secret mqtt_port_dev
-#   username:  !secret mqtt_user_dev
-#   password:  !secret mqtt_password_dev
-
 # I2C conf
 i2c:
   sda: D5
   scl: D6
-#  frequency: 10khz
 
 
 # Définition des Switch's
@@ -122,7 +94,7 @@ sensor:
       name: "th2 Température"
     humidity:
       name: "th2 Humidité"
-    update_interval: 15s
+    update_interval: 60s
 
 # valeur brute en volts de la photo résistance
   - platform: adc
