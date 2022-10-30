@@ -8,7 +8,7 @@
 #-- Si la pin D2 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- ATTENTION, comme il n'y a qu'un seul convertisseur ADC sur l'ESP8266, il n'y a plus la fonction BMS et indicateur de capacité !
-#-- zf221023.1617
+#-- zf221030.1233
 #--
 # sources: 
 # https://esphome.io/components/sensor/adc.html
@@ -137,9 +137,9 @@ sensor:
                 - delay: 1s
                 - logger.log: On me demande de dormir !
                 - deep_sleep.enter: deep_sleep_1
-        else:
-          - logger.log: Erreur 007 *********************************************************
-          - deep_sleep.enter: deep_sleep_1
+              else:
+                - logger.log: Erreur 007 *********************************************************
+                - deep_sleep.enter: deep_sleep_1
 
   - platform: uptime
     name: "batrec_d1_1 uptime"
