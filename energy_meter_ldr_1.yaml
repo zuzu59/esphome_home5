@@ -1,9 +1,9 @@
 #------------------------------
 #-- energy_meter_ldr_1.yaml
 #-- Petit code générique minimaliste pour des projets à base d'esp mini d1
-#-- blablabla
+#-- ATTENTION, la LED builting et le sensor pulse sont 'cachés' (internal: true) à cause que cela rempli l'history pour rien
 #-- location: tableau électrique
-#-- zf221025.0133
+#-- zf221101.0959
 #--
 # sources: 
 # https://esphome.io/components/sensor/pulse_meter.html#converting-units  
@@ -73,6 +73,7 @@ switch:
     inverted: True
     id: led
     pin: D4
+    internal: true
 
   - platform: restart
     name: "energy_meter_ldr_1 Restart"
@@ -98,7 +99,7 @@ sensor:
     accuracy_decimals: 0
     internal_filter: 50ms
     internal_filter_mode: edge
-    timeout: 100s
+    timeout: 30s
     filters:
       - multiply: 60       # Facteur de conversion durée impulsion (1000 pulses per kWh)
       # - sliding_window_moving_average:
@@ -131,3 +132,5 @@ binary_sensor:
       - switch.turn_on: led
       - delay: 100ms
       - switch.turn_off: led
+    internal: true
+
