@@ -4,7 +4,7 @@
 #-- location: bureau Vreni
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- zf221024.2230
+#-- zf221101.1423
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -158,7 +158,13 @@ sensor:
                 - deep_sleep.enter: deep_sleep_1
         else:
           - logger.log: Erreur 007 *********************************************************
-          - deep_sleep.enter: deep_sleep_1
+          - if:
+              condition:
+                lambda: 'return id(th11_sleep_mode).state == 1;'
+              then:
+                - delay: 1s
+                - logger.log: On me demande de dormir !
+                - deep_sleep.enter: deep_sleep_1
 
   - platform: uptime
     name: "th11 uptime"
@@ -201,8 +207,8 @@ sensor:
     lambda: return id(th11_bat_voltage).state ;
     filters:
       - calibrate_linear:
-          - 3.5 -> 0.0
-          - 4.0 -> 100.0
+          - 3.4 -> 0.0
+          - 4.1 -> 100.0
       # filtre la valeur minimale
       - lambda: |-
           if (x >= 0) 
