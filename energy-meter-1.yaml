@@ -125,7 +125,7 @@ sensor:
     multiplexer: 'A0_GND'
     gain: 4.096
     accuracy_decimals: 2
-    update_interval: 5s
+    update_interval: 15s
     unit_of_measurement: "A"
     icon: "mdi:flash"
     filters:
@@ -148,7 +148,7 @@ sensor:
     multiplexer: 'A1_GND'
     gain: 4.096
     accuracy_decimals: 2
-    update_interval: 5s
+    update_interval: 15s
     unit_of_measurement: "A"
     icon: "mdi:flash"
     filters:
@@ -171,7 +171,7 @@ sensor:
     multiplexer: 'A2_GND'
     gain: 4.096
     accuracy_decimals: 2
-    update_interval: 5s
+    update_interval: 15s
     unit_of_measurement: "A"
     icon: "mdi:flash"
     filters:
@@ -194,7 +194,7 @@ sensor:
     multiplexer: 'A3_GND'
     gain: 4.096
     accuracy_decimals: 2
-    update_interval: 5s
+    update_interval: 15s
     unit_of_measurement: "A"
     icon: "mdi:flash"
     filters:
