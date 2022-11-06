@@ -2,7 +2,7 @@
 #-- pzem-3x-test-1.yaml
 #-- Petits tests d2 3x modules power-meter PZEM-004T V3
 #-- ATTENTION: il faut leur changer l'adresse AVANT et tous les brancher en // !
-#-- zf210817.0804, zf220627.1124
+#-- zf210817.0804, zf220627.1124, zf221101.1542
 #--
 
 # sources: 
@@ -30,9 +30,10 @@ ota:
 
 # Configuration WIFI
 wifi:
+  fast_connect: true
   ssid: !secret wifi_ssid_apzuzu6
   password: !secret wifi_pass_apzuzu6
-  reboot_timeout: 60min
+#  reboot_timeout: 60min
 
   # networks:
   
@@ -101,7 +102,7 @@ sensor:
 
   - platform: uptime
     name: "pzem-3x-test-1 Uptime"
-    update_interval: 60s
+    update_interval: 15s
 
   - platform: pzemac
     address: 1
@@ -117,7 +118,7 @@ sensor:
       name: "PZEM-L1 Frequency"
     power_factor:
       name: "PZEM-L1 Power Factor"
-    update_interval: 15s
+    update_interval: 5s
 
   - platform: pzemac
     address: 2
@@ -133,7 +134,7 @@ sensor:
       name: "PZEM-L2 Frequency"
     power_factor:
       name: "PZEM-L2 Power Factor"
-    update_interval: 15s
+    update_interval: 5s
 
   - platform: pzemac
     address: 3
@@ -149,7 +150,7 @@ sensor:
       name: "PZEM-L3 Frequency"
     power_factor:
       name: "PZEM-L3 Power Factor"
-    update_interval: 15s
+    update_interval: 5s
 
 
 uart:
