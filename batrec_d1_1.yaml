@@ -8,7 +8,7 @@
 #-- Si la pin D2 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- ATTENTION, comme il n'y a qu'un seul convertisseur ADC sur l'ESP8266, il n'y a plus la fonction BMS et indicateur de capacité !
-#-- zf221030.1357
+#-- zf221106.1218
 #--
 # sources: 
 # https://esphome.io/components/sensor/adc.html
@@ -25,19 +25,20 @@ esp8266:
 
 # Configuration WIFI
 wifi:
+  reboot_timeout: 5min
   # ssid: !secret wifi_ssid_3G_zf2
   # password: !secret wifi_pass_3G_zf2
 
   networks:
-  
+
     - ssid: !secret wifi_ssid_apzuzu7
     - password: !secret wifi_pass_apzuzu7
     
-    - ssid: !secret wifi_ssid_apzuzu6
-    - password: !secret wifi_pass_apzuzu6
+    # - ssid: !secret wifi_ssid_apzuzu6
+    # - password: !secret wifi_pass_apzuzu6
 
-    - ssid: !secret wifi_ssid_3g_s7
-    - password: !secret wifi_pass_3g_s7
+    # - ssid: !secret wifi_ssid_3g_s7
+    # - password: !secret wifi_pass_3g_s7
 
   #   - ssid: !secret wifi_ssid_3G_zf
   #   - password: !secret wifi_pass_3G_zf2
@@ -122,7 +123,7 @@ switch:
 sensor:
   - platform: wifi_signal
     name: "batrec_d1_1 Signal Wi-Fi"
-    update_interval: 5s
+    update_interval: 15s
     on_value:
       if:
         condition:
@@ -145,7 +146,7 @@ sensor:
               then:
                 - delay: 1s
                 - logger.log: On me demande de dormir !
-                - deep_sleep.enter: deep_sleep_1
+                # - deep_sleep.enter: deep_sleep_1
 
   - platform: uptime
     name: "batrec_d1_1 uptime"
@@ -156,7 +157,7 @@ sensor:
     pin: A0
     name: "batrec_d1_1 ADC brut"
     id: batrec_d1_1_adc_brut
-    update_interval: 2s
+    update_interval: 15s
     unit_of_measurement: "V"
     accuracy_decimals: 3
 
@@ -164,7 +165,7 @@ sensor:
   - platform: template
     name: "batrec_d1_1 ADC Voltage"
     id: batrec_d1_1_adc_voltage
-    update_interval: 2s
+    update_interval: 15s
     unit_of_measurement: "V"
     accuracy_decimals: 2
     lambda: return id(batrec_d1_1_adc_brut).state ;
