@@ -4,7 +4,7 @@
 #-- location: bureau Vreni
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- zf221101.1423
+#-- zf221106.1300
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -48,7 +48,7 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "esp32-ble-hub1 Fallback"
+    ssid: "th11 Fallback"
     password: !secret ap_wifi_password
 
 captive_portal:

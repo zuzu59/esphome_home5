@@ -3,7 +3,7 @@
 #-- Petit code mini manilste pour mesurer la température et l'humidité
 #-- Lit la tmpérature et l'humidité du capteur HTU21D
 #-- location: hall rez
-#-- zf210720.1023, zf220302.1155, zf221017.2307
+#-- zf210720.1023, zf220302.1155, zf221106.1300
 #--
 
 
@@ -44,7 +44,7 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "esp32-ble-hub1 Fallback"
+    ssid: "th7 Fallback"
     password: !secret ap_wifi_password
 
 captive_portal:

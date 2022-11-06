@@ -3,7 +3,7 @@
 #-- Petit code pour une démo d'un display mini OLED de mini-d1
 #-- va chercher le COV sur un autre capteur ESPhome et l'affiche
 #-- source: https://esphome.io/cookbook/display_time_temp_oled.html
-#-- zf210208.1701, zf2209.1129
+#-- zf210208.1701, zf221106.1300
 #--
 
 
@@ -42,7 +42,7 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "esp32-ble-hub1 Fallback"
+    ssid: "tst_d1_disp1 Fallback"
     password: !secret ap_wifi_password
 
 captive_portal:

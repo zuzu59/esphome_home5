@@ -2,7 +2,7 @@
 #-- th4.yaml
 #-- Petit code pour monitorer la température et l'humidité dans une pièce
 #-- location: chambre Heïda
-#-- zf221031.1402
+#-- zf221106.1300
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -41,7 +41,7 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "esp32-ble-hub1 Fallback"
+    ssid: "th4 Fallback"
     password: !secret ap_wifi_password
 
 captive_portal:

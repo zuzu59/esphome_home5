@@ -4,7 +4,7 @@
 #-- Cherche des consignes sur le Home Assistant
 #-- et fait une petite détection de dépassement avec alarme sur Telegram
 #-- 
-#-- zf220523.0942
+#-- zf220523.0942, zf221106.1300
 #--
 
 esphome:
@@ -44,7 +44,7 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "esp32-ble-hub1 fallback"
+    ssid: "demo-darby1 fallback"
     password: !secret ap_wifi_password
 
 # Enable wifi configuration fallback

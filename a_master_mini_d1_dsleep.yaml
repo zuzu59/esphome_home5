@@ -47,7 +47,7 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "esp32-ble-hub1 Fallback"
+    ssid: "a_master_mini_d1_dsleep Fallback"
     password: !secret ap_wifi_password
 
 captive_portal:
