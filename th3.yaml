@@ -4,7 +4,7 @@
 #-- location: salon
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- zf221106.1300
+#-- zf221111.2218
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -252,5 +252,5 @@ text_sensor:
 # Deep Sleep
 deep_sleep:
 #  run_duration: 5s
-  sleep_duration: 60s
+  sleep_duration: 120s
   id: deep_sleep_1
