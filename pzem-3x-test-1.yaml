@@ -2,7 +2,7 @@
 #-- pzem-3x-test-1.yaml
 #-- Petits tests d2 3x modules power-meter PZEM-004T V3
 #-- ATTENTION: il faut leur changer l'adresse AVANT et tous les brancher en // !
-#-- zf210817.0804, zf220627.1124, zf221101.1542
+#-- zf210817.0804, zf220627.1124, zf221112.0820
 #--
 
 # sources: 
@@ -118,7 +118,7 @@ sensor:
       name: "PZEM-L1 Frequency"
     power_factor:
       name: "PZEM-L1 Power Factor"
-    update_interval: 5s
+    update_interval: 16s
 
   - platform: pzemac
     address: 2
@@ -134,7 +134,7 @@ sensor:
       name: "PZEM-L2 Frequency"
     power_factor:
       name: "PZEM-L2 Power Factor"
-    update_interval: 5s
+    update_interval: 15s
 
   - platform: pzemac
     address: 3
@@ -150,7 +150,7 @@ sensor:
       name: "PZEM-L3 Frequency"
     power_factor:
       name: "PZEM-L3 Power Factor"
-    update_interval: 5s
+    update_interval: 14s
 
 
 uart:
