@@ -3,7 +3,7 @@
 #-- Petit code pour faire un PWM pour piloter le chauffe eau à base d'esp mini d1
 #-- blablabla
 #-- location: buanderie
-#-- zf221115.1346
+#-- zf221120.1444
 #--
 # sources: 
 # ...
@@ -16,8 +16,8 @@ esp8266:
 
 # Configuration WIFI
 wifi:
-  ssid: !secret wifi_ssid_apzuzu7
-  password: !secret wifi_pass_apzuzu7
+  ssid: !secret wifi_ssid_apzuzu6
+  password: !secret wifi_pass_apzuzu6
 
   # networks:
   
@@ -63,6 +63,12 @@ web_server:
   port: 80
 
 
+# Configuration 1-wire pour les capteurs de température DS18B20
+dallas:
+  - pin: D5
+    update_interval: 15s
+
+
 # Définition des Switch's
 switch:
   - platform: gpio
@@ -85,6 +91,14 @@ sensor:
     name: "boiler_pwm1 uptime"
     update_interval: 15s
 
+# Température variateur
+  - platform: dallas
+    address: 0x1a0301a279494a28
+    name: "boiler_pwm1 temp"
+    id: boiler_pwm1_temp
+    # filters:
+    #     - lambda: return ( x - (id(th_ext_sud_temperature_calibration).state /1) );
+
 
 # Définition des Sensors text
 text_sensor:
@@ -100,15 +114,18 @@ text_sensor:
       id: wifi_ssid
 
 
-# Définition des inputs numbers
-number:
-  - platform: template
-    name: "boiler_pwm1 consigne alarme low"
-    restore_value: true
-    optimistic: true
-    min_value: 0.0
-    max_value: 0.8
-    step: 0.01
-    initial_value: 0.4
-    unit_of_measurement: "V"
-    id: boiler_pwm1_consigne_alarme_low
+# Définition des outputs 
+output:
+  - platform: esp8266_pwm
+    pin: D1
+    frequency: 1000 Hz
+    id: boiler_pwm1_pwm_output
+
+
+# Définition des lights 
+light:
+  - platform: monochromatic
+    output: boiler_pwm1_pwm_output
+    name: boiler_pwm1_pwm_output_power_set"
+
+    
