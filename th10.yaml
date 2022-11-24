@@ -4,7 +4,7 @@
 #-- location: salle de douche
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- zf221111.2213
+#-- zf221124.0733
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -22,8 +22,8 @@ esp8266:
 # Configuration WIFI
 wifi:
   fast_connect: true
-  ssid: !secret wifi_ssid_apzuzu7
-  password: !secret wifi_pass_apzuzu7
+  ssid: !secret wifi_ssid_apzuzu6
+  password: !secret wifi_pass_apzuzu6
 
   # networks:
   
@@ -129,7 +129,7 @@ script:
     then:
       if:
         condition:
-          lambda: 'return id(th10_bat_voltage).state < 3.3 ;'
+          lambda: 'return id(th10_bat_voltage).state < 3.0 ;'
         then:
           - logger.log: "The sensor value is below 3.3 Volts !"
           - delay: 1s
