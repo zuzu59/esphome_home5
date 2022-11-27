@@ -2,13 +2,13 @@
 #-- batrec_d1_1.yaml
 #-- Petit code pour monitorer une batterie
 #-- Lit le port ADC0 et l'envoie sur un mqtt broker
-#-- Afin de pouvoir lire des tensions >3.3V, il y a un diviseur résistif R1/R2 de 150kR/10R !
+#-- Afin de pouvoir lire des tensions >3.3V, il y a un diviseur résistif R1/R2 de 150kR/10kR !
 #-- Il y a donc un facteur de correction de 50 environ avec une plage de mesure de 0V à 48V
 #-- location: garage
 #-- Si la pin D2 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- ATTENTION, comme il n'y a qu'un seul convertisseur ADC sur l'ESP8266, il n'y a plus la fonction BMS et indicateur de capacité !
-#-- zf221106.1300
+#-- zf221126.1421
 #--
 # sources: 
 # https://esphome.io/components/sensor/adc.html
@@ -204,20 +204,5 @@ deep_sleep:
 #  run_duration: 5s
   sleep_duration: 60s
   id: deep_sleep_1
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
