@@ -2,7 +2,7 @@
 #-- pzem-3x-test-1.yaml
 #-- Petits tests d2 3x modules power-meter PZEM-004T V3
 #-- ATTENTION: il faut leur changer l'adresse AVANT et tous les brancher en // !
-#-- zf210817.0804, zf220627.1124, zf221112.0820
+#-- zf210817.0804, zf220627.1124, zf221202.1426
 #--
 
 # sources: 
@@ -23,7 +23,7 @@ logger:
 # Enable Home Assistant API
 api:
   password: !secret api_password
-  reboot_timeout: 60min
+  reboot_timeout: 10min
 
 ota:
   password: !secret ota_password
@@ -33,7 +33,7 @@ wifi:
   fast_connect: true
   ssid: !secret wifi_ssid_apzuzu6
   password: !secret wifi_pass_apzuzu6
-#  reboot_timeout: 60min
+  reboot_timeout: 10min
 
   # networks:
   
