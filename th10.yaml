@@ -4,7 +4,7 @@
 #-- location: salle de douche
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- zf221124.0733
+#-- zf221205.1555
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -13,8 +13,9 @@
 esphome:
   name: th10
   on_boot:
-  # - switch.turn_on: led
-  - switch.turn_off: led
+#   - switch.turn_on: led
+   - switch.turn_off: led
+
 
 esp8266:
   board: d1_mini
@@ -24,6 +25,12 @@ wifi:
   fast_connect: true
   ssid: !secret wifi_ssid_apzuzu6
   password: !secret wifi_pass_apzuzu6
+  manual_ip:
+    static_ip: 192.168.0.201
+    gateway: 192.168.0.51
+    dns1: 192.168.0.51
+    dns2: 8.8.8.8
+    subnet: 255.255.255.0
 
   # networks:
   
@@ -56,6 +63,7 @@ captive_portal:
 # Enable logging
 logger:
   level: DEBUG
+#  level: INFO
   logs:
     logger: INFO
     adc: INFO
@@ -123,17 +131,21 @@ switch:
 
 # Définition des Scripts
 script:
-    # fonction BMS, shutdown si < 3.3 Volts !
+  # fonction BMS, shutdown si < 3.3 Volts !
   - id: my_bms
-    mode: restart
     then:
-      if:
-        condition:
-          lambda: 'return id(th10_bat_voltage).state < 3.0 ;'
-        then:
-          - logger.log: "The sensor value is below 3.3 Volts !"
-          - delay: 1s
-          - switch.turn_on: th10_shutdown
+      - logger.log:
+          format: "La batterie est à %.1f"
+          args: [ 'id(th10_bat_voltage).state' ]
+      - if:
+          condition:
+            lambda: 'return id(th10_bat_voltage).state < 3.3 ;'
+          then:
+            - logger.log: "La batterie est en dessous de 3.3 Volts !"
+            - delay: 0.5s
+            - switch.turn_on: th10_shutdown
+          else:
+            - logger.log: "La batterie est encore bonne !"
 
 
 # Définition des Sensors
@@ -146,14 +158,12 @@ sensor:
         condition:
           mqtt.connected:
         then:
-          - logger.log: Je suis connected sur le mqtt et j'envoie la sauce !
-          - delay: 1s
-          - script.execute: my_bms
+          - logger.log: Je suis connecté sur le mqtt et j'envoie la sauce !
+          - delay: 0.1s
           - if:
               condition:
                 lambda: 'return id(th10_sleep_mode).state == 1;'
               then:
-                - delay: 1s
                 - logger.log: On me demande de dormir !
                 - deep_sleep.enter: deep_sleep_1
         else:
@@ -162,7 +172,6 @@ sensor:
               condition:
                 lambda: 'return id(th10_sleep_mode).state == 1;'
               then:
-                - delay: 1s
                 - logger.log: On me demande de dormir !
                 - deep_sleep.enter: deep_sleep_1
 
@@ -196,6 +205,9 @@ sensor:
     update_interval: 2s
     unit_of_measurement: "V"
     accuracy_decimals: 3
+    on_value:
+      then:
+        - script.execute: my_bms
     lambda: return id(th10_vcc_voltage).state + 1.258 ;
  
 # capacité de la batterie
