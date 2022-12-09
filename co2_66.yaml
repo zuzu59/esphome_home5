@@ -1,34 +1,58 @@
 #------------------------------
 #-- co2_66.yaml
-#-- Petit code mini minilste pour mesurer le TVOC et eCO2
-#-- Lit TVOC et eCO2 du capteur ccs811
-#-- location: chambre des parents petit meuble à droite en entrant
-#-- zf210720.1026
+#-- Petit code mini minimaliste pour mesurer le COV et eCO2
+#-- Lit COV et eCO2 du capteur ccs811
+#-- location: chambre parents table de nuit zf
+#-- zf210720.1033, zf221209.1350
 #--
 
 
 # sources: 
 # https://esphome.io/components/sensor/ccs811.html
 
+
 esphome:
   name: co2_66
-  platform: ESP8266
+
+esp8266:
   board: nodemcuv2
 
+# Configuration WIFI
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
+
+  # networks:
+  
+  #   - ssid: !secret wifi_ssid_apzuzu7
+  #   - password: !secret wifi_pass_apzuzu7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6
+  #   - password: !secret wifi_pass_apzuzu6
+
+  #   - ssid: !secret wifi_ssid_3G_zf
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3G_zf2
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3g_s7
+  #   - password: !secret wifi_pass_3g_s7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
+  #   - password: !secret wifi_pass_apzuzu6_EXT
+
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "co2_66 Fallback Hotspot"
+    ssid: "co2_66 Fallback"
     password: !secret ap_wifi_password
 
 captive_portal:
 
 # Enable logging
 logger:
-#    level: VERBOSE
+    level: VERBOSE
 
 # Enable Home Assistant API
 api:
@@ -37,7 +61,19 @@ api:
 ota:
   password: !secret ota_password
 
-# Switch
+# WEB Server
+web_server:
+  port: 80
+
+
+# I2C conf
+i2c:
+    scl: D1
+    sda: D2
+    scan: True
+
+
+# Définition des Switch's
 switch:
   - platform: gpio
     name: "co2_66 LED"
@@ -48,77 +84,57 @@ switch:
   - platform: restart
     name: "co2_66 Restart"
 
-# Définition du bouton physique
-binary_sensor:
-  - platform: gpio
-    pin:
-      number: D3
-      mode: INPUT_PULLUP
-      inverted: True
-    name: "co2_66 button"
-    on_press:
-      - switch.toggle: led
 
-# WEB Server
-web_server:
-  port: 80
-
-# MQTT server
-mqtt:
-  broker:  !secret mqtt_server_dev
-  port:  !secret mqtt_port_dev
-  username:  !secret mqtt_user_dev
-  password:  !secret mqtt_password_dev
-
-# Définitions des texts sensors
-text_sensor:
-  - platform: wifi_info
-    ip_address:
-      name: 1w_th_solar IP Address
-      id: wifi_ip
-    ssid:
-      name: 1w_th_solar Connected SSID
-      id: wifi_ssid
-
-
-
-# I2C conf
-i2c:
-    sda: D5
-    scl: D6
-    scan: True
-
-# Sensors
+# Définition des Sensors
 sensor:
   - platform: wifi_signal
     name: "co2_66 Signal Wi-Fi"
-    update_interval: 61s
+    update_interval: 60s
 
   - platform: uptime
     name: "co2_66 uptime"
-    update_interval: 63s
+    update_interval: 60s
 
-######### juste là pour changer l'harmonique du CPU qui interagit avec le WIFI sur mes NodeMCU lowcost :-(
+
+
   - platform: homeassistant
-    name: "th8 Temp"
-    entity_id: sensor.th8_temperature
-#    id: th8_th
-    internal: true
-#########
+    name: "co2_66 th0 Temp"
+    entity_id: sensor.th0_temperature
+    id: co2_66_th0_th
+    internal: false
+  - platform: homeassistant
+    name: "co2_66 th0 Humi"
+    entity_id: sensor.th0_humidite
+    id: co2_66_th0_hu
+    internal: false
 
-#   - platform: homeassistant
-#     name: "th8 Humi"
-#     entity_id: sensor.th8_humidite
-#     id: th8_hu
+
+
 
   - platform: ccs811
-    baseline: 0xC9BE
-#    temperature: th8_th
-#    humidity: th8_hu
-    update_interval: 15s
+    # baseline: 0x5BB8
+    # temperature: co2_66_th0_th
+    # humidity: co2_66_th0_hu
+    update_interval: 5s
     eco2:
       name: "co2_66 eCO2"
     tvoc:
       name: "co2_66 TVOC"
+
+
+
+
+# Définition des Sensors text
+text_sensor:
+  - platform: version
+    name: "co2_66 Version 1312"
+
+  - platform: wifi_info
+    ip_address:
+      name: co2_66 IP Address
+      id: wifi_ip
+    ssid:
+      name: co2_66 Connected SSID
+      id: wifi_ssid
 
 
