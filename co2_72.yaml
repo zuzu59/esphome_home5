@@ -3,7 +3,7 @@
 #-- Petit code mini minimaliste pour mesurer le COV et eCO2
 #-- Lit COV et eCO2 du capteur ccs811
 #-- location: chambre à Chloé carton vers mur
-#-- zf210720.1033, zf221209.1348
+#-- zf210720.1033, zf221209.1657
 #--
 
 
@@ -97,30 +97,37 @@ sensor:
 
 
 
-  - platform: homeassistant
-    name: "co2_72 th0 Temp"
-    entity_id: sensor.th0_temperature
-    id: co2_72_th0_th
-    internal: false
-  - platform: homeassistant
-    name: "co2_72 th0 Humi"
-    entity_id: sensor.th0_humidite
-    id: co2_72_th0_hu
-    internal: false
+  # - platform: homeassistant
+  #   name: "co2_72 th0 Temp"
+  #   entity_id: sensor.th0_temperature
+  #   id: co2_72_th0_th
+  #   internal: false
+  # - platform: homeassistant
+  #   name: "co2_72 th0 Humi"
+  #   entity_id: sensor.th0_humidite
+  #   id: co2_72_th0_hu
+  #   internal: false
 
 
 
 
   - platform: ccs811
     # baseline: 0x5BB8
-    temperature: co2_72_th0_th
-    humidity: co2_72_th0_hu
+    # temperature: co2_72_th0_th
+    # humidity: co2_72_th0_hu
     update_interval: 5s
     eco2:
       name: "co2_72 eCO2"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 5
+            send_every: 5
     tvoc:
       name: "co2_72 TVOC"
-
+      filters:
+        - sliding_window_moving_average:
+            window_size: 5
+            send_every: 5
 
 
 

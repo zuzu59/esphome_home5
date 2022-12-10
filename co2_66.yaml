@@ -118,9 +118,16 @@ sensor:
     update_interval: 5s
     eco2:
       name: "co2_66 eCO2"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 5
+            send_every: 5
     tvoc:
       name: "co2_66 TVOC"
-
+      filters:
+        - sliding_window_moving_average:
+            window_size: 5
+            send_every: 5
 
 
 
