@@ -1,11 +1,12 @@
 #------------------------------
 #-- dsleep_2_0_test.yaml
 #-- Petit code tester mon nouveau dsleep 2.0 intelligent basé sur les deltas de mesures et non sur le temps
+#-- Pour simuler les deltas, j'utilise un diviseur résistif sur l'entrée ADC constitué d'un potientiomètre de 100k
 #-- location: ...
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- ATTENTION, comme il n'y a qu'un seul convertisseur ADC sur l'ESP8266, il n'y a plus la fonction BMS et indicateur de capacité !
-#-- zf221210.1507
+#-- zf221210.1531
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -14,7 +15,9 @@
 esphome:
   name: dsleep_2_0_test
   on_boot:
-  - switch.turn_on: led
+   - switch.turn_on: led
+#   - switch.turn_off: led
+
 
 esp8266:
   board: d1_mini
@@ -24,6 +27,12 @@ wifi:
   fast_connect: true
   ssid: !secret wifi_ssid_apzuzu7
   password: !secret wifi_pass_apzuzu7
+  # manual_ip:
+  #   static_ip: 192.168.0.201
+  #   gateway: 192.168.0.51
+  #   dns1: 192.168.0.51
+  #   dns2: 8.8.8.8
+  #   subnet: 255.255.255.0
 
   # networks:
   
@@ -56,6 +65,7 @@ captive_portal:
 # Enable logging
 logger:
   level: DEBUG
+#  level: INFO
   logs:
     logger: INFO
     adc: INFO
@@ -97,11 +107,11 @@ mqtt:
   birth_message:
   will_message:
 
-# I2C conf
-i2c:
-  sda: D2
-  scl: D1
-#  frequency: 10khz
+# # I2C conf
+# i2c:
+#   sda: D2
+#   scl: D1
+# #  frequency: 10khz
 
 
 # Définition des Switch's
@@ -121,19 +131,23 @@ switch:
     internal: true
 
 
-# Définition des Scripts
-script:
-    # fonction BMS, shutdown si < 3.3 Volts !
-  - id: my_bms
-    mode: restart
-    then:
-      if:
-        condition:
-          lambda: 'return id(dsleep_2_0_test_bat_voltage).state < 3.3 ;'
-        then:
-          - logger.log: "The sensor value is below 3.3 Volts !"
-          - delay: 1s
-          - switch.turn_on: dsleep_2_0_test_shutdown
+# # Définition des Scripts
+# script:
+#   # fonction BMS, shutdown si < 3.3 Volts !
+#   - id: my_bms
+#     then:
+#       - logger.log:
+#           format: "La batterie est à %.1f"
+#           args: [ 'id(dsleep_2_0_test_bat_voltage).state' ]
+#       - if:
+#           condition:
+#             lambda: 'return id(dsleep_2_0_test_bat_voltage).state < 3.3 ;'
+#           then:
+#             - logger.log: "La batterie est en dessous de 3.3 Volts !"
+#             - delay: 0.5s
+#             - switch.turn_on: dsleep_2_0_test_shutdown
+#           else:
+#             - logger.log: "La batterie est encore bonne !"
 
 
 # Définition des Sensors
@@ -146,75 +160,81 @@ sensor:
         condition:
           mqtt.connected:
         then:
-          - logger.log: Je suis connected sur le mqtt et j'envoie la sauce !
-          - delay: 1s
-          - script.execute: my_bms
+          - logger.log: Je suis connecté sur le mqtt et j'envoie la sauce !
+          - delay: 0.1s
           - if:
               condition:
                 lambda: 'return id(dsleep_2_0_test_sleep_mode).state == 1;'
               then:
-                - delay: 1s
                 - logger.log: On me demande de dormir !
                 - deep_sleep.enter: deep_sleep_1
         else:
           - logger.log: Erreur 007 *********************************************************
-          - deep_sleep.enter: deep_sleep_1
+          - if:
+              condition:
+                lambda: 'return id(dsleep_2_0_test_sleep_mode).state == 1;'
+              then:
+                - logger.log: On me demande de dormir !
+                - deep_sleep.enter: deep_sleep_1
 
   - platform: uptime
     name: "dsleep_2_0_test uptime"
     update_interval: 15s
 
-# température et humidité
-  - platform: htu21d
-    temperature:
-      name: "dsleep_2_0_test Température"
-    humidity:
-      name: "dsleep_2_0_test Humidité"
-#      accuracy_decimals: 0
-    update_interval: 15s
+# # température et humidité
+#   - platform: htu21d
+#     temperature:
+#       name: "dsleep_2_0_test Température"
+#     humidity:
+#       name: "dsleep_2_0_test Humidité"
+# #      accuracy_decimals: 0
+#     update_interval: 15s
 
 # tension VCC à l'intérieur de l'ESP
   - platform: adc
-    pin: VCC
+    pin: A0
     name: "dsleep_2_0_test VCC Voltage"
     id: dsleep_2_0_test_vcc_voltage
     update_interval: 2s
     unit_of_measurement: "V"
     accuracy_decimals: 3
-    internal: true
+#    internal: true
 
-# tension de la batterie
-  - platform: template
-    name: "dsleep_2_0_test BAT Voltage"
-    id: dsleep_2_0_test_bat_voltage
-    update_interval: 2s
-    unit_of_measurement: "V"
-    accuracy_decimals: 3
-    lambda: return id(dsleep_2_0_test_vcc_voltage).state + 1.396 ;
+# # tension de la batterie
+#   - platform: template
+#     name: "dsleep_2_0_test BAT Voltage"
+#     id: dsleep_2_0_test_bat_voltage
+#     update_interval: 2s
+#     unit_of_measurement: "V"
+#     accuracy_decimals: 3
+#     # on_value:
+#     #   then:
+#     #     - script.execute: my_bms
+#     lambda: return id(dsleep_2_0_test_vcc_voltage).state + 1.258 ;
  
 # capacité de la batterie
-  - platform: template
-    name: "dsleep_2_0_test BAT capacity"
-    update_interval: 2s
-    unit_of_measurement: "%"
-    accuracy_decimals: 0
-    lambda: return id(dsleep_2_0_test_bat_voltage).state ;
-    filters:
-      - calibrate_linear:
-          - 3.5 -> 0.0
-          - 4.0 -> 100.0
-      # filtre la valeur minimale
-      - lambda: |-
-          if (x >= 0) 
-            return x;
-          else 
-            return 0;
-      # filtre la valeur maximale
-      - lambda: |-
-          if (x <= 100) 
-            return x;
-          else 
-            return 100;
+  # - platform: template
+  #   name: "dsleep_2_0_test BAT capacity"
+  #   update_interval: 2s
+  #   unit_of_measurement: "%"
+  #   accuracy_decimals: 0
+  #   lambda: return id(dsleep_2_0_test_bat_voltage).state ;
+  #   filters:
+  #     - calibrate_linear:
+  #         - 3.4 -> 0.0
+  #         - 4.1 -> 100.0
+  #     # filtre la valeur minimale
+  #     - lambda: |-
+  #         if (x >= 0) 
+  #           return x;
+  #         else 
+  #           return 0;
+  #     # filtre la valeur maximale
+  #     - lambda: |-
+  #         if (x <= 100) 
+  #           return x;
+  #         else 
+  #           return 100;
 
 
 # Définition des binary sensor
@@ -245,5 +265,5 @@ text_sensor:
 # Deep Sleep
 deep_sleep:
 #  run_duration: 5s
-  sleep_duration: 60s
+  sleep_duration: 120s
   id: deep_sleep_1
