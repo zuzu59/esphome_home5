@@ -13,7 +13,9 @@
 esphome:
   name: a_master_mini_d1_dsleep
   on_boot:
-  - switch.turn_on: led
+   - switch.turn_on: led
+#   - switch.turn_off: led
+
 
 esp8266:
   board: d1_mini
@@ -23,6 +25,12 @@ wifi:
   fast_connect: true
   ssid: !secret wifi_ssid_apzuzu7
   password: !secret wifi_pass_apzuzu7
+  # manual_ip:
+  #   static_ip: 192.168.0.201
+  #   gateway: 192.168.0.51
+  #   dns1: 192.168.0.51
+  #   dns2: 8.8.8.8
+  #   subnet: 255.255.255.0
 
   # networks:
   
@@ -55,6 +63,7 @@ captive_portal:
 # Enable logging
 logger:
   level: DEBUG
+#  level: INFO
   logs:
     logger: INFO
     adc: INFO
@@ -122,17 +131,21 @@ switch:
 
 # Définition des Scripts
 script:
-    # fonction BMS, shutdown si < 3.3 Volts !
+  # fonction BMS, shutdown si < 3.3 Volts !
   - id: my_bms
-    mode: restart
     then:
-      if:
-        condition:
-          lambda: 'return id(a_master_mini_d1_dsleep_bat_voltage).state < 3.3 ;'
-        then:
-          - logger.log: "The sensor value is below 3.3 Volts !"
-          - delay: 1s
-          - switch.turn_on: a_master_mini_d1_dsleep_shutdown
+      - logger.log:
+          format: "La batterie est à %.1f"
+          args: [ 'id(a_master_mini_d1_dsleep_bat_voltage).state' ]
+      - if:
+          condition:
+            lambda: 'return id(a_master_mini_d1_dsleep_bat_voltage).state < 3.3 ;'
+          then:
+            - logger.log: "La batterie est en dessous de 3.3 Volts !"
+            - delay: 0.5s
+            - switch.turn_on: a_master_mini_d1_dsleep_shutdown
+          else:
+            - logger.log: "La batterie est encore bonne !"
 
 
 # Définition des Sensors
@@ -145,19 +158,22 @@ sensor:
         condition:
           mqtt.connected:
         then:
-          - logger.log: Je suis connected sur le mqtt et j'envoie la sauce !
-          - delay: 1s
-          - script.execute: my_bms
+          - logger.log: Je suis connecté sur le mqtt et j'envoie la sauce !
+          - delay: 0.1s
           - if:
               condition:
                 lambda: 'return id(a_master_mini_d1_dsleep_sleep_mode).state == 1;'
               then:
-                - delay: 1s
                 - logger.log: On me demande de dormir !
                 - deep_sleep.enter: deep_sleep_1
         else:
           - logger.log: Erreur 007 *********************************************************
-          - deep_sleep.enter: deep_sleep_1
+          - if:
+              condition:
+                lambda: 'return id(a_master_mini_d1_dsleep_sleep_mode).state == 1;'
+              then:
+                - logger.log: On me demande de dormir !
+                - deep_sleep.enter: deep_sleep_1
 
   - platform: uptime
     name: "a_master_mini_d1_dsleep uptime"
@@ -189,7 +205,10 @@ sensor:
     update_interval: 2s
     unit_of_measurement: "V"
     accuracy_decimals: 3
-    lambda: return id(a_master_mini_d1_dsleep_vcc_voltage).state + 1.396 ;
+    on_value:
+      then:
+        - script.execute: my_bms
+    lambda: return id(a_master_mini_d1_dsleep_vcc_voltage).state + 1.258 ;
  
 # capacité de la batterie
   - platform: template
@@ -200,8 +219,8 @@ sensor:
     lambda: return id(a_master_mini_d1_dsleep_bat_voltage).state ;
     filters:
       - calibrate_linear:
-          - 3.5 -> 0.0
-          - 4.0 -> 100.0
+          - 3.4 -> 0.0
+          - 4.1 -> 100.0
       # filtre la valeur minimale
       - lambda: |-
           if (x >= 0) 
@@ -244,5 +263,5 @@ text_sensor:
 # Deep Sleep
 deep_sleep:
 #  run_duration: 5s
-  sleep_duration: 60s
+  sleep_duration: 120s
   id: deep_sleep_1
