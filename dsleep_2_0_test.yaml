@@ -6,7 +6,7 @@
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- ATTENTION, comme il n'y a qu'un seul convertisseur ADC sur l'ESP8266, il n'y a plus la fonction BMS et indicateur de capacité !
-#-- zf221210.1832
+#-- zf221210.1857
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -202,6 +202,11 @@ sensor:
 # #      accuracy_decimals: 0
 #     update_interval: 15s
 
+
+
+#########################################################################################
+#########################################################################################
+#########################################################################################
 # tension VCC à l'intérieur de l'ESP
   - platform: adc
     pin: A0
@@ -218,7 +223,7 @@ sensor:
             args: [ 'id(dsleep_2_0_test_vcc_voltage).state' , 'id(last_value_temp)' ]
         - if:
             condition:
-              lambda: 'return id(dsleep_2_0_test_vcc_voltage).state > id(last_value_temp) ;'
+              lambda: 'return abs( id(dsleep_2_0_test_vcc_voltage).state - id(last_value_temp) ) > 0.1 ;'
             then:
               - logger.log: "c'est plus grand je la change !"
               - globals.set:
@@ -226,6 +231,16 @@ sensor:
                   value: !lambda 'return id(dsleep_2_0_test_vcc_voltage).state;'
             else:
               - logger.log: c'est plus petit je ne fais rien !
+              - delay: 0.3s
+              - if:
+                  condition:
+                    lambda: 'return id(dsleep_2_0_test_sleep_mode).state == 1;'
+                  then:
+                    - logger.log: On me demande de dormir !
+                    - delay: 0.3s
+                    - deep_sleep.enter: deep_sleep_1
+
+
 
 
 
@@ -295,5 +310,5 @@ text_sensor:
 # Deep Sleep
 deep_sleep:
 #  run_duration: 5s
-  sleep_duration: 120s
+  sleep_duration: 5s
   id: deep_sleep_1
