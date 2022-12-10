@@ -6,7 +6,7 @@
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- ATTENTION, comme il n'y a qu'un seul convertisseur ADC sur l'ESP8266, il n'y a plus la fonction BMS et indicateur de capacité !
-#-- zf221210.1857
+#-- zf221210.2238
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -118,7 +118,7 @@ mqtt:
 globals:
    - id: last_value_temp
      type: float
-#     restore_value: yes
+     restore_value: yes
      initial_value: '0.5'
 
 
@@ -212,7 +212,7 @@ sensor:
     pin: A0
     name: "dsleep_2_0_test VCC Voltage"
     id: dsleep_2_0_test_vcc_voltage
-    update_interval: 2s
+    update_interval: 7s
     unit_of_measurement: "V"
     accuracy_decimals: 3
 #    internal: true
@@ -230,14 +230,14 @@ sensor:
                   id: last_value_temp
                   value: !lambda 'return id(dsleep_2_0_test_vcc_voltage).state;'
             else:
-              - logger.log: c'est plus petit je ne fais rien !
-              - delay: 0.3s
+              # - logger.log: c'est plus petit je ne fais rien !
+              # - delay: 0.3s
               - if:
                   condition:
                     lambda: 'return id(dsleep_2_0_test_sleep_mode).state == 1;'
                   then:
-                    - logger.log: On me demande de dormir !
-                    - delay: 0.3s
+                    # - logger.log: On me demande de dormir !
+                    # - delay: 0.3s
                     - deep_sleep.enter: deep_sleep_1
 
 
