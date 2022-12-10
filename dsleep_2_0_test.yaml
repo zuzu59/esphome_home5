@@ -6,7 +6,7 @@
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- ATTENTION, comme il n'y a qu'un seul convertisseur ADC sur l'ESP8266, il n'y a plus la fonction BMS et indicateur de capacité !
-#-- zf221210.1531
+#-- zf221210.1832
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -114,6 +114,18 @@ mqtt:
 # #  frequency: 10khz
 
 
+# Définition des Globals variables
+globals:
+   - id: last_value_temp
+     type: float
+#     restore_value: yes
+     initial_value: '0.5'
+
+
+
+
+
+
 # Définition des Switch's
 switch:
   - platform: gpio
@@ -199,6 +211,24 @@ sensor:
     unit_of_measurement: "V"
     accuracy_decimals: 3
 #    internal: true
+    on_value:
+      then:
+        - logger.log:
+            format: "L'adc est à %.1f et la globale variable est à %.1f"
+            args: [ 'id(dsleep_2_0_test_vcc_voltage).state' , 'id(last_value_temp)' ]
+        - if:
+            condition:
+              lambda: 'return id(dsleep_2_0_test_vcc_voltage).state > id(last_value_temp) ;'
+            then:
+              - logger.log: "c'est plus grand je la change !"
+              - globals.set:
+                  id: last_value_temp
+                  value: !lambda 'return id(dsleep_2_0_test_vcc_voltage).state;'
+            else:
+              - logger.log: c'est plus petit je ne fais rien !
+
+
+
 
 # # tension de la batterie
 #   - platform: template
