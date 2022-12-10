@@ -2,7 +2,7 @@
 #-- a_master_mini_d1_dsleep.yaml
 #-- Petit code générique pour mini d1 avec dsleep à dupliquer
 #-- location: ...
-#-- Si la pin D2 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- zf221023.1152
 #--
