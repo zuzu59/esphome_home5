@@ -4,7 +4,7 @@
 #-- location: salle de douche
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- zf221205.1555
+#-- zf221211.2247
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -13,8 +13,8 @@
 esphome:
   name: th10
   on_boot:
-#   - switch.turn_on: led
-   - switch.turn_off: led
+   - switch.turn_on: led
+#   - switch.turn_off: led
 
 
 esp8266:
@@ -112,6 +112,14 @@ i2c:
 #  frequency: 10khz
 
 
+# Définition des Globals variables
+globals:
+   - id: last_value_temp
+     type: float
+     restore_value: yes
+     initial_value: '20.0'
+
+
 # Définition des Switch's
 switch:
   - platform: gpio
@@ -183,6 +191,44 @@ sensor:
   - platform: htu21d
     temperature:
       name: "th10 Température"
+      id: th10_temperature
+
+
+
+      on_value:
+        then:
+          - logger.log:
+              format: "La température est à %.1f et la globale variable est à %.1f"
+              args: [ 'id(th10_temperature).state' , 'id(last_value_temp)' ]
+          - if:
+              condition:
+                lambda: 'return abs( id(th10_temperature).state - id(last_value_temp) ) > 0.3 ;'
+              then:
+                - logger.log: "c'est plus grand je la change !"
+                - globals.set:
+                    id: last_value_temp
+                    value: !lambda 'return id(th10_temperature).state;'
+              else:
+                # - logger.log: c'est plus petit je ne fais rien !
+                # - delay: 0.3s
+                - if:
+                    condition:
+                      lambda: 'return id(th10_sleep_mode).state == 1;'
+                    then:
+                      # - logger.log: On me demande de dormir !
+                      # - delay: 0.3s
+                      - deep_sleep.enter: deep_sleep_1
+
+
+
+
+
+
+
+
+
+
+
     humidity:
       name: "th10 Humidité"
 #      accuracy_decimals: 0
@@ -263,5 +309,5 @@ text_sensor:
 # Deep Sleep
 deep_sleep:
 #  run_duration: 5s
-  sleep_duration: 120s
+  sleep_duration: 5s
   id: deep_sleep_1
