@@ -1,0 +1,100 @@
+#------------------------------
+#-- boot_mini_d1.yaml
+#-- Petit code pour tester l'envoi de quelque chose sur le ha au moment du boot
+#-- Ici, c'est l'état de la LED
+#-- location: xxx
+#-- zf221219.1130
+#--
+# sources: 
+# ...
+
+esphome:
+  name: boot_mini_d1
+  on_boot:
+   - switch.turn_on: led
+
+esp8266:
+  board: d1_mini
+
+# Configuration WIFI
+wifi:
+  ssid: !secret wifi_ssid_3G_zf
+  password: !secret wifi_pass_3G_zf2
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "boot_mini_d1 Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+    level: VERBOSE
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+ota:
+  password: !secret ota_password
+
+# WEB Server
+web_server:
+  port: 80
+
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "boot_mini_d1 LED"
+    inverted: True
+    id: led
+    pin: D4
+
+  - platform: restart
+    name: "boot_mini_d1 Restart"
+
+  - platform: shutdown
+    name: "boot_mini_d1 Shutdown"
+    id: boot_mini_d1_shutdown
+#    internal: true
+
+# Définition des Sensors
+sensor:
+  - platform: wifi_signal
+    name: "boot_mini_d1 Signal Wi-Fi"
+    update_interval: 10s
+    on_value:
+      if:
+        condition:
+          api.connected:
+        then:
+          - logger.log: Je suis connecté !
+          - delay: 5s
+          - switch.turn_off: led
+  #  - delay: 3s
+  #  - switch.turn_on: boot_mini_d1_shutdown
+
+        else:
+          - logger.log: Erreur 007 *********************************************************
+ 
+  - platform: uptime
+    name: "boot_mini_d1 uptime"
+    update_interval: 60s
+
+
+# Définition des Sensors text
+text_sensor:
+  - platform: version
+    name: "boot_mini_d1 Version 1150"
+
+  - platform: wifi_info
+    ip_address:
+      name: boot_mini_d1 IP Address
+      id: wifi_ip
+    ssid:
+      name: boot_mini_d1 Connected SSID
+      id: wifi_ssid
+
+
