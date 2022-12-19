@@ -4,7 +4,8 @@
 #-- location: salle de douche
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- zf221211.2247
+#-- calibration VCC diode: lambda: return id(th10_vcc_voltage).state + 1.258 ;
+#-- zf221212.0911
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -147,9 +148,9 @@ script:
           args: [ 'id(th10_bat_voltage).state' ]
       - if:
           condition:
-            lambda: 'return id(th10_bat_voltage).state < 3.3 ;'
+            lambda: 'return id(th10_bat_voltage).state < 3.2 ;'
           then:
-            - logger.log: "La batterie est en dessous de 3.3 Volts !"
+            - logger.log: "La batterie est en dessous de 3.2 Volts !"
             - delay: 0.5s
             - switch.turn_on: th10_shutdown
           else:
@@ -202,7 +203,7 @@ sensor:
               args: [ 'id(th10_temperature).state' , 'id(last_value_temp)' ]
           - if:
               condition:
-                lambda: 'return abs( id(th10_temperature).state - id(last_value_temp) ) > 0.3 ;'
+                lambda: 'return abs( id(th10_temperature).state - id(last_value_temp) ) > 0.25 ;'
               then:
                 - logger.log: "c'est plus grand je la change !"
                 - globals.set:
@@ -309,5 +310,5 @@ text_sensor:
 # Deep Sleep
 deep_sleep:
 #  run_duration: 5s
-  sleep_duration: 5s
+  sleep_duration: 60s
   id: deep_sleep_1
