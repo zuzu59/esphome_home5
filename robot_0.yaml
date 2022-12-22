@@ -3,7 +3,7 @@
 #-- Code pour piloter un petit robot NodeMCU à 20 balles au moyen d'un brocker MQTT
 #-- Les commandes sont expressément très simplistes
 #-- location: xxx
-#-- zf221222.1337
+#-- zf221222.1704
 #--
 # sources: 
 # ...
@@ -74,11 +74,11 @@ switch:
   - platform: restart
     name: "robot_0 Restart"
 
-  - platform: gpio
-    name: "robot_0 motor A speed"
-    # inverted: True
-    id: robot_0_motor_A_speed
-    pin: D1
+  # - platform: gpio
+  #   name: "robot_0 motor A speed"
+  #   # inverted: True
+  #   id: robot_0_motor_A_speed
+  #   pin: D1
 
   - platform: gpio
     name: "robot_0 motor B speed"
@@ -97,6 +97,48 @@ switch:
     # inverted: True
     id: robot_0_motor_B_direction
     pin: D4
+
+
+
+  - platform: template
+    name: "robot_0 START"
+    id: robot_0_start
+    turn_on_action:
+      - light.turn_on:
+          id: robot_0_motor_A_speed
+          brightness:  !lambda |-
+            // output value must be in range 0 - 1.0
+            return id(robot_0_speed).state / 100.0;
+
+
+  - platform: template
+    name: "robot_0 STOP"
+    id: robot_0_stop
+    turn_on_action:
+      # - light.turn_on:
+      #     id: robot_0_motor_A_speed
+      #     brightness: 0%
+      - light.turn_off:
+          id: robot_0_motor_A_speed
+
+
+
+
+# Définition des Output's
+output:
+  - platform: esp8266_pwm
+    pin: D1
+    frequency: 200 Hz
+    id: robot_0_motor_A_pwm
+
+# Définition des Light's
+light:
+  - platform: monochromatic
+    output: robot_0_motor_A_pwm
+    name: "robot_0 motor A speed"
+    id: robot_0_motor_A_speed
+
+
 
 
 
@@ -138,12 +180,13 @@ text_sensor:
 # Définition des inputs numbers
 number:
   - platform: template
-    name: "robot_0 consigne alarme low"
+    name: "robot_0 speed"
+    id: robot_0_speed
     restore_value: true
     optimistic: true
     min_value: 0.0
-    max_value: 0.8
-    step: 0.01
-    initial_value: 0.4
-    unit_of_measurement: "V"
-    id: robot_0_consigne_alarme_low
+    max_value: 100
+    step: 1
+    initial_value: 0.0
+    unit_of_measurement: "%"
+
