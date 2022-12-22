@@ -65,61 +65,54 @@ web_server:
 
 # Définition des Switch's
 switch:
-  - platform: gpio
-    name: "robot_0 LED"
-    inverted: True
-    id: led
-    pin: D4
+  # - platform: gpio
+  #   name: "robot_0 LED"
+  #   inverted: True
+  #   id: led
+  #   pin: D4
 
   - platform: restart
     name: "robot_0 Restart"
 
-  # - platform: gpio
-  #   name: "robot_0 motor A speed"
-  #   # inverted: True
-  #   id: robot_0_motor_A_speed
-  #   pin: D1
 
   - platform: gpio
-    name: "robot_0 motor B speed"
+    name: "robot_0 motor Direction A "
     # inverted: True
-    id: robot_0_motor_B_speed
-    pin: D2
-
-  - platform: gpio
-    name: "robot_0 motor A direction"
-    # inverted: True
-    id: robot_0_motor_A_direction
+    id: robot_0_motor_direction_a
     pin: D3
 
   - platform: gpio
-    name: "robot_0 motor b direction"
+    name: "robot_0 motor Direction B"
     # inverted: True
-    id: robot_0_motor_B_direction
+    id: robot_0_moto_direction_b
     pin: D4
 
 
 
   - platform: template
-    name: "robot_0 START"
+    name: "robot_0 Motor START"
     id: robot_0_start
     turn_on_action:
       - light.turn_on:
-          id: robot_0_motor_A_speed
+          id: robot_0_motor_speed_a
           brightness:  !lambda |-
             // output value must be in range 0 - 1.0
-            return id(robot_0_speed).state / 100.0;
+            return id(robot_0_motor_speed).state / 100.0;
+      - light.turn_on:
+          id: robot_0_motor_speed_b
+          brightness:  !lambda |-
+            // output value must be in range 0 - 1.0
+            return id(robot_0_motor_speed).state / 100.0;
 
 
   - platform: template
-    name: "robot_0 STOP"
+    name: "robot_0 Motor STOP"
     id: robot_0_stop
     turn_on_action:
-      # - light.turn_on:
-      #     id: robot_0_motor_A_speed
-      #     brightness: 0%
       - light.turn_off:
-          id: robot_0_motor_A_speed
+          id: robot_0_motor_speed_a
+      - light.turn_off:
+          id: robot_0_motor_speed_b
 
 
 
@@ -129,14 +122,24 @@ output:
   - platform: esp8266_pwm
     pin: D1
     frequency: 200 Hz
-    id: robot_0_motor_A_pwm
+    id: robot_0_motor_pwm_a
+
+  - platform: esp8266_pwm
+    pin: D2
+    frequency: 200 Hz
+    id: robot_0_motor_pwm_b
 
 # Définition des Light's
 light:
   - platform: monochromatic
-    output: robot_0_motor_A_pwm
-    name: "robot_0 motor A speed"
-    id: robot_0_motor_A_speed
+    output: robot_0_motor_pwm_a
+    name: "robot_0 motor Speed A"
+    id: robot_0_motor_speed_a
+
+  - platform: monochromatic
+    output: robot_0_motor_pwm_b
+    name: "robot_0 motor Speed B"
+    id: robot_0_motor_speed_b
 
 
 
@@ -180,13 +183,13 @@ text_sensor:
 # Définition des inputs numbers
 number:
   - platform: template
-    name: "robot_0 speed"
-    id: robot_0_speed
+    name: "robot_0 Motor Speed"
+    id: robot_0_motor_speed
     restore_value: true
     optimistic: true
-    min_value: 0.0
+    min_value: 75
     max_value: 100
     step: 1
-    initial_value: 0.0
+    initial_value: 100
     unit_of_measurement: "%"
 
