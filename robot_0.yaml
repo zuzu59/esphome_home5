@@ -112,6 +112,7 @@ switch:
   - platform: template
     name: "robot_0 Motor START"
     id: robot_0_start
+    optimistic: true
     turn_on_action:
       - light.turn_on:
           id: robot_0_motor_speed_a
@@ -129,6 +130,8 @@ switch:
     name: "robot_0 Motor STOP"
     id: robot_0_stop
     turn_on_action:
+      - switch.turn_off:
+          id: robot_0_start
       - light.turn_off:
           id: robot_0_motor_speed_a
       - light.turn_off:
@@ -183,8 +186,29 @@ sensor:
   - platform: ultrasonic
     trigger_pin: D5
     echo_pin: D6
-    name: "robot_0 distance"
-    update_interval: 2s
+    name: "robot_0 Distance"
+    id: robot_0_distance
+    update_interval: 1s
+    on_value:
+      then:
+        - if:
+            condition:
+              lambda: 'return (id(robot_0_start).state == 1 and id(robot_0_distance).state < 0.2) ;'
+            then:
+              - switch.turn_off:
+                  id: robot_0_start
+              - switch.turn_on:
+                  id: robot_0_stop
+              - switch.turn_off:
+                  id: robot_0_go
+
+
+
+
+
+
+# lambda: 'return (id(robot_0_start).state == 1 and id(robot_0_distance).state < 0.2) ;'
+
 
 
 
