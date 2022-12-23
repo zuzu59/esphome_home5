@@ -3,7 +3,7 @@
 #-- Code pour piloter un petit robot NodeMCU à 20 balles au moyen d'un brocker MQTT
 #-- Les commandes sont expressément très simplistes
 #-- location: xxx
-#-- zf221222.1704
+#-- zf221223.1706
 #--
 # sources: 
 # ...
@@ -89,6 +89,26 @@ switch:
 
 
 
+
+
+
+
+
+  - platform: template
+    name: "robot_0 Motor GO"
+    id: robot_0_go
+    optimistic: true
+    restore_mode: ALWAYS_OFF
+    turn_on_action:
+      - switch.turn_on:
+          id: robot_0_start
+      - number.set:
+          id: robot_0_motor_time
+          value: 20
+
+
+
+
   - platform: template
     name: "robot_0 Motor START"
     id: robot_0_start
@@ -135,11 +155,14 @@ light:
     output: robot_0_motor_pwm_a
     name: "robot_0 motor Speed A"
     id: robot_0_motor_speed_a
+    internal: true
+
 
   - platform: monochromatic
     output: robot_0_motor_pwm_b
     name: "robot_0 motor Speed B"
     id: robot_0_motor_speed_b
+    internal: true
 
 
 
@@ -193,3 +216,61 @@ number:
     initial_value: 100
     unit_of_measurement: "%"
 
+
+
+  - platform: template
+    name: "robot_0 Motor Time"
+    id: robot_0_motor_time
+    restore_value: true
+    optimistic: true
+    min_value: 0
+    max_value: 30
+    step: 1
+    initial_value: 20
+    unit_of_measurement: "S"
+
+
+    
+
+
+
+# Gestion des timers
+interval:
+
+
+# Timer pour calculer le temps passé à avancer !
+  - interval: 0.333s
+    then:
+      - if:
+          condition:
+            lambda: 'return id(robot_0_motor_time).state > 0;'
+          then:
+            - number.decrement:
+                id: robot_0_motor_time
+                cycle: false
+          else:
+            - if:
+                condition:
+                  lambda: 'return id(robot_0_go).state == 1;'
+                then:
+                  - switch.turn_on:
+                      id: robot_0_stop
+                  - switch.turn_off:
+                      id: robot_0_go
+
+
+
+
+      # lambda: id(robot_0_motor_time).state += 1 ;
+
+
+
+
+
+
+
+      # - if:
+      #     condition:
+      #       lambda: 'return id(robot_0_motor_time).state > 0;'
+      #     then:
+      #       lambda: id(robot_0_motor_time).state += 1 ;
