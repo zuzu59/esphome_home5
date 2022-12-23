@@ -3,7 +3,7 @@
 #-- Code pour piloter un petit robot NodeMCU à 20 balles au moyen d'un brocker MQTT
 #-- Les commandes sont expressément très simplistes
 #-- location: xxx
-#-- zf221223.1706
+#-- zf221223.1727
 #--
 # sources: 
 # ...
@@ -102,9 +102,9 @@ switch:
     turn_on_action:
       - switch.turn_on:
           id: robot_0_start
-      - number.set:
-          id: robot_0_motor_time
-          value: 20
+      # - number.set:
+      #     id: robot_0_motor_time
+      #     value: 18
 
 
 
@@ -224,9 +224,9 @@ number:
     restore_value: true
     optimistic: true
     min_value: 0
-    max_value: 30
-    step: 1
-    initial_value: 20
+    max_value: 6
+    step: 0.2
+    initial_value: 0
     unit_of_measurement: "S"
 
 
@@ -239,11 +239,11 @@ interval:
 
 
 # Timer pour calculer le temps passé à avancer !
-  - interval: 0.333s
+  - interval: 0.2s
     then:
       - if:
           condition:
-            lambda: 'return id(robot_0_motor_time).state > 0;'
+            lambda: 'return (id(robot_0_motor_time).state > 0 and id(robot_0_go).state == 1) ;'
           then:
             - number.decrement:
                 id: robot_0_motor_time
