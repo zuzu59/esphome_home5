@@ -1,11 +1,10 @@
 #------------------------------
 #-- co2_66.yaml
-#-- Petit code mini minimaliste pour mesurer le COV et eCO2
+#-- Petit code mini pour mesurer le COV et eCO2
 #-- Lit COV et eCO2 du capteur ccs811
 #-- location: chambre parents table de nuit zf
-#-- zf210720.1033, zf221209.1350
+#-- zf210720.1033, zf221225.1129
 #--
-
 
 # sources: 
 # https://esphome.io/components/sensor/ccs811.html
@@ -68,9 +67,9 @@ web_server:
 
 # I2C conf
 i2c:
-    scl: D1
-    sda: D2
-    scan: True
+  scl: D1
+  sda: D2
+  scan: True
 
 
 # Définition des Switch's
@@ -95,26 +94,29 @@ sensor:
     name: "co2_66 uptime"
     update_interval: 60s
 
-
-
-  - platform: homeassistant
-    name: "co2_66 th0 Temp"
-    entity_id: sensor.th0_temperature
-    id: co2_66_th0_th
-    internal: false
-  - platform: homeassistant
-    name: "co2_66 th0 Humi"
-    entity_id: sensor.th0_humidite
-    id: co2_66_th0_hu
-    internal: false
-
-
-
+  - platform: htu21d
+    address: 0x40
+    temperature:
+      name: "co2_66 Température"
+      id: co2_66_temperature
+      filters:
+        - sliding_window_moving_average:
+            window_size: 5
+            send_every: 5
+    humidity:
+      name: "co2_66 Humidité"
+      id: co2_66_humidite
+      filters:
+        - sliding_window_moving_average:
+            window_size: 5
+            send_every: 5
+    update_interval: 5s
 
   - platform: ccs811
+    address: 0x5A
     # baseline: 0x5BB8
-    # temperature: co2_66_th0_th
-    # humidity: co2_66_th0_hu
+    temperature: co2_66_temperature
+    humidity: co2_66_humidite
     update_interval: 5s
     eco2:
       name: "co2_66 eCO2"
