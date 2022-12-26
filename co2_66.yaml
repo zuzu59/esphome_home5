@@ -3,7 +3,7 @@
 #-- Petit code mini pour mesurer le COV et eCO2
 #-- Lit COV et eCO2 du capteur ccs811
 #-- location: chambre parents table de nuit zf
-#-- zf210720.1033, zf221225.1129
+#-- zf210720.1033, zf221226.1337
 #--
 
 # sources: 
@@ -100,6 +100,7 @@ sensor:
       name: "co2_66 Température"
       id: co2_66_temperature
       filters:
+        - lambda: return x - 1.6;
         - sliding_window_moving_average:
             window_size: 5
             send_every: 5
