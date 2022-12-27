@@ -1,0 +1,114 @@
+#------------------------------
+#-- a_master_mini_d1.yaml
+#-- Petit code générique minimaliste pour des projets à base d'esp mini d1
+#-- blablabla
+#-- location: xxx
+#-- zf221023.1151
+#--
+# sources: 
+# ...
+
+esphome:
+  name: a_master_mini_d1
+
+esp8266:
+  board: d1_mini
+
+# Configuration WIFI
+wifi:
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
+
+  # networks:
+  
+  #   - ssid: !secret wifi_ssid_apzuzu7
+  #   - password: !secret wifi_pass_apzuzu7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6
+  #   - password: !secret wifi_pass_apzuzu6
+
+  #   - ssid: !secret wifi_ssid_3G_zf
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3G_zf2
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3g_s7
+  #   - password: !secret wifi_pass_3g_s7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
+  #   - password: !secret wifi_pass_apzuzu6_EXT
+
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "a_master_mini_d1 Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+    level: VERBOSE
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+ota:
+  password: !secret ota_password
+
+# WEB Server
+web_server:
+  port: 80
+
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "a_master_mini_d1 LED"
+    inverted: True
+    id: led
+    pin: D4
+
+  - platform: restart
+    name: "a_master_mini_d1 Restart"
+
+
+# Définition des Sensors
+sensor:
+  - platform: wifi_signal
+    name: "a_master_mini_d1 Signal Wi-Fi"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "a_master_mini_d1 uptime"
+    update_interval: 60s
+
+
+# Définition des Sensors text
+text_sensor:
+  - platform: version
+    name: "a_master_mini_d1 Version 1150"
+
+  - platform: wifi_info
+    ip_address:
+      name: a_master_mini_d1 IP Address
+      id: wifi_ip
+    ssid:
+      name: a_master_mini_d1 Connected SSID
+      id: wifi_ssid
+
+
+# Définition des inputs numbers
+number:
+  - platform: template
+    name: "a_master_mini_d1 consigne alarme low"
+    restore_value: true
+    optimistic: true
+    min_value: 0.0
+    max_value: 0.8
+    step: 0.01
+    initial_value: 0.4
+    unit_of_measurement: "V"
+    id: a_master_mini_d1_consigne_alarme_low
