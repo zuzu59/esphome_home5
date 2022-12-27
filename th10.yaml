@@ -5,7 +5,7 @@
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- calibration VCC diode: lambda: return id(th10_vcc_voltage).state + 1.258 ;
-#-- zf221212.0911
+#-- zf221227.1137
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -168,7 +168,7 @@ sensor:
           mqtt.connected:
         then:
           - logger.log: Je suis connecté sur le mqtt et j'envoie la sauce !
-          - delay: 0.1s
+          - delay: 0.5s
           - if:
               condition:
                 lambda: 'return id(th10_sleep_mode).state == 1;'
@@ -186,7 +186,7 @@ sensor:
 
   - platform: uptime
     name: "th10 uptime"
-    update_interval: 15s
+    update_interval: 2s
 
 # température et humidité
   - platform: htu21d
@@ -203,7 +203,7 @@ sensor:
               args: [ 'id(th10_temperature).state' , 'id(last_value_temp)' ]
           - if:
               condition:
-                lambda: 'return abs( id(th10_temperature).state - id(last_value_temp) ) > 0.25 ;'
+                lambda: 'return abs( id(th10_temperature).state - id(last_value_temp) ) > 0.30 ;'
               then:
                 - logger.log: "c'est plus grand je la change !"
                 - globals.set:
@@ -233,7 +233,7 @@ sensor:
     humidity:
       name: "th10 Humidité"
 #      accuracy_decimals: 0
-    update_interval: 15s
+    update_interval: 2s
 
 # tension VCC à l'intérieur de l'ESP
   - platform: adc
