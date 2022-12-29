@@ -119,3 +119,76 @@ number:
     initial_value: 0.4
     unit_of_measurement: "V"
     id: a_master_c3_oled_consigne_alarme_low
+
+
+
+
+font:
+#https://github.com/JotJunior/PHP-Boleto-ZF2/blob/master/public/assets/fonts/arial.ttf
+  - file: 'arialn.ttf'
+    id: font1
+    size: 10
+  - file: 'arialn.ttf'
+    id: font2
+    size: 13
+
+i2c:
+  sda: GPIO05
+  scl: GPIO06
+  scan: true
+  frequency: 200kHz
+
+display:
+# http://www.esp8266learning.com/wemos-oled-shield-example.php
+# https://esphome.io/api/namespaceesphome_1_1display.html
+  - platform: ssd1306_i2c
+    model: "SSD1306 64x48"
+    address: 0x3C
+    invert: true
+    update_interval: 3s
+    lambda: |-
+
+      // Turn the whole display on.
+      //it.fill(COLOR_ON);
+      // Turn the whole display off.
+      //it.fill(COLOR_OFF);
+
+      // For example, draw a line from [x=0,y=0] to [x=50,y=50]
+      it.line(0, 0, 50, 50);
+
+      
+      // Print "Hello Zuzu" for fonts tests in top center.
+      it.print(32, 20, id(font2), TextAlign::TOP_CENTER, "Hello 5553");
+
+
+
+#
+
+
+
+      # // Print inside temperature (from homeassistant sensor)
+      # it.printf(0, 7, id(font1), TextAlign::BASELINE_LEFT, "In side");
+      # if (id(inside_temperature).has_state()) {
+      #   it.printf(64, 7, id(font1), TextAlign::BASELINE_RIGHT , "%.1f°C", id(inside_temperature).state);
+      # }
+
+      # // Print outside temperature (from homeassistant sensor)
+      # it.printf(0, 16, id(font1), TextAlign::BASELINE_LEFT, "Out side");
+      # if (id(outside_temperature).has_state()) {
+      #   it.printf(64, 16, id(font1), TextAlign::BASELINE_RIGHT , "%.1f°C", id(outside_temperature).state);
+      # }      
+      
+      # // Print TVOC (from homeassistant sensor)
+      # it.printf(0, 25, id(font1), TextAlign::BASELINE_LEFT, "TVOC");
+      # if (id(outside_temperature).has_state()) {
+      #   it.printf(64, 25, id(font1), TextAlign::BASELINE_RIGHT , "%.0f", id(tvoc).state);
+      # }      
+
+      # // Print "L'état du input text de HA: <state>" in midle center
+      # it.printf(32, 36, id(font2), TextAlign::BASELINE_CENTER, "%s", id(alarm_state).state.c_str());
+
+      # // Print time in HH:MM format
+      # it.strftime(32, 48, id(font1), TextAlign::BOTTOM_CENTER, "%d-%m %H:%M:%S", id(esptime).now());
+
+    
+#unavailable
