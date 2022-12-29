@@ -1,17 +1,23 @@
 #------------------------------
 #-- a_master_c3_oled.yaml
 #-- Petit code générique minimaliste pour des projets à base d'esp32-c3-oled
-#-- blablabla
+#-- ATTENTION: je ne sais pas pourquoi mais il faut le flasher via web.esphome.io (maintenir la touche BOOT pendant le RESET), via le port USB en ESPHOME cela ne fonctionne pas !
+#-- REMARQUE: je ne sais pas pourquoi la luminosité du display OLED est très très faible !
 #-- location: xxx
-#-- zf221029.1732
+#-- zf221029.1836
 #--
 # sources: 
-# ...
+# https://github.com/01Space/ESP32-C3-0.42LCD
+# https://github.com/01Space/ESP32-C3-0.42LCD/blob/main/Schematic/ESP32-C3-0.42OED%20Schematic.pdf
+
 
 esphome:
   name: a_master_c3_oled
   # platformio_options:
   #   board_build.flash_mode: dio
+  on_boot:
+   - switch.turn_on: led
+  # - switch.turn_off: led
 
 esp32:
   board: esp32-c3-devkitm-1
@@ -75,11 +81,21 @@ web_server:
 
 # Définition des Switch's
 switch:
-  # - platform: gpio
-  #   name: "a_master_c3_oled LED"
-  #   inverted: True
-  #   id: led
-  #   pin: D4
+  - platform: gpio
+    name: "a_master_c3_oled LED"
+#    inverted: True
+    id: led
+    pin: GPIO9
+    on_turn_on:
+      - light.turn_on:
+          id: a_master_c3_oled_rgb
+          brightness: 30%
+          red: 100%
+          green: 0%
+          blue: 0%
+    on_turn_off:
+      - light.turn_off:
+          id: a_master_c3_oled_rgb
 
   - platform: restart
     name: "a_master_c3_oled Restart"
@@ -122,6 +138,16 @@ number:
     initial_value: 0.4
     unit_of_measurement: "V"
     id: a_master_c3_oled_consigne_alarme_low
+
+light:
+  - platform: neopixelbus
+    type: GRB
+    variant: WS2812
+    pin: GPIO2
+    num_leds: 1
+    name: "a_master_c3_oled RGB"
+    id: a_master_c3_oled_rgb
+
 
 
 
@@ -193,5 +219,28 @@ display:
       # // Print time in HH:MM format
       # it.strftime(32, 48, id(font1), TextAlign::BOTTOM_CENTER, "%d-%m %H:%M:%S", id(esptime).now());
 
-    
-#unavailable
+
+
+# # Gestion des timers
+# interval:
+
+
+# # Timer pour calculer le temps passé à avancer !
+#   - interval: 2s
+#     then:
+#       - light.turn_on:
+#           id: a_master_c3_oled_rgb
+#           brightness: 30%
+#           red: 100%
+#           green: 0%
+#           blue: 0%
+
+#       - delay: 1s
+
+#       - light.turn_on:
+#           id: a_master_c3_oled_rgb
+#           brightness: 0%
+#           red: 100%
+#           green: 0%
+#           blue: 0%
+
