@@ -1,23 +1,30 @@
 #------------------------------
-#-- a_master_mini_d1.yaml
-#-- Petit code générique minimaliste pour des projets à base d'esp mini d1
+#-- a_master_c3_oled.yaml
+#-- Petit code générique minimaliste pour des projets à base d'esp32-c3-oled
 #-- blablabla
 #-- location: xxx
-#-- zf221023.1151
+#-- zf221029.1513
 #--
 # sources: 
 # ...
 
 esphome:
-  name: a_master_mini_d1
+  name: a_master_c3_oled
+  platformio_options:
+    board_build.flash_mode: dio
 
-esp8266:
-  board: d1_mini
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: arduino
+    version: 2.0.5
+    platform_version: 5.2.0
+
 
 # Configuration WIFI
 wifi:
-  ssid: !secret wifi_ssid_apzuzu7
-  password: !secret wifi_pass_apzuzu7
+  ssid: !secret wifi_ssid_3g_s7
+  password: !secret wifi_pass_3g_s7
 
   # networks:
   
@@ -42,7 +49,7 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "a_master_mini_d1 Fallback"
+    ssid: "a_master_c3_oled Fallback"
     password: !secret ap_wifi_password
 
 captive_portal:
@@ -65,45 +72,45 @@ web_server:
 
 # Définition des Switch's
 switch:
-  - platform: gpio
-    name: "a_master_mini_d1 LED"
-    inverted: True
-    id: led
-    pin: D4
+  # - platform: gpio
+  #   name: "a_master_c3_oled LED"
+  #   inverted: True
+  #   id: led
+  #   pin: D4
 
   - platform: restart
-    name: "a_master_mini_d1 Restart"
+    name: "a_master_c3_oled Restart"
 
 
 # Définition des Sensors
 sensor:
   - platform: wifi_signal
-    name: "a_master_mini_d1 Signal Wi-Fi"
+    name: "a_master_c3_oled Signal Wi-Fi"
     update_interval: 60s
 
   - platform: uptime
-    name: "a_master_mini_d1 uptime"
+    name: "a_master_c3_oled uptime"
     update_interval: 60s
 
 
 # Définition des Sensors text
 text_sensor:
   - platform: version
-    name: "a_master_mini_d1 Version 1150"
+    name: "a_master_c3_oled Version 1150"
 
   - platform: wifi_info
     ip_address:
-      name: a_master_mini_d1 IP Address
+      name: a_master_c3_oled IP Address
       id: wifi_ip
     ssid:
-      name: a_master_mini_d1 Connected SSID
+      name: a_master_c3_oled Connected SSID
       id: wifi_ssid
 
 
 # Définition des inputs numbers
 number:
   - platform: template
-    name: "a_master_mini_d1 consigne alarme low"
+    name: "a_master_c3_oled consigne alarme low"
     restore_value: true
     optimistic: true
     min_value: 0.0
@@ -111,4 +118,4 @@ number:
     step: 0.01
     initial_value: 0.4
     unit_of_measurement: "V"
-    id: a_master_mini_d1_consigne_alarme_low
+    id: a_master_c3_oled_consigne_alarme_low
