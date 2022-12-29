@@ -3,22 +3,25 @@
 #-- Petit code générique minimaliste pour des projets à base d'esp32-c3-oled
 #-- blablabla
 #-- location: xxx
-#-- zf221029.1513
+#-- zf221029.1732
 #--
 # sources: 
 # ...
 
 esphome:
   name: a_master_c3_oled
-  platformio_options:
-    board_build.flash_mode: dio
+  # platformio_options:
+  #   board_build.flash_mode: dio
 
 esp32:
   board: esp32-c3-devkitm-1
   framework:
     type: arduino
-    version: 2.0.5
-    platform_version: 5.2.0
+  #   version: 2.0.5
+  #   platform_version: 5.2.0
+
+
+
 
 
 # Configuration WIFI
@@ -86,11 +89,11 @@ switch:
 sensor:
   - platform: wifi_signal
     name: "a_master_c3_oled Signal Wi-Fi"
-    update_interval: 60s
+    update_interval: 5s
 
   - platform: uptime
     name: "a_master_c3_oled uptime"
-    update_interval: 60s
+    update_interval: 5s
 
 
 # Définition des Sensors text
@@ -158,7 +161,7 @@ display:
 
       
       // Print "Hello Zuzu" for fonts tests in top center.
-      it.print(32, 20, id(font2), TextAlign::TOP_CENTER, "Hello 5553");
+      it.print(32, 20, id(font2), TextAlign::TOP_CENTER, "Hello 3400");
 
 
 
