@@ -1,11 +1,12 @@
 #------------------------------
 #-- balise_1.yaml
-#-- Petit code pour faire justeune petite balise indiquant le bon fonctionnement du WIFI pour St-Luc
+#-- Petit code pour faire juste une petite balise indiquant le bon fonctionnement du WIFI pour St-Luc
+#-- et d'indiquer la température/hunidité dans la douche
 #-- C'est aussi pour tester la possibilité d'avoir des ESPhome à St-Luc
 #-- Il faut publier sur mqtt 'balise_1/switch/balise_1_led/command' = ON/OFF pour allumer/éteindre la LED !
 #
-#-- location: xxx
-#-- zf221010.1016
+#-- location: St-Luc douche tout à gauche en entrant
+#-- zf221010.1016, zf230102.1839
 #--
 # sources: 
 # ...
@@ -108,16 +109,29 @@ mqtt:
   password:  !secret mqtt_password_dev
 
 
+# I2C conf
+i2c:
+  sda: D2
+  scl: D1
+#  frequency: 10khz
+
+
 # Sensors
 sensor:
   - platform: wifi_signal
     name: "balise_1 Signal Wi-Fi"
     update_interval: 60s
-
   - platform: uptime
     name: "balise_1 uptime"
     update_interval: 15s
-
+# température et humidité
+  - platform: htu21d
+    temperature:
+      name: "balise_1 Température"
+    humidity:
+      name: "balise_1 Humidité"
+#      accuracy_decimals: 0
+    update_interval: 15s
 # valeur brute en volts de l'ADC
   - platform: adc
     pin: VCC
@@ -130,7 +144,7 @@ sensor:
 # Sensors text
 text_sensor:
   - platform: version
-    name: "balise_1 Version 1150"
+    name: "balise_1 Version 1233"
 
   - platform: wifi_info
     ip_address:
