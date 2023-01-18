@@ -2,8 +2,8 @@
 #-- robot_0.yaml
 #-- Code pour piloter un petit robot NodeMCU à 20 balles au moyen d'un brocker MQTT
 #-- Les commandes sont expressément très simplistes
-#-- location: xxx
-#-- zf230118.1435
+#-- location: Hôtel du Cervin à St-Luc ;-)
+#-- zf230118.1458
 #--
 # sources: 
 # ...
@@ -52,8 +52,8 @@ logger:
     level: VERBOSE
 
 # Enable Home Assistant API
-api:
-  password: !secret api_password
+# api:
+#   password: !secret api_password
 
 ota:
   password: !secret ota_password
@@ -62,6 +62,14 @@ ota:
 web_server:
   port: 80
 
+# MQTT server
+mqtt:
+  broker:  192.168.20.107
+  port:  1883
+  username:  toto
+  password:  tutu
+  birth_message:
+  will_message:
 
 # Définition des Switch's
 switch:
