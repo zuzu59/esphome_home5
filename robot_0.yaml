@@ -3,7 +3,7 @@
 #-- Code pour piloter un petit robot NodeMCU à 20 balles au moyen d'un brocker MQTT
 #-- Les commandes sont expressément très simplistes
 #-- location: xxx
-#-- zf221223.1727
+#-- zf230118.1435
 #--
 # sources: 
 # ...
@@ -16,8 +16,8 @@ esp8266:
 
 # Configuration WIFI
 wifi:
-  ssid: !secret wifi_ssid_apzuzu7
-  password: !secret wifi_pass_apzuzu7
+  ssid: !secret wifi_ssid_cours_iot
+  password: !secret wifi_pass_cours_iot
 
   # networks:
   
