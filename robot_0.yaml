@@ -3,7 +3,7 @@
 #-- Code pour piloter un petit robot NodeMCU à 20 balles au moyen d'un brocker MQTT
 #-- Les commandes sont expressément très simplistes
 #-- location: Hôtel du Cervin à St-Luc ;-)
-#-- zf230120.1745
+#-- zf230120.1804
 #--
 # sources: 
 # ...
@@ -207,12 +207,12 @@ switch:
 output:
   - platform: esp8266_pwm
     pin: D1
-    frequency: 200 Hz
+    frequency: 50 Hz
     id: ${devicename}_motor_pwm_a
 
   - platform: esp8266_pwm
     pin: D2
-    frequency: 200 Hz
+    frequency: 50 Hz
     id: ${devicename}_motor_pwm_b
 
 
