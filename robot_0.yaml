@@ -3,7 +3,7 @@
 #-- Code pour piloter un petit robot NodeMCU à 20 balles au moyen d'un brocker MQTT
 #-- Les commandes sont expressément très simplistes
 #-- location: Hôtel du Cervin à St-Luc ;-)
-#-- zf230120.1701
+#-- zf230120.1745
 #--
 # sources: 
 # ...
@@ -99,6 +99,34 @@ switch:
     optimistic: true
     restore_mode: ALWAYS_OFF
     turn_on_action:
+
+
+
+
+
+
+      - light.turn_on:
+          id: ${devicename}_motor_speed_a
+          brightness:  !lambda |-
+            // output value must be in range 0 - 1.0
+            return id(${devicename}_motor_preburn).state;
+
+      - light.turn_on:
+          id: ${devicename}_motor_speed_b
+          brightness:  !lambda |-
+            // output value must be in range 0 - 1.0
+            return id(${devicename}_motor_preburn).state;
+
+      - delay: !lambda return id(${devicename}_motor_preburn_time).state * 1000;
+
+
+
+
+
+
+
+
+
       - light.turn_on:
           id: ${devicename}_motor_speed_a
           brightness:  !lambda |-
@@ -252,13 +280,48 @@ number:
   - platform: template
     name: "${devicename} Motor Speed"
     id: ${devicename}_motor_speed
-    restore_value: false
+    restore_value: true
     optimistic: true
-    min_value: 75
+    min_value: 60
     max_value: 100
     step: 1
     initial_value: 75
     unit_of_measurement: "%"
+
+
+
+
+  - platform: template
+    name: "${devicename} Motor Preburn"
+    id: ${devicename}_motor_preburn
+    restore_value: true
+    optimistic: true
+    min_value: 0
+    max_value: 1
+    step: 0.05
+    initial_value: 1
+    unit_of_measurement: ""
+
+
+  - platform: template
+    name: "${devicename} Motor Preburn Time"
+    id: ${devicename}_motor_preburn_time
+    restore_value: true
+    optimistic: true
+    min_value: 0
+    max_value: 1
+    step: 0.05
+    initial_value: 1
+    unit_of_measurement: "s"
+
+
+
+
+
+
+
+
+
 
   - platform: template
     name: "${devicename} Motor Differentiel"
