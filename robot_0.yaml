@@ -3,7 +3,7 @@
 #-- Code pour piloter un petit robot NodeMCU à 20 balles au moyen d'un brocker MQTT
 #-- Les commandes sont expressément très simplistes
 #-- location: Hôtel du Cervin à St-Luc ;-)
-#-- zf230120.1449
+#-- zf230120.1546
 #--
 # sources: 
 # ...
@@ -121,6 +121,7 @@ switch:
     name: "${devicename} Motor START"
     id: ${devicename}_start
     optimistic: true
+    restore_mode: ALWAYS_OFF
     turn_on_action:
       - light.turn_on:
           id: ${devicename}_motor_speed_a
@@ -134,10 +135,19 @@ switch:
             return id(${devicename}_motor_speed).state / 100.0;
       - switch.turn_off: ${devicename}_stop
 
+
+    # turn_off_action:
+    #   - switch.turn_on: ${devicename}_stop
+
+
+
+
+
   - platform: template
     name: "${devicename} Motor STOP"
     id: ${devicename}_stop
     optimistic: true
+    restore_mode: ALWAYS_OFF
     turn_on_action:
       - switch.turn_off:
           id: ${devicename}_start
@@ -146,11 +156,13 @@ switch:
       - light.turn_off:
           id: ${devicename}_motor_speed_b
       - switch.turn_off: ${devicename}_start
+      - switch.turn_off: ${devicename}_go
 
   - platform: template
     name: "${devicename} Motor Direction FORWARD"
     id: ${devicename}_dir_forward
     optimistic: true
+    restore_mode: ALWAYS_OFF
     turn_on_action:
       - switch.turn_off: ${devicename}_motor_direction_a
       - switch.turn_off: ${devicename}_motor_direction_b
@@ -162,6 +174,7 @@ switch:
     name: "${devicename} Motor Direction BACK"
     id: ${devicename}_dir_back
     optimistic: true
+    restore_mode: ALWAYS_OFF
     turn_on_action:
       - switch.turn_on: ${devicename}_motor_direction_a
       - switch.turn_on: ${devicename}_motor_direction_b
@@ -173,6 +186,7 @@ switch:
     name: "${devicename} Motor Direction RIGHT"
     id: ${devicename}_dir_right
     optimistic: true
+    restore_mode: ALWAYS_OFF
     turn_on_action:
       - switch.turn_off: ${devicename}_motor_direction_a
       - switch.turn_on: ${devicename}_motor_direction_b
@@ -184,6 +198,7 @@ switch:
     name: "${devicename} Motor Direction LEFT"
     id: ${devicename}_dir_left
     optimistic: true
+    restore_mode: ALWAYS_OFF
     turn_on_action:
       - switch.turn_on: ${devicename}_motor_direction_a
       - switch.turn_off: ${devicename}_motor_direction_b
@@ -244,12 +259,12 @@ sensor:
     echo_pin: D6
     name: "${devicename} Distance"
     id: ${devicename}_distance
-    update_interval: 1s
+    update_interval: 0.5s
     on_value:
       then:
         - if:
             condition:
-              lambda: 'return (id(${devicename}_start).state == 1 and id(${devicename}_distance).state < 0.2) ;'
+              lambda: 'return (id(${devicename}_start).state == 1 and id(${devicename}_dir_forward).state == 1 and id(${devicename}_distance).state < 0.25) ;'
             then:
               - switch.turn_off:
                   id: ${devicename}_start
@@ -288,12 +303,12 @@ number:
   - platform: template
     name: "${devicename} Motor Speed"
     id: ${devicename}_motor_speed
-    restore_value: true
+    restore_value: false
     optimistic: true
     min_value: 75
     max_value: 100
     step: 1
-    initial_value: 100
+    initial_value: 75
     unit_of_measurement: "%"
 
 
@@ -301,12 +316,12 @@ number:
   - platform: template
     name: "${devicename} Motor Time"
     id: ${devicename}_motor_time
-    restore_value: true
+    restore_value: false
     optimistic: true
     min_value: 0
     max_value: 6
     step: 0.2
-    initial_value: 0
+    initial_value: 2
     unit_of_measurement: "S"
 
 
@@ -351,22 +366,7 @@ interval:
                 then:
                   - switch.turn_on:
                       id: ${devicename}_stop
-                  - switch.turn_off:
-                      id: ${devicename}_go
+                  # - switch.turn_off:
+                  #     id: ${devicename}_go
 
 
-
-
-      # lambda: id(${devicename}_motor_time).state += 1 ;
-
-
-
-
-
-
-
-      # - if:
-      #     condition:
-      #       lambda: 'return id(${devicename}_motor_time).state > 0;'
-      #     then:
-      #       lambda: id(${devicename}_motor_time).state += 1 ;
