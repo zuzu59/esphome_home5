@@ -3,7 +3,7 @@
 #-- Code pour piloter un petit robot NodeMCU à 20 balles au moyen d'un brocker MQTT
 #-- Les commandes sont expressément très simplistes
 #-- location: Hôtel du Cervin à St-Luc ;-)
-#-- zf230120.1804
+#-- zf230120.1950
 #--
 # sources: 
 # ...
@@ -59,6 +59,33 @@ mqtt:
   password:  tutu
   birth_message:
   will_message:
+
+
+
+
+
+  on_message:
+    - topic: robot_0/switch/robot_0_motor_start/set
+      payload: 'ON'
+      then:
+        - logger.log: Receive START command !
+        - switch.turn_on:
+            id: ${devicename}_start
+
+
+    - topic: robot_0/switch/robot_0_motor_stop/set
+      payload: 'ON'
+      then:
+        - logger.log: Receive STOP command !
+        - switch.turn_on:
+            id: ${devicename}_stop
+
+
+
+
+
+
+
 
 
 # Définition des Switch's
