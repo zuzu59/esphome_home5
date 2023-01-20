@@ -3,7 +3,7 @@
 #-- Code pour piloter un petit robot NodeMCU à 20 balles au moyen d'un brocker MQTT
 #-- Les commandes sont expressément très simplistes
 #-- location: Hôtel du Cervin à St-Luc ;-)
-#-- zf230120.1635
+#-- zf230120.1701
 #--
 # sources: 
 # ...
@@ -38,7 +38,7 @@ captive_portal:
 
 # Enable logging
 logger:
-    level: VERBOSE
+    level: DEBUG
 
 # Enable Home Assistant API
 # api:
@@ -134,13 +134,13 @@ switch:
     turn_on_action:
       - switch.turn_off: ${devicename}_motor_direction_a
       - switch.turn_off: ${devicename}_motor_direction_b
-      - switch.turn_off: ${devicename}_dir_back
+      - switch.turn_off: ${devicename}_dir_backward
       - switch.turn_off: ${devicename}_dir_right
       - switch.turn_off: ${devicename}_dir_left
 
   - platform: template
     name: "${devicename} Motor Direction BACK"
-    id: ${devicename}_dir_back
+    id: ${devicename}_dir_backward
     optimistic: true
     restore_mode: ALWAYS_OFF
     turn_on_action:
@@ -160,7 +160,7 @@ switch:
       - switch.turn_on: ${devicename}_motor_direction_b
       - switch.turn_off: ${devicename}_dir_left
       - switch.turn_off: ${devicename}_dir_forward
-      - switch.turn_off: ${devicename}_dir_back
+      - switch.turn_off: ${devicename}_dir_backward
 
   - platform: template
     name: "${devicename} Motor Direction LEFT"
@@ -172,7 +172,7 @@ switch:
       - switch.turn_off: ${devicename}_motor_direction_b
       - switch.turn_off: ${devicename}_dir_right
       - switch.turn_off: ${devicename}_dir_forward
-      - switch.turn_off: ${devicename}_dir_back
+      - switch.turn_off: ${devicename}_dir_backward
 
 
 # Définition des Output's
