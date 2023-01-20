@@ -3,13 +3,26 @@
 #-- Code pour piloter un petit robot NodeMCU à 20 balles au moyen d'un brocker MQTT
 #-- Les commandes sont expressément très simplistes
 #-- location: Hôtel du Cervin à St-Luc ;-)
-#-- zf230118.1839
+#-- zf230120.1140
 #--
 # sources: 
 # ...
 
+substitutions:
+  devicename: robot_0
+
+
+# sensor:
+# - platform: dht
+#   # ...
+#   temperature:
+#     name: ${upper_devicename} Temperature
+#   humidity:
+#     name: ${upper_devicename} Humidity
+
+
 esphome:
-  name: robot_0
+  name: $devicename
 
 esp8266:
   board: nodemcuv2
@@ -42,7 +55,7 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "robot_0 Fallback"
+    ssid: "${devicename} Fallback"
     password: !secret ap_wifi_password
 
 captive_portal:
@@ -74,25 +87,25 @@ mqtt:
 # Définition des Switch's
 switch:
   # - platform: gpio
-  #   name: "robot_0 LED"
+  #   name: "${devicename} LED"
   #   inverted: True
   #   id: led
   #   pin: D4
 
   - platform: restart
-    name: "robot_0 Restart"
+    name: "${devicename} Restart"
 
 
   - platform: gpio
-    name: "robot_0 motor Direction A "
+    name: "${devicename} motor Direction A "
     # inverted: True
-    id: robot_0_motor_direction_a
+    id: ${devicename}_motor_direction_a
     pin: D3
 
   - platform: gpio
-    name: "robot_0 motor Direction B"
+    name: "${devicename} motor Direction B"
     # inverted: True
-    id: robot_0_moto_direction_b
+    id: ${devicename}_moto_direction_b
     pin: D4
 
 
@@ -103,47 +116,47 @@ switch:
 
 
   - platform: template
-    name: "robot_0 Motor GO"
-    id: robot_0_go
+    name: "${devicename} Motor GO"
+    id: ${devicename}_go
     optimistic: true
     restore_mode: ALWAYS_OFF
     turn_on_action:
       - switch.turn_on:
-          id: robot_0_start
+          id: ${devicename}_start
       # - number.set:
-      #     id: robot_0_motor_time
+      #     id: ${devicename}_motor_time
       #     value: 18
 
 
 
 
   - platform: template
-    name: "robot_0 Motor START"
-    id: robot_0_start
+    name: "${devicename} Motor START"
+    id: ${devicename}_start
     optimistic: true
     turn_on_action:
       - light.turn_on:
-          id: robot_0_motor_speed_a
+          id: ${devicename}_motor_speed_a
           brightness:  !lambda |-
             // output value must be in range 0 - 1.0
-            return id(robot_0_motor_speed).state / 100.0;
+            return id(${devicename}_motor_speed).state / 100.0;
       - light.turn_on:
-          id: robot_0_motor_speed_b
+          id: ${devicename}_motor_speed_b
           brightness:  !lambda |-
             // output value must be in range 0 - 1.0
-            return id(robot_0_motor_speed).state / 100.0;
+            return id(${devicename}_motor_speed).state / 100.0;
 
 
   - platform: template
-    name: "robot_0 Motor STOP"
-    id: robot_0_stop
+    name: "${devicename} Motor STOP"
+    id: ${devicename}_stop
     turn_on_action:
       - switch.turn_off:
-          id: robot_0_start
+          id: ${devicename}_start
       - light.turn_off:
-          id: robot_0_motor_speed_a
+          id: ${devicename}_motor_speed_a
       - light.turn_off:
-          id: robot_0_motor_speed_b
+          id: ${devicename}_motor_speed_b
 
 
 
@@ -153,26 +166,26 @@ output:
   - platform: esp8266_pwm
     pin: D1
     frequency: 200 Hz
-    id: robot_0_motor_pwm_a
+    id: ${devicename}_motor_pwm_a
 
   - platform: esp8266_pwm
     pin: D2
     frequency: 200 Hz
-    id: robot_0_motor_pwm_b
+    id: ${devicename}_motor_pwm_b
 
 # Définition des Light's
 light:
   - platform: monochromatic
-    output: robot_0_motor_pwm_a
-    name: "robot_0 motor Speed A"
-    id: robot_0_motor_speed_a
+    output: ${devicename}_motor_pwm_a
+    name: "${devicename} motor Speed A"
+    id: ${devicename}_motor_speed_a
     internal: true
 
 
   - platform: monochromatic
-    output: robot_0_motor_pwm_b
-    name: "robot_0 motor Speed B"
-    id: robot_0_motor_speed_b
+    output: ${devicename}_motor_pwm_b
+    name: "${devicename} motor Speed B"
+    id: ${devicename}_motor_speed_b
     internal: true
 
 
@@ -183,39 +196,39 @@ light:
 # Définition des Sensors
 sensor:
   - platform: wifi_signal
-    name: "robot_0 Signal Wi-Fi"
+    name: "${devicename} Signal Wi-Fi"
     update_interval: 60s
 
   - platform: uptime
-    name: "robot_0 uptime"
+    name: "${devicename} uptime"
     update_interval: 15s
 
 
   - platform: ultrasonic
     trigger_pin: D5
     echo_pin: D6
-    name: "robot_0 Distance"
-    id: robot_0_distance
+    name: "${devicename} Distance"
+    id: ${devicename}_distance
     update_interval: 1s
     on_value:
       then:
         - if:
             condition:
-              lambda: 'return (id(robot_0_start).state == 1 and id(robot_0_distance).state < 0.2) ;'
+              lambda: 'return (id(${devicename}_start).state == 1 and id(${devicename}_distance).state < 0.2) ;'
             then:
               - switch.turn_off:
-                  id: robot_0_start
+                  id: ${devicename}_start
               - switch.turn_on:
-                  id: robot_0_stop
+                  id: ${devicename}_stop
               - switch.turn_off:
-                  id: robot_0_go
+                  id: ${devicename}_go
 
 
 
 
 
 
-# lambda: 'return (id(robot_0_start).state == 1 and id(robot_0_distance).state < 0.2) ;'
+# lambda: 'return (id(${devicename}_start).state == 1 and id(${devicename}_distance).state < 0.2) ;'
 
 
 
@@ -224,22 +237,22 @@ sensor:
 # Définition des Sensors text
 text_sensor:
   - platform: version
-    name: "robot_0 Version 1150"
+    name: "${devicename} Version 1150"
 
   - platform: wifi_info
     ip_address:
-      name: robot_0 IP Address
+      name: ${devicename} IP Address
       id: wifi_ip
     ssid:
-      name: robot_0 Connected SSID
+      name: ${devicename} Connected SSID
       id: wifi_ssid
 
 
 # Définition des inputs numbers
 number:
   - platform: template
-    name: "robot_0 Motor Speed"
-    id: robot_0_motor_speed
+    name: "${devicename} Motor Speed"
+    id: ${devicename}_motor_speed
     restore_value: true
     optimistic: true
     min_value: 75
@@ -251,8 +264,8 @@ number:
 
 
   - platform: template
-    name: "robot_0 Motor Time"
-    id: robot_0_motor_time
+    name: "${devicename} Motor Time"
+    id: ${devicename}_motor_time
     restore_value: true
     optimistic: true
     min_value: 0
@@ -275,25 +288,25 @@ interval:
     then:
       - if:
           condition:
-            lambda: 'return (id(robot_0_motor_time).state > 0 and id(robot_0_go).state == 1) ;'
+            lambda: 'return (id(${devicename}_motor_time).state > 0 and id(${devicename}_go).state == 1) ;'
           then:
             - number.decrement:
-                id: robot_0_motor_time
+                id: ${devicename}_motor_time
                 cycle: false
           else:
             - if:
                 condition:
-                  lambda: 'return id(robot_0_go).state == 1;'
+                  lambda: 'return id(${devicename}_go).state == 1;'
                 then:
                   - switch.turn_on:
-                      id: robot_0_stop
+                      id: ${devicename}_stop
                   - switch.turn_off:
-                      id: robot_0_go
+                      id: ${devicename}_go
 
 
 
 
-      # lambda: id(robot_0_motor_time).state += 1 ;
+      # lambda: id(${devicename}_motor_time).state += 1 ;
 
 
 
@@ -303,6 +316,6 @@ interval:
 
       # - if:
       #     condition:
-      #       lambda: 'return id(robot_0_motor_time).state > 0;'
+      #       lambda: 'return id(${devicename}_motor_time).state > 0;'
       #     then:
-      #       lambda: id(robot_0_motor_time).state += 1 ;
+      #       lambda: id(${devicename}_motor_time).state += 1 ;
