@@ -3,7 +3,7 @@
 #-- Code pour piloter un petit robot NodeMCU à 20 balles au moyen d'un brocker MQTT
 #-- Les commandes sont expressément très simplistes
 #-- location: Hôtel du Cervin à St-Luc ;-)
-#-- zf230120.1546
+#-- zf230120.1635
 #--
 # sources: 
 # ...
@@ -28,27 +28,6 @@ esp8266:
 wifi:
   ssid: !secret wifi_ssid_cours_iot
   password: !secret wifi_pass_cours_iot
-
-  # networks:
-  
-  #   - ssid: !secret wifi_ssid_apzuzu7
-  #   - password: !secret wifi_pass_apzuzu7
-    
-  #   - ssid: !secret wifi_ssid_apzuzu6
-  #   - password: !secret wifi_pass_apzuzu6
-
-  #   - ssid: !secret wifi_ssid_3G_zf
-  #   - password: !secret wifi_pass_3G_zf2
-    
-  #   - ssid: !secret wifi_ssid_3G_zf2
-  #   - password: !secret wifi_pass_3G_zf2
-    
-  #   - ssid: !secret wifi_ssid_3g_s7
-  #   - password: !secret wifi_pass_3g_s7
-    
-  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
-  #   - password: !secret wifi_pass_apzuzu6_EXT
-
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
@@ -113,9 +92,6 @@ switch:
     turn_on_action:
       - switch.turn_on:
           id: ${devicename}_start
-      # - number.set:
-      #     id: ${devicename}_motor_time
-      #     value: 18
 
   - platform: template
     name: "${devicename} Motor START"
@@ -127,21 +103,13 @@ switch:
           id: ${devicename}_motor_speed_a
           brightness:  !lambda |-
             // output value must be in range 0 - 1.0
-            return id(${devicename}_motor_speed).state / 100.0;
+            return id(${devicename}_motor_speed).state / 100.0 * (0.5 + id(${devicename}_motor_diff).state);
       - light.turn_on:
           id: ${devicename}_motor_speed_b
           brightness:  !lambda |-
             // output value must be in range 0 - 1.0
-            return id(${devicename}_motor_speed).state / 100.0;
+            return id(${devicename}_motor_speed).state / 100.0 / (0.5 + id(${devicename}_motor_diff).state);
       - switch.turn_off: ${devicename}_stop
-
-
-    # turn_off_action:
-    #   - switch.turn_on: ${devicename}_stop
-
-
-
-
 
   - platform: template
     name: "${devicename} Motor STOP"
@@ -207,10 +175,6 @@ switch:
       - switch.turn_off: ${devicename}_dir_back
 
 
-
-
-
-
 # Définition des Output's
 output:
   - platform: esp8266_pwm
@@ -223,6 +187,7 @@ output:
     frequency: 200 Hz
     id: ${devicename}_motor_pwm_b
 
+
 # Définition des Light's
 light:
   - platform: monochromatic
@@ -231,16 +196,11 @@ light:
     id: ${devicename}_motor_speed_a
     internal: true
 
-
   - platform: monochromatic
     output: ${devicename}_motor_pwm_b
     name: "${devicename} motor Speed B"
     id: ${devicename}_motor_speed_b
     internal: true
-
-
-
-
 
 
 # Définition des Sensors
@@ -252,7 +212,6 @@ sensor:
   - platform: uptime
     name: "${devicename} uptime"
     update_interval: 15s
-
 
   - platform: ultrasonic
     trigger_pin: D5
@@ -272,16 +231,6 @@ sensor:
                   id: ${devicename}_stop
               - switch.turn_off:
                   id: ${devicename}_go
-
-
-
-
-
-
-# lambda: 'return (id(${devicename}_start).state == 1 and id(${devicename}_distance).state < 0.2) ;'
-
-
-
 
 
 # Définition des Sensors text
@@ -311,7 +260,16 @@ number:
     initial_value: 75
     unit_of_measurement: "%"
 
-
+  - platform: template
+    name: "${devicename} Motor Differentiel"
+    id: ${devicename}_motor_diff
+    restore_value: true
+    optimistic: true
+    min_value: 0.2
+    max_value: 0.8
+    step: 0.01
+    initial_value: 0.50
+    unit_of_measurement: ""
 
   - platform: template
     name: "${devicename} Motor Time"
@@ -323,26 +281,6 @@ number:
     step: 0.2
     initial_value: 2
     unit_of_measurement: "S"
-
-
-
-
-# # Gestion des scripts
-# script:
-#   - id: robot_forward
-#     then:
-#       - switch.turn_off: ${devicename}_motor_direction_a
-# #      - delay: 1s
-#       - switch.turn_off: ${devicename}_motor_direction_b
-
-#   - id: robot_back
-#     then:
-#       - switch.turn_on: ${devicename}_motor_direction_a
-# #      - delay: 1s
-#       - switch.turn_on: ${devicename}_motor_direction_b
-
-
-
 
 
 # Gestion des timers
