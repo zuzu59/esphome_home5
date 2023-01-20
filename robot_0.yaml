@@ -3,26 +3,23 @@
 #-- Code pour piloter un petit robot NodeMCU à 20 balles au moyen d'un brocker MQTT
 #-- Les commandes sont expressément très simplistes
 #-- location: Hôtel du Cervin à St-Luc ;-)
-#-- zf230120.1140
+#-- zf230120.1449
 #--
 # sources: 
 # ...
 
 substitutions:
   devicename: robot_0
+  
+# mettre la notion de debug ici !
 
-
-# sensor:
-# - platform: dht
-#   # ...
-#   temperature:
-#     name: ${upper_devicename} Temperature
-#   humidity:
-#     name: ${upper_devicename} Humidity
 
 
 esphome:
   name: $devicename
+  on_boot:
+   - switch.turn_on: ${devicename}_dir_forward
+   - switch.turn_on: ${devicename}_stop
 
 esp8266:
   board: nodemcuv2
@@ -84,6 +81,7 @@ mqtt:
   birth_message:
   will_message:
 
+
 # Définition des Switch's
 switch:
   # - platform: gpio
@@ -95,7 +93,6 @@ switch:
   - platform: restart
     name: "${devicename} Restart"
 
-
   - platform: gpio
     name: "${devicename} motor Direction A "
     # inverted: True
@@ -105,15 +102,8 @@ switch:
   - platform: gpio
     name: "${devicename} motor Direction B"
     # inverted: True
-    id: ${devicename}_moto_direction_b
+    id: ${devicename}_motor_direction_b
     pin: D4
-
-
-
-
-
-
-
 
   - platform: template
     name: "${devicename} Motor GO"
@@ -126,9 +116,6 @@ switch:
       # - number.set:
       #     id: ${devicename}_motor_time
       #     value: 18
-
-
-
 
   - platform: template
     name: "${devicename} Motor START"
@@ -145,11 +132,12 @@ switch:
           brightness:  !lambda |-
             // output value must be in range 0 - 1.0
             return id(${devicename}_motor_speed).state / 100.0;
-
+      - switch.turn_off: ${devicename}_stop
 
   - platform: template
     name: "${devicename} Motor STOP"
     id: ${devicename}_stop
+    optimistic: true
     turn_on_action:
       - switch.turn_off:
           id: ${devicename}_start
@@ -157,6 +145,53 @@ switch:
           id: ${devicename}_motor_speed_a
       - light.turn_off:
           id: ${devicename}_motor_speed_b
+      - switch.turn_off: ${devicename}_start
+
+  - platform: template
+    name: "${devicename} Motor Direction FORWARD"
+    id: ${devicename}_dir_forward
+    optimistic: true
+    turn_on_action:
+      - switch.turn_off: ${devicename}_motor_direction_a
+      - switch.turn_off: ${devicename}_motor_direction_b
+      - switch.turn_off: ${devicename}_dir_back
+      - switch.turn_off: ${devicename}_dir_right
+      - switch.turn_off: ${devicename}_dir_left
+
+  - platform: template
+    name: "${devicename} Motor Direction BACK"
+    id: ${devicename}_dir_back
+    optimistic: true
+    turn_on_action:
+      - switch.turn_on: ${devicename}_motor_direction_a
+      - switch.turn_on: ${devicename}_motor_direction_b
+      - switch.turn_off: ${devicename}_dir_forward
+      - switch.turn_off: ${devicename}_dir_right
+      - switch.turn_off: ${devicename}_dir_left
+
+  - platform: template
+    name: "${devicename} Motor Direction RIGHT"
+    id: ${devicename}_dir_right
+    optimistic: true
+    turn_on_action:
+      - switch.turn_off: ${devicename}_motor_direction_a
+      - switch.turn_on: ${devicename}_motor_direction_b
+      - switch.turn_off: ${devicename}_dir_left
+      - switch.turn_off: ${devicename}_dir_forward
+      - switch.turn_off: ${devicename}_dir_back
+
+  - platform: template
+    name: "${devicename} Motor Direction LEFT"
+    id: ${devicename}_dir_left
+    optimistic: true
+    turn_on_action:
+      - switch.turn_on: ${devicename}_motor_direction_a
+      - switch.turn_off: ${devicename}_motor_direction_b
+      - switch.turn_off: ${devicename}_dir_right
+      - switch.turn_off: ${devicename}_dir_forward
+      - switch.turn_off: ${devicename}_dir_back
+
+
 
 
 
@@ -275,7 +310,23 @@ number:
     unit_of_measurement: "S"
 
 
-    
+
+
+# # Gestion des scripts
+# script:
+#   - id: robot_forward
+#     then:
+#       - switch.turn_off: ${devicename}_motor_direction_a
+# #      - delay: 1s
+#       - switch.turn_off: ${devicename}_motor_direction_b
+
+#   - id: robot_back
+#     then:
+#       - switch.turn_on: ${devicename}_motor_direction_a
+# #      - delay: 1s
+#       - switch.turn_on: ${devicename}_motor_direction_b
+
+
 
 
 
