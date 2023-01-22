@@ -3,7 +3,7 @@
 #-- Code pour piloter un petit robot NodeMCU à 20 balles au moyen d'un brocker MQTT
 #-- Les commandes sont expressément très simplistes
 #-- location: Hôtel du Cervin à St-Luc ;-)
-#-- zf230121.1213
+#-- zf230122.1108
 #--
 # sources: 
 # ...
@@ -196,34 +196,19 @@ switch:
     optimistic: true
     restore_mode: ALWAYS_OFF
     turn_on_action:
-
-
-
-
-
-
+      # Préchauffage des moteurs pour combattre le frottement mu zéro
       - light.turn_on:
           id: ${devicename}_motor_speed_a
           brightness:  !lambda |-
             // output value must be in range 0 - 1.0
-            return id(${devicename}_motor_preburn).state;
-
+            return id(${devicename}_motor_preburn).state / 100;
       - light.turn_on:
           id: ${devicename}_motor_speed_b
           brightness:  !lambda |-
             // output value must be in range 0 - 1.0
-            return id(${devicename}_motor_preburn).state;
-
+            return id(${devicename}_motor_preburn).state / 100;
       - delay: !lambda return id(${devicename}_motor_preburn_time).state * 1000;
-
-
-
-
-
-
-
-
-
+# Allumage des moteurs selon la consigne avec le différentiel gauche/droite
       - light.turn_on:
           id: ${devicename}_motor_speed_a
           brightness:  !lambda |-
@@ -379,52 +364,43 @@ number:
     id: ${devicename}_motor_speed
     restore_value: true
     optimistic: true
+    mode: box
     min_value: 60
     max_value: 100
     step: 1
     initial_value: 75
     unit_of_measurement: "%"
 
-
-
-
   - platform: template
     name: "${devicename} Motor Preburn"
     id: ${devicename}_motor_preburn
     restore_value: true
     optimistic: true
-    min_value: 0
-    max_value: 1
-    step: 0.05
-    initial_value: 1
-    unit_of_measurement: ""
-
+    mode: box
+    min_value: 75
+    max_value: 100
+    step: 3
+    initial_value: 100
+    unit_of_measurement: "%"
 
   - platform: template
     name: "${devicename} Motor Preburn Time"
     id: ${devicename}_motor_preburn_time
     restore_value: true
     optimistic: true
+    mode: box
     min_value: 0
     max_value: 1
-    step: 0.05
+    step: 0.01
     initial_value: 1
-    unit_of_measurement: "s"
-
-
-
-
-
-
-
-
-
+    unit_of_measurement: "S"
 
   - platform: template
     name: "${devicename} Motor Differentiel"
     id: ${devicename}_motor_diff
     restore_value: true
     optimistic: true
+    mode: box
     min_value: 0.2
     max_value: 0.8
     step: 0.01
@@ -436,8 +412,10 @@ number:
     id: ${devicename}_motor_time
     restore_value: false
     optimistic: true
+    mode: box
     min_value: 0
-    max_value: 6
+    max_value: 20
+    # ATTENTION, ne pas modifier le 'step' car c'est le 'décrement' du chronomètre de la commande 'go'
     step: 0.2
     initial_value: 2
     unit_of_measurement: "S"
