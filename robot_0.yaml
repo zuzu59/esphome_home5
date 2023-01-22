@@ -3,14 +3,14 @@
 #-- Code pour piloter un petit robot NodeMCU à 20 balles au moyen d'un brocker MQTT
 #-- Les commandes sont expressément très simplistes
 #-- location: Hôtel du Cervin à St-Luc ;-)
-#-- zf230122.1313
+#-- zf230122.1510
 
 #--
 # sources: 
 # ...
 
 substitutions:
-  devicename: robot_0
+  devicename: robot_1
 
 
 esphome:
