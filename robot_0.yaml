@@ -3,7 +3,7 @@
 #-- Code pour piloter un petit robot NodeMCU à 20 balles au moyen d'un brocker MQTT
 #-- Les commandes sont expressément très simplistes
 #-- location: Hôtel du Cervin à St-Luc ;-)
-#-- zf230122.1135
+#-- zf230122.1205
 
 #--
 # sources: 
@@ -11,9 +11,6 @@
 
 substitutions:
   devicename: robot_0
-  
-# mettre la notion de debug ici !
-
 
 
 esphome:
@@ -21,9 +18,14 @@ esphome:
   on_boot:
    - switch.turn_on: ${devicename}_motor_direction_forward
    - switch.turn_on: ${devicename}_stop
+   - switch.turn_on: ${devicename}_led
+   - delay: 0.5s
+   - switch.turn_off: ${devicename}_led
+
 
 esp8266:
   board: nodemcuv2
+
 
 # Configuration WIFI
 wifi:
@@ -35,18 +37,23 @@ wifi:
     ssid: "${devicename} Fallback"
     password: !secret ap_wifi_password
 
+
 captive_portal:
+
 
 # Enable logging
 logger:
     level: DEBUG
 
+
 # Enable Home Assistant API
 # api:
 #   password: !secret api_password
 
+
 ota:
   password: !secret ota_password
+
 
 # WEB Server
 web_server:
@@ -70,47 +77,48 @@ mqtt:
         - logger.log: Receive START command !
         - switch.turn_on:
             id: ${devicename}_start
+
     - topic: ${devicename}/switch/${devicename}_motor_stop/set
       payload: 'ON'
       then:
         - logger.log: Receive STOP command !
         - switch.turn_on:
             id: ${devicename}_stop
+
     - topic: ${devicename}/switch/${devicename}_motor_go/set
       payload: 'ON'
       then:
         - logger.log: Receive GO command !
         - switch.turn_on:
             id: ${devicename}_go
+
     - topic: ${devicename}/switch/${devicename}_motor_direction_forward/set
       payload: 'ON'
       then:
         - logger.log: Receive FORWARD command !
         - switch.turn_on:
             id: ${devicename}_motor_direction_forward
+
     - topic: ${devicename}/switch/${devicename}_motor_direction_backward/set
       payload: 'ON'
       then:
         - logger.log: Receive BACKWARD command !
         - switch.turn_on:
             id: ${devicename}_motor_direction_backward
+
     - topic: ${devicename}/switch/${devicename}_motor_direction_left/set
       payload: 'ON'
       then:
         - logger.log: Receive LEFT command !
         - switch.turn_on:
             id: ${devicename}_motor_direction_left
+
     - topic: ${devicename}/switch/${devicename}_motor_direction_right/set
       payload: 'ON'
       then:
         - logger.log: Receive RIGHT command !
         - switch.turn_on:
             id: ${devicename}_motor_direction_right
-
-
-
-
-
 
   on_json_message:
     # valeurs de réglages pour le robot
@@ -139,9 +147,6 @@ mqtt:
                         return x["value"];
 
     - topic: ${devicename}/number/${devicename}_motor_differentiel/set
-    
-    #robot_0/number/robot_0_motor_differentiel/set
-
       then:
         - logger.log: Receive Motor Differentiel value !
         - number.set:
@@ -158,23 +163,13 @@ mqtt:
                         return x["value"];
 
 
-
-
-
-
-
-
-
-
-
-
 # Définition des Switch's
 switch:
-  # - platform: gpio
-  #   name: "${devicename} LED"
-  #   inverted: True
-  #   id: led
-  #   pin: D4
+  - platform: gpio
+    name: "${devicename} LED"
+    inverted: True
+    id: ${devicename}_led
+    pin: D0
 
   - platform: restart
     name: "${devicename} Restart"
@@ -327,11 +322,14 @@ light:
 sensor:
   - platform: wifi_signal
     name: "${devicename} Signal Wi-Fi"
-    update_interval: 60s
+    update_interval: 5s
+    on_value:
+      then:
+        - switch.turn_on: ${devicename}_led
 
   - platform: uptime
     name: "${devicename} uptime"
-    update_interval: 15s
+    update_interval: 5s
 
   - platform: ultrasonic
     trigger_pin: D5
@@ -356,7 +354,7 @@ sensor:
 # Définition des Sensors text
 text_sensor:
   - platform: version
-    name: "${devicename} Version 1150"
+    name: "${devicename} Version 1209"
 
   - platform: wifi_info
     ip_address:
@@ -452,7 +450,5 @@ interval:
                 then:
                   - switch.turn_on:
                       id: ${devicename}_stop
-                  # - switch.turn_off:
-                  #     id: ${devicename}_go
 
 
