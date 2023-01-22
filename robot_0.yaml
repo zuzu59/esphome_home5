@@ -3,7 +3,7 @@
 #-- Code pour piloter un petit robot NodeMCU à 20 balles au moyen d'un brocker MQTT
 #-- Les commandes sont expressément très simplistes
 #-- location: Hôtel du Cervin à St-Luc ;-)
-#-- zf230122.1205
+#-- zf230122.1313
 
 #--
 # sources: 
@@ -43,8 +43,11 @@ captive_portal:
 
 # Enable logging
 logger:
-    level: DEBUG
-
+  level: DEBUG
+  logs:
+    sensor: INFO
+    ultrasonic.sensor: INFO
+  
 
 # Enable Home Assistant API
 # api:
@@ -322,7 +325,7 @@ light:
 sensor:
   - platform: wifi_signal
     name: "${devicename} Signal Wi-Fi"
-    update_interval: 5s
+    update_interval: 15s
     on_value:
       then:
         - switch.turn_on: ${devicename}_led
@@ -336,7 +339,7 @@ sensor:
     echo_pin: D6
     name: "${devicename} Distance"
     id: ${devicename}_distance
-    update_interval: 0.5s
+    update_interval: 0.25s
     on_value:
       then:
         - if:
