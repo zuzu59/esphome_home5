@@ -3,7 +3,8 @@
 #-- Code pour piloter un petit robot NodeMCU à 20 balles au moyen d'un brocker MQTT
 #-- Les commandes sont expressément très simplistes
 #-- location: Hôtel du Cervin à St-Luc ;-)
-#-- zf230122.1108
+#-- zf230122.1135
+
 #--
 # sources: 
 # ...
@@ -63,43 +64,43 @@ mqtt:
 
   on_message:
   # Commandes de déplacements du robot
-    - topic: robot_0/switch/robot_0_motor_start/set
+    - topic: ${devicename}/switch/${devicename}_motor_start/set
       payload: 'ON'
       then:
         - logger.log: Receive START command !
         - switch.turn_on:
             id: ${devicename}_start
-    - topic: robot_0/switch/robot_0_motor_stop/set
+    - topic: ${devicename}/switch/${devicename}_motor_stop/set
       payload: 'ON'
       then:
         - logger.log: Receive STOP command !
         - switch.turn_on:
             id: ${devicename}_stop
-    - topic: robot_0/switch/robot_0_motor_go/set
+    - topic: ${devicename}/switch/${devicename}_motor_go/set
       payload: 'ON'
       then:
         - logger.log: Receive GO command !
         - switch.turn_on:
             id: ${devicename}_go
-    - topic: robot_0/switch/robot_0_motor_direction_forward/set
+    - topic: ${devicename}/switch/${devicename}_motor_direction_forward/set
       payload: 'ON'
       then:
         - logger.log: Receive FORWARD command !
         - switch.turn_on:
             id: ${devicename}_motor_direction_forward
-    - topic: robot_0/switch/robot_0_motor_direction_backward/set
+    - topic: ${devicename}/switch/${devicename}_motor_direction_backward/set
       payload: 'ON'
       then:
         - logger.log: Receive BACKWARD command !
         - switch.turn_on:
             id: ${devicename}_motor_direction_backward
-    - topic: robot_0/switch/robot_0_motor_direction_left/set
+    - topic: ${devicename}/switch/${devicename}_motor_direction_left/set
       payload: 'ON'
       then:
         - logger.log: Receive LEFT command !
         - switch.turn_on:
             id: ${devicename}_motor_direction_left
-    - topic: robot_0/switch/robot_0_motor_direction_right/set
+    - topic: ${devicename}/switch/${devicename}_motor_direction_right/set
       payload: 'ON'
       then:
         - logger.log: Receive RIGHT command !
@@ -110,48 +111,57 @@ mqtt:
 
 
 
+
   on_json_message:
-    # topic: the/topic
-    # then:
-    #   - light.turn_on:
-    #       id: living_room_lights
-
-    #       transition_length: !lambda |-
-    #         int length = 1000;
-    #         if (x.containsKey("length"))
-    #           length = x["length"];
-    #         return length;
-
-    #       brightness: !lambda "return x["bright"];"
-
-    #       effect: !lambda |-
-    #         const char *effect = "None";
-    #         if (x.containsKey("effect"))
-    #           effect = x["effect"];
-    #         return effect;
-
-# valeurs de réglages pour le robot
-    - topic: robot_0/number/robot_0_motor_time/set
-#      payload: 'ON'
+    # valeurs de réglages pour le robot
+    - topic: ${devicename}/number/${devicename}_motor_speed/set
       then:
-        - logger.log: Receive MOTOR TIME command !
-
-
+        - logger.log: Receive Motor Speed value !
         - number.set:
-            id: robot_0_motor_time
+            id: ${devicename}_motor_speed
             value: !lambda |-
                         return x["value"];
 
-        # - logger.log:
-        #     format: "The temperature sensor reports value %.1f and humidity %.1f"
-        #     args: [ '!lambda "return x["bright"];"', 'id(${devicename}_distance).state' ]
-          
-          
-#            args: [ !lambda "return x["bright"];" ]          
+    - topic: ${devicename}/number/${devicename}_motor_preburn/set
+      then:
+        - logger.log: Receive Motor Preburn value !
+        - number.set:
+            id: ${devicename}_motor_preburn
+            value: !lambda |-
+                        return x["value"];
 
-        # - number.set:
-        #     id: robot_0_motor_time
-        #     value: !lambda "return x;"
+    - topic: ${devicename}/number/${devicename}_motor_preburn_time/set
+      then:
+        - logger.log: Receive Motor Preburn Time value !
+        - number.set:
+            id: ${devicename}_motor_preburn_time
+            value: !lambda |-
+                        return x["value"];
+
+    - topic: ${devicename}/number/${devicename}_motor_differentiel/set
+    
+    #robot_0/number/robot_0_motor_differentiel/set
+
+      then:
+        - logger.log: Receive Motor Differentiel value !
+        - number.set:
+            id: ${devicename}_motor_differentiel
+            value: !lambda |-
+                        return x["value"];
+
+    - topic: ${devicename}/number/${devicename}_motor_time/set
+      then:
+        - logger.log: Receive Motor Time value !
+        - number.set:
+            id: ${devicename}_motor_time
+            value: !lambda |-
+                        return x["value"];
+
+
+
+
+
+
 
 
 
@@ -213,12 +223,12 @@ switch:
           id: ${devicename}_motor_speed_a
           brightness:  !lambda |-
             // output value must be in range 0 - 1.0
-            return id(${devicename}_motor_speed).state / 100.0 * (0.5 + id(${devicename}_motor_diff).state);
+            return id(${devicename}_motor_speed).state / 100.0 * (0.5 + id(${devicename}_motor_differentiel).state);
       - light.turn_on:
           id: ${devicename}_motor_speed_b
           brightness:  !lambda |-
             // output value must be in range 0 - 1.0
-            return id(${devicename}_motor_speed).state / 100.0 / (0.5 + id(${devicename}_motor_diff).state);
+            return id(${devicename}_motor_speed).state / 100.0 / (0.5 + id(${devicename}_motor_differentiel).state);
       - switch.turn_off: ${devicename}_stop
 
   - platform: template
@@ -397,7 +407,7 @@ number:
 
   - platform: template
     name: "${devicename} Motor Differentiel"
-    id: ${devicename}_motor_diff
+    id: ${devicename}_motor_differentiel
     restore_value: true
     optimistic: true
     mode: box
