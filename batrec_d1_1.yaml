@@ -8,7 +8,7 @@
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- ATTENTION, comme il n'y a qu'un seul convertisseur ADC sur l'ESP8266, il n'y a plus la fonction BMS et indicateur de capacité !
-#-- zf221126.1421
+#-- zf230209.1443
 #--
 # sources: 
 # https://esphome.io/components/sensor/adc.html
@@ -31,8 +31,8 @@ wifi:
 
   networks:
 
-    - ssid: !secret wifi_ssid_apzuzu7
-    - password: !secret wifi_pass_apzuzu7
+    - ssid: !secret wifi_ssid_apzuzu8
+    - password: !secret wifi_pass_apzuzu8
     
     # - ssid: !secret wifi_ssid_apzuzu6
     # - password: !secret wifi_pass_apzuzu6
