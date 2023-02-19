@@ -2,7 +2,7 @@
 #-- th2.yaml
 #-- Petit code pour monitorer la température et l'humidité dans une pièce
 #-- location: garage porte nord
-#-- zf221106.1258
+#-- zf230219.2334
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -52,7 +52,9 @@ logger:
 
 # Enable Home Assistant API
 api:
- password: !secret api_password
+#  password: !secret api_password
+  encryption:
+    key: !secret api_encryption_key
 
 ota:
   password: !secret ota_password

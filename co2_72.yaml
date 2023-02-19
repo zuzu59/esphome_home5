@@ -3,7 +3,7 @@
 #-- Petit code mini minimaliste pour mesurer le COV et eCO2
 #-- Lit COV et eCO2 du capteur ccs811
 #-- location: chambre à Chloé carton vers mur
-#-- zf210720.1033, zf221209.1657
+#-- zf210720.1033, zf230219.2332
 #--
 
 
@@ -56,7 +56,9 @@ logger:
 
 # Enable Home Assistant API
 api:
-  password: !secret api_password
+#  password: !secret api_password
+  encryption:
+    key: !secret api_encryption_key
 
 ota:
   password: !secret ota_password

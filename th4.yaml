@@ -2,7 +2,7 @@
 #-- th4.yaml
 #-- Petit code pour monitorer la température et l'humidité dans une pièce
 #-- location: chambre Heïda
-#-- zf221106.1300
+#-- zf230220.0001
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -72,7 +72,9 @@ logger:
 
 # Enable Home Assistant API
 api:
- password: !secret api_password
+#  password: !secret api_password
+  encryption:
+    key: !secret api_encryption_key
 
 ota:
   password: !secret ota_password
