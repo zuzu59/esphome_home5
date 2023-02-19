@@ -5,7 +5,7 @@
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- calibration VCC diode: lambda: return id(th10_vcc_voltage).state + 1.258 ;
-#-- zf230106.1432
+#-- zf230209.1110
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -15,6 +15,8 @@ esphome:
   name: th10
   on_boot:
    - switch.turn_on: led
+   - switch.turn_on: th10_power_htu21d
+   - delay: 0.5s
 #   - switch.turn_off: led
 
 
@@ -110,6 +112,7 @@ mqtt:
 i2c:
   sda: D2
   scl: D1
+  scan: false
 #  frequency: 10khz
 
 
@@ -128,6 +131,12 @@ switch:
     inverted: True
     id: led
     pin: D4
+
+  - platform: gpio
+    name: "th10 power htu21d"
+#    inverted: True
+    id: th10_power_htu21d
+    pin: D5
 
   - platform: restart
     name: "th10 Restart"
@@ -311,4 +320,5 @@ text_sensor:
 deep_sleep:
 #  run_duration: 5s
   sleep_duration: 60s
+#  sleep_duration: 5s
   id: deep_sleep_1
