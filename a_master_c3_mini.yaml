@@ -1,0 +1,243 @@
+#------------------------------
+#-- a_master_c3_mini.yaml
+#-- Petit code générique minimaliste pour des projets à base d'esp32-c3 mini lolin
+#-- ATTENTION: je ne sais pas pourquoi mais il faut le flasher via web.esphome.io (maintenir la touche BOOT pendant le RESET), via le port USB en ESPHOME cela ne fonctionne pas !
+#-- REMARQUE: xxx
+#-- location: xxx
+#-- zf2327.1509
+#--
+# sources: 
+# 
+
+esphome:
+  name: a_master_c3_mini
+  # platformio_options:
+  #   board_build.flash_mode: dio
+  on_boot:
+   - switch.turn_on: led
+  # - switch.turn_off: led
+
+esp32:
+  board: esp32-c3-devkitm-1
+  # framework:
+    # type: esp-idf
+    # version: recommended
+
+
+
+
+
+# Configuration WIFI
+wifi:
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
+
+  # networks:
+  
+  #   - ssid: !secret wifi_ssid_apzuzu7
+  #   - password: !secret wifi_pass_apzuzu7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6
+  #   - password: !secret wifi_pass_apzuzu6
+
+  #   - ssid: !secret wifi_ssid_3G_zf
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3G_zf2
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3g_s7
+  #   - password: !secret wifi_pass_3g_s7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
+  #   - password: !secret wifi_pass_apzuzu6_EXT
+
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "a_master_c3_mini Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+    level: VERBOSE
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+ota:
+  password: !secret ota_password
+
+# WEB Server
+web_server:
+  port: 80
+
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "a_master_c3_mini LED"
+#    inverted: True
+    id: led
+    pin: GPIO9
+    on_turn_on:
+      - light.turn_on:
+          id: a_master_c3_mini_rgb
+          brightness: 30%
+          red: 100%
+          green: 0%
+          blue: 0%
+    on_turn_off:
+      - light.turn_off:
+          id: a_master_c3_mini_rgb
+
+  - platform: restart
+    name: "a_master_c3_mini Restart"
+
+
+# Définition des Sensors
+sensor:
+  - platform: wifi_signal
+    name: "a_master_c3_mini Signal Wi-Fi"
+    update_interval: 5s
+
+  - platform: uptime
+    name: "a_master_c3_mini uptime"
+    update_interval: 5s
+
+
+# Définition des Sensors text
+text_sensor:
+  - platform: version
+    name: "a_master_c3_mini Version 1150"
+
+  - platform: wifi_info
+    ip_address:
+      name: a_master_c3_mini IP Address
+      id: wifi_ip
+    ssid:
+      name: a_master_c3_mini Connected SSID
+      id: wifi_ssid
+
+
+# Définition des inputs numbers
+number:
+  - platform: template
+    name: "a_master_c3_mini consigne alarme low"
+    restore_value: true
+    optimistic: true
+    min_value: 0.0
+    max_value: 0.8
+    step: 0.01
+    initial_value: 0.4
+    unit_of_measurement: "V"
+    id: a_master_c3_mini_consigne_alarme_low
+
+light:
+  - platform: neopixelbus
+    type: GRB
+    variant: WS2812
+    pin: GPIO2
+    num_leds: 1
+    name: "a_master_c3_mini RGB"
+    id: a_master_c3_mini_rgb
+
+
+
+
+
+# font:
+# #https://github.com/JotJunior/PHP-Boleto-ZF2/blob/master/public/assets/fonts/arial.ttf
+#   - file: 'arialn.ttf'
+#     id: font1
+#     size: 10
+#   - file: 'arialn.ttf'
+#     id: font2
+#     size: 13
+
+# i2c:
+#   sda: GPIO05
+#   scl: GPIO06
+#   scan: true
+#   frequency: 200kHz
+
+# display:
+# # http://www.esp8266learning.com/wemos-oled-shield-example.php
+# # https://esphome.io/api/namespaceesphome_1_1display.html
+#   - platform: ssd1306_i2c
+#     model: "SSD1306 64x48"
+#     address: 0x3C
+#     invert: true
+#     update_interval: 3s
+#     lambda: |-
+
+#       // Turn the whole display on.
+#       //it.fill(COLOR_ON);
+#       // Turn the whole display off.
+#       //it.fill(COLOR_OFF);
+
+#       // For example, draw a line from [x=0,y=0] to [x=50,y=50]
+#       it.line(0, 0, 50, 50);
+
+      
+#       // Print "Hello Zuzu" for fonts tests in top center.
+#       it.print(32, 20, id(font2), TextAlign::TOP_CENTER, "Hello 3400");
+
+
+
+#
+
+
+
+      # // Print inside temperature (from homeassistant sensor)
+      # it.printf(0, 7, id(font1), TextAlign::BASELINE_LEFT, "In side");
+      # if (id(inside_temperature).has_state()) {
+      #   it.printf(64, 7, id(font1), TextAlign::BASELINE_RIGHT , "%.1f°C", id(inside_temperature).state);
+      # }
+
+      # // Print outside temperature (from homeassistant sensor)
+      # it.printf(0, 16, id(font1), TextAlign::BASELINE_LEFT, "Out side");
+      # if (id(outside_temperature).has_state()) {
+      #   it.printf(64, 16, id(font1), TextAlign::BASELINE_RIGHT , "%.1f°C", id(outside_temperature).state);
+      # }      
+      
+      # // Print TVOC (from homeassistant sensor)
+      # it.printf(0, 25, id(font1), TextAlign::BASELINE_LEFT, "TVOC");
+      # if (id(outside_temperature).has_state()) {
+      #   it.printf(64, 25, id(font1), TextAlign::BASELINE_RIGHT , "%.0f", id(tvoc).state);
+      # }      
+
+      # // Print "L'état du input text de HA: <state>" in midle center
+      # it.printf(32, 36, id(font2), TextAlign::BASELINE_CENTER, "%s", id(alarm_state).state.c_str());
+
+      # // Print time in HH:MM format
+      # it.strftime(32, 48, id(font1), TextAlign::BOTTOM_CENTER, "%d-%m %H:%M:%S", id(esptime).now());
+
+
+
+# # Gestion des timers
+# interval:
+
+
+# # Timer pour calculer le temps passé à avancer !
+#   - interval: 2s
+#     then:
+#       - light.turn_on:
+#           id: a_master_c3_mini_rgb
+#           brightness: 30%
+#           red: 100%
+#           green: 0%
+#           blue: 0%
+
+#       - delay: 1s
+
+#       - light.turn_on:
+#           id: a_master_c3_mini_rgb
+#           brightness: 0%
+#           red: 100%
+#           green: 0%
+#           blue: 0%
+
