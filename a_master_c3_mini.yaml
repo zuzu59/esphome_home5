@@ -4,7 +4,7 @@
 #-- ATTENTION: je ne sais pas pourquoi mais il faut le flasher via web.esphome.io (maintenir la touche BOOT pendant le RESET), via le port USB en ESPHOME cela ne fonctionne pas !
 #-- REMARQUE: xxx
 #-- location: xxx
-#-- zf2327.1509
+#-- zf2328.1016
 #--
 # sources: 
 # 
@@ -78,11 +78,13 @@ web_server:
 
 # Définition des Switch's
 switch:
-  - platform: gpio
+  - platform: template
     name: "a_master_c3_mini LED"
 #    inverted: True
     id: led
-    pin: GPIO9
+    optimistic: true
+
+#    pin: GPIO9
     on_turn_on:
       - light.turn_on:
           id: a_master_c3_mini_rgb
@@ -96,6 +98,18 @@ switch:
 
   - platform: restart
     name: "a_master_c3_mini Restart"
+
+
+# Définition du bouton physique
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO9
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "a_master_c3_mini button"
+    on_press:
+      - switch.toggle: led
 
 
 # Définition des Sensors
@@ -127,20 +141,21 @@ text_sensor:
 number:
   - platform: template
     name: "a_master_c3_mini consigne alarme low"
+    id: a_master_c3_mini_consigne_alarme_low
     restore_value: true
     optimistic: true
+    mode: box
     min_value: 0.0
     max_value: 0.8
     step: 0.01
     initial_value: 0.4
     unit_of_measurement: "V"
-    id: a_master_c3_mini_consigne_alarme_low
 
 light:
   - platform: neopixelbus
     type: GRB
     variant: WS2812
-    pin: GPIO2
+    pin: GPIO7
     num_leds: 1
     name: "a_master_c3_mini RGB"
     id: a_master_c3_mini_rgb
