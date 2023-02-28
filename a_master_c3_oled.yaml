@@ -4,7 +4,7 @@
 #-- ATTENTION: je ne sais pas pourquoi mais il faut le flasher via web.esphome.io (maintenir la touche BOOT pendant le RESET), via le port USB en ESPHOME cela ne fonctionne pas !
 #-- REMARQUE: je ne sais pas pourquoi la luminosité du display OLED est très très faible !
 #-- location: xxx
-#-- zf221029.1836
+#-- zf221229.1836
 #--
 # sources: 
 # https://github.com/01Space/ESP32-C3-0.42LCD
