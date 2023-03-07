@@ -1,11 +1,13 @@
 #------------------------------
 #-- th2.yaml
-#-- Petit code pour monitorer la température et l'humidité dans une pièce
+#-- Petit code pour monitorer la température et l'humidité dans une pièce ainsi que la luminosité
 #-- location: garage porte nord
-#-- zf230219.2334
+#-- zf230219.2334, zf230307.0833
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
+# Schéma LDR: https://docs.google.com/document/d/1GOp2zN0aFk80cv2Hz6DmlEwY84OPwVK38da-KSO77zw/edit#heading=h.cqejpm6wn83l
+
 
 esphome:
   name: th2

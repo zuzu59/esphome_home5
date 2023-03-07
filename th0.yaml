@@ -3,13 +3,14 @@
 #-- Petit code mini manilste pour mesurer la température et l'humidité
 #-- Lit la tmpérature et l'humidité du capteur HTU21D
 #-- location: chambre à Chloé bureau zf
-#-- zf210720.1021, zf230219.2321
+#-- zf210720.1021, zf230219.2321, zf230307.0832
 #--
 
 
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
 # Google Sheet pour la calibation: https://docs.google.com/spreadsheets/d/1iXrqRoCMJt91MejVzX4IAtF0g-0zK2hgI-jhiC7n6G8
+# Schéma LDR: https://docs.google.com/document/d/1GOp2zN0aFk80cv2Hz6DmlEwY84OPwVK38da-KSO77zw/edit#heading=h.cqejpm6wn83l
 
 
 esphome:
