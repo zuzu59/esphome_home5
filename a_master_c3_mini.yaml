@@ -4,7 +4,7 @@
 #-- ATTENTION: je ne sais pas pourquoi mais il faut le flasher via web.esphome.io (maintenir la touche BOOT pendant le RESET), via le port USB en ESPHOME cela ne fonctionne pas !
 #-- REMARQUE: xxx
 #-- location: xxx
-#-- zf2328.1016
+#-- zf230302.1844
 #--
 # sources: 
 # 
@@ -14,8 +14,16 @@ esphome:
   # platformio_options:
   #   board_build.flash_mode: dio
   on_boot:
-   - switch.turn_on: led
-  # - switch.turn_off: led
+  - delay: 1s
+  - light.turn_off:
+      id: a_master_c3_mini_rgb
+  - delay: 2s
+  - light.turn_on:
+      id: a_master_c3_mini_rgb
+      brightness: 30%
+      red: 100%
+      green: 0%
+      blue: 0%
 
 esp32:
   board: esp32-c3-devkitm-1
@@ -74,6 +82,19 @@ ota:
 # WEB Server
 web_server:
   port: 80
+
+
+
+# Définition des lights
+light:
+  - platform: neopixelbus
+    type: GRB
+    variant: WS2812
+    pin: GPIO7
+    num_leds: 1
+    name: "a_master_c3_mini RGB"
+    id: a_master_c3_mini_rgb
+
 
 
 # Définition des Switch's
@@ -150,16 +171,6 @@ number:
     step: 0.01
     initial_value: 0.4
     unit_of_measurement: "V"
-
-light:
-  - platform: neopixelbus
-    type: GRB
-    variant: WS2812
-    pin: GPIO7
-    num_leds: 1
-    name: "a_master_c3_mini RGB"
-    id: a_master_c3_mini_rgb
-
 
 
 
