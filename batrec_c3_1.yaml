@@ -5,7 +5,7 @@
 #-- Afin de pouvoir lire des tensions >3.3V, il y a un diviseur résistif R1/R2 de 270kR/12kR !
 #-- Il y a donc un facteur de correction de xx environ avec une plage de mesure de 0V à 56V
 #-- location: garage
-#-- zf230502.1921
+#-- zf230503.0112
 #--
 # sources: 
 # https://esphome.io/components/sensor/adc.html
@@ -17,16 +17,25 @@ esphome:
   # platformio_options:
   #   board_build.flash_mode: dio
   on_boot:
+  - light.turn_on:
+      id: batrec_c3_1_rgb
+      brightness: 100%
+      red: 100%
+      green: 0%
+      blue: 0%
   - delay: 1s
   - light.turn_off:
       id: batrec_c3_1_rgb
-  - delay: 2s
+  - delay: 1s
   - light.turn_on:
       id: batrec_c3_1_rgb
       brightness: 30%
       red: 0%
       green: 100%
       blue: 0%
+  - delay: 1s
+  - light.turn_off:
+      id: batrec_c3_1_rgb
 
 esp32:
   board: esp32-c3-devkitm-1
@@ -68,26 +77,26 @@ captive_portal:
 logger:
 #  level: DEBUG
   level: VERBOSE
-  logs:
-    logger: INFO
-    adc: INFO
-    captive_portal: INFO
-    deep_sleep: INFO
-    htu21d: INFO
-    i2c: INFO
-    ota: INFO
-    restart: INFO
-    sensor: INFO
-    switch: INFO
-    switch.gpio: INFO
-    uptime.sensor: INFO
-    web_server: INFO
-    wifi_signal.sensor: INFO
-    mqtt: INFO
-    mqtt.component: INFO
-    mqtt.client: INFO
-    mqtt.switch: INFO
-    mqtt.sensor: INFO
+  # logs:
+  #   logger: INFO
+  #   adc: INFO
+  #   captive_portal: INFO
+  #   deep_sleep: INFO
+  #   htu21d: INFO
+  #   i2c: INFO
+  #   ota: INFO
+  #   restart: INFO
+  #   sensor: INFO
+  #   switch: INFO
+  #   switch.gpio: INFO
+  #   uptime.sensor: INFO
+  #   web_server: INFO
+  #   wifi_signal.sensor: INFO
+  #   mqtt: INFO
+  #   mqtt.component: INFO
+  #   mqtt.client: INFO
+  #   mqtt.switch: INFO
+  #   mqtt.sensor: INFO
 
 # Enable Home Assistant API
 api:
@@ -174,6 +183,7 @@ sensor:
 # valeur brute en volts de l'ADC0
   - platform: adc
     pin: GPIO0
+    attenuation: 11db
     name: "batrec_c3_1 ADC0 brut"
     id: batrec_c3_1_adc0_brut
     update_interval: 1s
