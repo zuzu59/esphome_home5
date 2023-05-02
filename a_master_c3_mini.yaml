@@ -4,7 +4,7 @@
 #-- ATTENTION: je ne sais pas pourquoi mais il faut le flasher via web.esphome.io (maintenir la touche BOOT pendant le RESET), via le port USB en ESPHOME cela ne fonctionne pas !
 #-- REMARQUE: xxx
 #-- location: xxx
-#-- zf230302.1844
+#-- zf230302.1844, zf230502.1132
 #--
 # sources: 
 # 
@@ -14,16 +14,25 @@ esphome:
   # platformio_options:
   #   board_build.flash_mode: dio
   on_boot:
-  - delay: 1s
-  - light.turn_off:
-      id: a_master_c3_mini_rgb
-  - delay: 2s
   - light.turn_on:
       id: a_master_c3_mini_rgb
-      brightness: 30%
+      brightness: 100%
       red: 100%
       green: 0%
       blue: 0%
+  - delay: 1s
+  - light.turn_off:
+      id: a_master_c3_mini_rgb
+  - delay: 1s
+  - light.turn_on:
+      id: a_master_c3_mini_rgb
+      brightness: 30%
+      red: 0%
+      green: 100%
+      blue: 0%
+  - delay: 1s
+  - light.turn_off:
+      id: a_master_c3_mini_rgb
 
 esp32:
   board: esp32-c3-devkitm-1
@@ -87,6 +96,7 @@ web_server:
 
 # Définition des lights
 light:
+  # LED RGB sur le mini c3 GPIO7
   - platform: neopixelbus
     type: GRB
     variant: WS2812
@@ -94,6 +104,7 @@ light:
     num_leds: 1
     name: "a_master_c3_mini RGB"
     id: a_master_c3_mini_rgb
+    default_transition_length: 0s
 
 
 
@@ -104,15 +115,13 @@ switch:
 #    inverted: True
     id: led
     optimistic: true
-
-#    pin: GPIO9
     on_turn_on:
       - light.turn_on:
           id: a_master_c3_mini_rgb
           brightness: 30%
-          red: 100%
+          red: 0%
           green: 0%
-          blue: 0%
+          blue: 100%
     on_turn_off:
       - light.turn_off:
           id: a_master_c3_mini_rgb
@@ -121,7 +130,7 @@ switch:
     name: "a_master_c3_mini Restart"
 
 
-# Définition du bouton physique
+# Définition du bouton physique sur le mini c3 GPIO9
 binary_sensor:
   - platform: gpio
     pin:
