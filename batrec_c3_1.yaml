@@ -5,7 +5,7 @@
 #-- Afin de pouvoir lire des tensions >3.3V, il y a un diviseur résistif R1/R2 de 270kR/12kR !
 #-- Il y a donc un facteur de correction de xx environ avec une plage de mesure de 0V à 56V
 #-- location: garage
-#-- zf230501.2256
+#-- zf230502.1921
 #--
 # sources: 
 # https://esphome.io/components/sensor/adc.html
@@ -37,14 +37,10 @@ esp32:
 # Configuration WIFI
 wifi:
   reboot_timeout: 5min
-  # ssid: !secret wifi_ssid_apzuzu8
-  # password: !secret wifi_pass_apzuzu8
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
 
-  networks:
-
-    - ssid: !secret wifi_ssid_apzuzu8
-    - password: !secret wifi_pass_apzuzu8
-    
+  # networks:
     # - ssid: !secret wifi_ssid_apzuzu6
     # - password: !secret wifi_pass_apzuzu6
 
@@ -70,7 +66,8 @@ captive_portal:
 
 # Enable logging
 logger:
-  level: DEBUG
+#  level: DEBUG
+  level: VERBOSE
   logs:
     logger: INFO
     adc: INFO
@@ -92,9 +89,9 @@ logger:
     mqtt.switch: INFO
     mqtt.sensor: INFO
 
-# # Enable Home Assistant API
-# api:
-#  password: !secret api_password
+# Enable Home Assistant API
+api:
+ password: !secret api_password
 
 ota:
   password: !secret ota_password
@@ -103,20 +100,21 @@ ota:
 web_server:
   port: 80
 
-# MQTT server
-mqtt:
-  broker:  !secret mqtt_server_dev
-  port:  !secret mqtt_port_dev
-  username:  !secret mqtt_user_dev
-  password:  !secret mqtt_password_dev
-  birth_message:
-  will_message:
+# # MQTT server
+# mqtt:
+#   broker:  !secret mqtt_server_dev
+#   port:  !secret mqtt_port_dev
+#   username:  !secret mqtt_user_dev
+#   password:  !secret mqtt_password_dev
+#   birth_message:
+#   will_message:
 
 
 
 
 # Définition des lights
 light:
+  # LED RGB sur le mini c3 GPIO7
   - platform: neopixelbus
     type: GRB
     variant: WS2812
@@ -124,7 +122,7 @@ light:
     num_leds: 1
     name: "batrec_c3_1 RGB"
     id: batrec_c3_1_rgb
-
+    default_transition_length: 0s
 
 
 
@@ -135,15 +133,13 @@ switch:
 #    inverted: True
     id: led
     optimistic: true
-
-#    pin: GPIO9
     on_turn_on:
       - light.turn_on:
           id: batrec_c3_1_rgb
           brightness: 30%
-          red: 100%
+          red: 0%
           green: 0%
-          blue: 0%
+          blue: 100%
     on_turn_off:
       - light.turn_off:
           id: batrec_c3_1_rgb
@@ -151,14 +147,8 @@ switch:
   - platform: restart
     name: "batrec_c3_1 Restart"
 
-  - platform: shutdown
-    name: "batrec_c3_1 Shutdown"
-    id: batrec_c3_1_shutdown
-    internal: true
 
-
-
-# Définition du bouton physique
+# Définition du bouton physique sur le mini c3 GPIO9
 binary_sensor:
   - platform: gpio
     pin:
@@ -171,7 +161,6 @@ binary_sensor:
 
 
 
-
 # Définition des Sensors
 sensor:
   - platform: wifi_signal
@@ -181,6 +170,35 @@ sensor:
   - platform: uptime
     name: "batrec_c3_1 uptime"
     update_interval: 5s
+
+# valeur brute en volts de l'ADC0
+  - platform: adc
+    pin: GPIO0
+    name: "batrec_c3_1 ADC0 brut"
+    id: batrec_c3_1_adc0_brut
+    update_interval: 1s
+    unit_of_measurement: "V"
+    accuracy_decimals: 3
+
+# valeur brute en volts de l'ADC1
+  - platform: adc
+    pin: GPIO1
+    name: "batrec_c3_1 ADC1 brut"
+    id: batrec_c3_1_adc1_brut
+    update_interval: 1s
+    unit_of_measurement: "V"
+    accuracy_decimals: 3
+
+# valeur brute en volts de l'ADC2
+  - platform: adc
+    pin: GPIO2
+    name: "batrec_c3_1 ADC2 brut"
+    id: batrec_c3_1_adc2_brut
+    update_interval: 1s
+    unit_of_measurement: "V"
+    accuracy_decimals: 3
+
+
 
 
 # # valeur brute en volts de l'ADC
