@@ -5,7 +5,7 @@
 #-- Afin de pouvoir lire des tensions >3.3V, il y a un diviseur résistif R1/R2 de 270kR/12kR !
 #-- Il y a donc un facteur de correction de xx environ avec une plage de mesure de 0V à 56V
 #-- location: garage
-#-- zf230503.0112
+#-- zf230503.1350
 #--
 # sources: 
 # https://esphome.io/components/sensor/adc.html
@@ -189,24 +189,32 @@ sensor:
     update_interval: 1s
     unit_of_measurement: "V"
     accuracy_decimals: 3
+    filters:
+      - multiply: 23.504
 
 # valeur brute en volts de l'ADC1
   - platform: adc
     pin: GPIO1
+    attenuation: 11db
     name: "batrec_c3_1 ADC1 brut"
     id: batrec_c3_1_adc1_brut
     update_interval: 1s
     unit_of_measurement: "V"
     accuracy_decimals: 3
+    filters:
+      - multiply: 23.707
 
 # valeur brute en volts de l'ADC2
   - platform: adc
-    pin: GPIO2
+    pin: GPIO3
+    attenuation: 11db
     name: "batrec_c3_1 ADC2 brut"
     id: batrec_c3_1_adc2_brut
     update_interval: 1s
     unit_of_measurement: "V"
     accuracy_decimals: 3
+    filters:
+      - multiply: 23.792
 
 
 
