@@ -1,0 +1,260 @@
+#------------------------------
+#-- batrec_nodemcu_1.yaml
+#-- Petit code pour monitorer plusieurs batteries branchées en série
+#-- La mesure se fait avec un ADC/i2C et NodeMCU blindé
+#-- Afin de pouvoir lire des tensions >2.048V, il y a un diviseur résistif R1/R2 de 270kR/12kR (24.6x) pour arriver à 42V -> 1.78V !
+#-- Il y a donc un facteur de correction de xx environ avec une plage de mesure de 0V à 42V
+#-- location: garage
+#-- zf230504.2251
+#--
+# sources: 
+# EspHome convertisseur ADC ADS1115: https://esphome.io/components/sensor/ads1115.html
+# https://www.digikey.fr/fr/resources/conversion-calculators/conversion-calculator-voltage-divider
+
+esphome:
+  name: batrec_nodemcu_1
+  platform: ESP8266
+  board: nodemcuv2
+  on_boot:
+  - switch.turn_on: batrec_nodemcu_1_led
+  - delay: 1s
+  - switch.turn_off: batrec_nodemcu_1_led
+  - delay: 1s
+  - switch.turn_on: batrec_nodemcu_1_led
+  - delay: 1s
+  - switch.turn_off: batrec_nodemcu_1_led
+
+
+# Configuration WIFI
+wifi:
+  reboot_timeout: 5min
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "batrec_nodemcu_1 Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+#  level: DEBUG
+  level: VERBOSE
+  # logs:
+  #   logger: INFO
+  #   adc: INFO
+  #   captive_portal: INFO
+  #   deep_sleep: INFO
+  #   htu21d: INFO
+  #   i2c: INFO
+  #   ota: INFO
+  #   restart: INFO
+  #   sensor: INFO
+  #   switch: INFO
+  #   switch.gpio: INFO
+  #   uptime.sensor: INFO
+  #   web_server: INFO
+  #   wifi_signal.sensor: INFO
+  #   mqtt: INFO
+  #   mqtt.component: INFO
+  #   mqtt.client: INFO
+  #   mqtt.switch: INFO
+  #   mqtt.sensor: INFO
+
+# Enable Home Assistant API
+api:
+ password: !secret api_password
+
+ota:
+  password: !secret ota_password
+
+# WEB Server
+web_server:
+  port: 80
+
+# # MQTT server
+# mqtt:
+#   broker:  !secret mqtt_server_dev
+#   port:  !secret mqtt_port_dev
+#   username:  !secret mqtt_user_dev
+#   password:  !secret mqtt_password_dev
+#   birth_message:
+#   will_message:
+
+
+i2c:
+  sda: D2
+  scl: D1
+  scan: False
+
+
+ads1115:
+  - address: 0x48
+#    continuous_mode: True
+
+
+
+
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "batrec_nodemcu_1 LED"
+    inverted: True
+    id: batrec_nodemcu_1_led
+    pin: D4
+
+  - platform: restart
+    name: "batrec_nodemcu_1 Restart"
+
+
+# Définition du bouton physique sur le mini c3 GPIO9
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D3
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "batrec_nodemcu_1 button"
+    on_press:
+      - switch.toggle: batrec_nodemcu_1_led
+
+
+
+# Définition des Sensors
+sensor:
+  - platform: wifi_signal
+    name: "batrec_nodemcu_1 Signal Wi-Fi"
+    update_interval: 5s
+
+  - platform: uptime
+    name: "batrec_nodemcu_1 uptime"
+    update_interval: 5s
+
+  - platform: ads1115
+    name: "batrec_nodemcu_1-A0"
+    multiplexer: 'A0_GND'
+    gain: 2.048
+    accuracy_decimals: 3
+    update_interval: 1s
+    unit_of_measurement: "V"
+    icon: "mdi:battery-charging-100"
+    # filters:
+    # - calibrate_polynomial:
+    #     degree: 3
+    #     datapoints:
+    #       - 0.17 -> 0.35
+    #       - 1.04 -> 1.30
+    #       - 2.30 -> 5.13
+    #       - 3.25 -> 10.24
+    # - lambda: |-
+    #     if (x <= 0.32) {
+    #       return 0.0;
+    #     } else {
+    #       return x;
+    #     }
+
+  - platform: ads1115
+    name: "batrec_nodemcu_1-A1"
+    multiplexer: 'A1_GND'
+    gain: 2.048
+    accuracy_decimals: 3
+    update_interval: 1s
+    unit_of_measurement: "V"
+    icon: "mdi:battery-charging-100"
+    # filters:
+    # - calibrate_polynomial:
+    #     degree: 3
+    #     datapoints:
+    #       - 0.06 -> 0.35
+    #       - 0.74 -> 1.30
+    #       - 2.11 -> 5.13
+    #       - 3.00 -> 10.24
+    # - lambda: |-
+    #     if (x <= 0.29) {
+    #       return 0.0;
+    #     } else {
+    #       return x;
+    #     }
+
+  - platform: ads1115
+    name: "batrec_nodemcu_1-A2"
+    multiplexer: 'A2_GND'
+    gain: 2.048
+    accuracy_decimals: 3
+    update_interval: 1s
+    unit_of_measurement: "V"
+    icon: "mdi:battery-charging-100"
+    # filters:
+    # - calibrate_polynomial:
+    #     degree: 3
+    #     datapoints:
+    #       - 0.07 -> 0.35
+    #       - 0.72 -> 1.30
+    #       - 2.08 -> 5.13
+    #       - 3.00 -> 10.24
+    # - lambda: |-
+    #     if (x <= 0.27) {
+    #       return 0.0;
+    #     } else {
+    #       return x;
+    #     }
+
+  # - platform: ads1115
+  #   name: "batrec_nodemcu_1-A3"
+  #   multiplexer: 'A3_GND'
+  #   gain: 2.048
+  #   accuracy_decimals: 3
+  #   update_interval: 1s
+  #   unit_of_measurement: "V"
+  #   icon: "mdi:battery-charging-100"
+  #   # filters:
+  #   # - calibrate_polynomial:
+  #   #     degree: 3
+  #   #     datapoints:
+  #   #       - 0.09 -> 0.35
+  #   #       - 0.83 -> 1.30
+  #   #       - 2.09 -> 5.13
+  #   #       - 3.00 -> 10.24
+  #   # - lambda: |-
+  #   #     if (x <= 0.29) {
+  #   #       return 0.0;
+  #   #     } else {
+  #   #       return x;
+  #   #     }
+
+
+
+
+
+# Définition des Sensors text
+text_sensor:
+  - platform: version
+    name: "batrec_nodemcu_1 Version 2218"
+
+  - platform: wifi_info
+    ip_address:
+      name: batrec_nodemcu_1 IP Address
+      id: wifi_ip
+    ssid:
+      name: batrec_nodemcu_1 Connected SSID
+      id: wifi_ssid
+
+
+# Définition des inputs numbers
+number:
+  - platform: template
+    name: "batrec_nodemcu_1 consigne alarme low"
+    id: batrec_nodemcu_1_consigne_alarme_low
+    restore_value: true
+    optimistic: true
+    mode: box
+    min_value: 0.0
+    max_value: 0.8
+    step: 0.01
+    initial_value: 0.4
+    unit_of_measurement: "V"
+
+
