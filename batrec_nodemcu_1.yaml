@@ -2,10 +2,10 @@
 #-- batrec_nodemcu_1.yaml
 #-- Petit code pour monitorer plusieurs batteries branchées en série
 #-- La mesure se fait avec un ADC/i2C et NodeMCU blindé
-#-- Afin de pouvoir lire des tensions >2.048V, il y a un diviseur résistif R1/R2 de 270kR/12kR (24.6x) pour arriver à 42V -> 1.78V !
-#-- Il y a donc un facteur de correction de xx environ avec une plage de mesure de 0V à 42V
+#-- Afin de pouvoir lire des tensions >2.048V, il y a un diviseur résistif R1/R2 de 270kR/12kR pour arriver à 42V -> 1.78V !
+#-- Il y a donc un facteur de correction de 24x environ avec une plage de mesure de 0V à 42V
 #-- location: garage
-#-- zf230504.2301
+#-- zf230504.2328
 #--
 # sources: 
 # EspHome convertisseur ADC ADS1115: https://esphome.io/components/sensor/ads1115.html
@@ -84,18 +84,17 @@ web_server:
 #   will_message:
 
 
+# Définition de l'I2C
 i2c:
   sda: D2
   scl: D1
   scan: False
 
 
+# Définition de convertisseur analogique digital
 ads1115:
   - address: 0x48
 #    continuous_mode: True
-
-
-
 
 
 # Définition des Switch's
@@ -122,7 +121,6 @@ binary_sensor:
       - switch.toggle: batrec_nodemcu_1_led
 
 
-
 # Définition des Sensors
 sensor:
   - platform: wifi_signal
@@ -133,106 +131,74 @@ sensor:
     name: "batrec_nodemcu_1 uptime"
     update_interval: 5s
 
+# valeur en volts de l'ADC0
   - platform: ads1115
-    name: "batrec_nodemcu_1-A0"
+    name: "batrec_nodemcu_1_ADC0"
+    id: batrec_nodemcu_1_ADC0
     multiplexer: 'A0_GND'
     gain: 2.048
     accuracy_decimals: 3
     update_interval: 1s
     unit_of_measurement: "V"
-    icon: "mdi:battery-charging-100"
+    icon: "mdi:gauge"
     filters:
       - multiply: 23.753
-    # filters:
-    # - calibrate_polynomial:
-    #     degree: 3
-    #     datapoints:
-    #       - 0.17 -> 0.35
-    #       - 1.04 -> 1.30
-    #       - 2.30 -> 5.13
-    #       - 3.25 -> 10.24
-    # - lambda: |-
-    #     if (x <= 0.32) {
-    #       return 0.0;
-    #     } else {
-    #       return x;
-    #     }
 
+# valeur en volts de l'ADC1
   - platform: ads1115
-    name: "batrec_nodemcu_1-A1"
+    name: "batrec_nodemcu_1_ADC1"
+    id: batrec_nodemcu_1_ADC1
     multiplexer: 'A1_GND'
     gain: 2.048
     accuracy_decimals: 3
     update_interval: 1s
     unit_of_measurement: "V"
-    icon: "mdi:battery-charging-100"
+    icon: "mdi:gauge"
     filters:
       - multiply: 23.809
-    # filters:
-    # - calibrate_polynomial:
-    #     degree: 3
-    #     datapoints:
-    #       - 0.06 -> 0.35
-    #       - 0.74 -> 1.30
-    #       - 2.11 -> 5.13
-    #       - 3.00 -> 10.24
-    # - lambda: |-
-    #     if (x <= 0.29) {
-    #       return 0.0;
-    #     } else {
-    #       return x;
-    #     }
 
+# valeur en volts de l'ADC2
   - platform: ads1115
-    name: "batrec_nodemcu_1-A2"
+    name: "batrec_nodemcu_1_ADC2"
+    id: batrec_nodemcu_1_ADC2
     multiplexer: 'A2_GND'
     gain: 2.048
     accuracy_decimals: 3
     update_interval: 1s
     unit_of_measurement: "V"
-    icon: "mdi:battery-charging-100"
+    icon: "mdi:gauge"
     filters:
       - multiply: 23.715
-    # filters:
-    # - calibrate_polynomial:
-    #     degree: 3
-    #     datapoints:
-    #       - 0.07 -> 0.35
-    #       - 0.72 -> 1.30
-    #       - 2.08 -> 5.13
-    #       - 3.00 -> 10.24
-    # - lambda: |-
-    #     if (x <= 0.27) {
-    #       return 0.0;
-    #     } else {
-    #       return x;
-    #     }
 
-  # - platform: ads1115
-  #   name: "batrec_nodemcu_1-A3"
-  #   multiplexer: 'A3_GND'
-  #   gain: 2.048
-  #   accuracy_decimals: 3
-  #   update_interval: 1s
-  #   unit_of_measurement: "V"
-  #   icon: "mdi:battery-charging-100"
-  #   # filters:
-  #   # - calibrate_polynomial:
-  #   #     degree: 3
-  #   #     datapoints:
-  #   #       - 0.09 -> 0.35
-  #   #       - 0.83 -> 1.30
-  #   #       - 2.09 -> 5.13
-  #   #       - 3.00 -> 10.24
-  #   # - lambda: |-
-  #   #     if (x <= 0.29) {
-  #   #       return 0.0;
-  #   #     } else {
-  #   #       return x;
-  #   #     }
+# valeur en volts de la batterie 1
+  - platform: template
+    name: "batrec_nodemcu_1_BAT1"
+    id: batrec_nodemcu_1_BAT1
+    accuracy_decimals: 2
+    unit_of_measurement: "V"
+    icon: "mdi:battery-charging-100"
+    lambda: 'return (id(batrec_nodemcu_1_ADC0).state - 0);'
+    update_interval: 1s
 
+# valeur en volts de la batterie 2
+  - platform: template
+    name: "batrec_nodemcu_1_BAT2"
+    id: batrec_nodemcu_1_BAT2
+    accuracy_decimals: 2
+    unit_of_measurement: "V"
+    icon: "mdi:battery-charging-100"
+    lambda: 'return (id(batrec_nodemcu_1_ADC1).state - id(batrec_nodemcu_1_ADC0).state);'
+    update_interval: 1s
 
-
+# valeur en volts de la batterie 3
+  - platform: template
+    name: "batrec_nodemcu_1_BAT3"
+    id: batrec_nodemcu_1_BAT3
+    accuracy_decimals: 2
+    unit_of_measurement: "V"
+    icon: "mdi:battery-charging-100"
+    lambda: 'return (id(batrec_nodemcu_1_ADC2).state - id(batrec_nodemcu_1_ADC1).state);'
+    update_interval: 1s
 
 
 # Définition des Sensors text
