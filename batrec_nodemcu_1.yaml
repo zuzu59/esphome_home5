@@ -5,7 +5,7 @@
 #-- Afin de pouvoir lire des tensions >2.048V, il y a un diviseur résistif R1/R2 de 270kR/12kR (24.6x) pour arriver à 42V -> 1.78V !
 #-- Il y a donc un facteur de correction de xx environ avec une plage de mesure de 0V à 42V
 #-- location: garage
-#-- zf230504.2251
+#-- zf230504.2301
 #--
 # sources: 
 # EspHome convertisseur ADC ADS1115: https://esphome.io/components/sensor/ads1115.html
@@ -141,6 +141,8 @@ sensor:
     update_interval: 1s
     unit_of_measurement: "V"
     icon: "mdi:battery-charging-100"
+    filters:
+      - multiply: 23.753
     # filters:
     # - calibrate_polynomial:
     #     degree: 3
@@ -164,6 +166,8 @@ sensor:
     update_interval: 1s
     unit_of_measurement: "V"
     icon: "mdi:battery-charging-100"
+    filters:
+      - multiply: 23.809
     # filters:
     # - calibrate_polynomial:
     #     degree: 3
@@ -187,6 +191,8 @@ sensor:
     update_interval: 1s
     unit_of_measurement: "V"
     icon: "mdi:battery-charging-100"
+    filters:
+      - multiply: 23.715
     # filters:
     # - calibrate_polynomial:
     #     degree: 3
