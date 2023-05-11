@@ -2,7 +2,7 @@
 #-- th2.yaml
 #-- Petit code pour monitorer la température et l'humidité dans une pièce ainsi que la luminosité
 #-- location: garage porte nord
-#-- zf230219.2334, zf230307.0833
+#-- zf230219.2334, zf230511.2300
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -87,7 +87,7 @@ switch:
 sensor:
   - platform: wifi_signal
     name: "th2 Signal Wi-Fi"
-    update_interval: 60s
+    update_interval: 5s
 
   - platform: uptime
     name: "th2 uptime"
@@ -98,7 +98,7 @@ sensor:
       name: "th2 Température"
     humidity:
       name: "th2 Humidité"
-    update_interval: 60s
+    update_interval: 15s
 
 # valeur brute en volts de la photo résistance
   - platform: adc
