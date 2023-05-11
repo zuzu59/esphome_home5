@@ -2,8 +2,8 @@
 #-- co2_72.yaml
 #-- Petit code mini minimaliste pour mesurer le COV et eCO2
 #-- Lit COV et eCO2 du capteur ccs811
-#-- location: chambre à Chloé carton vers mur
-#-- zf210720.1033, zf230219.2332
+#-- location: hall rez sous le meuble
+#-- zf210720.1033, zf230511.2244
 #--
 
 
