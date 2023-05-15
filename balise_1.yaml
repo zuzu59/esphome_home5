@@ -6,7 +6,7 @@
 #-- Il faut publier sur mqtt 'balise_1/switch/balise_1_led/command' = ON/OFF pour allumer/éteindre la LED !
 #
 #-- location: St-Luc douche tout à gauche en entrant
-#-- zf221010.1016, zf230515.0843
+#-- zf221010.1016, zf230515.0931
 #--
 # sources: 
 # ...
@@ -83,10 +83,10 @@ web_server:
 
 # MQTT server
 mqtt:
-  broker:  !secret mqtt_server_dev
-  port:  !secret mqtt_port_dev
-  username:  !secret mqtt_user_dev
-  password:  !secret mqtt_password_dev
+  broker:  !secret mqtt_server_dev_externe
+  port:  !secret mqtt_port_dev_externe
+  username:  !secret mqtt_user_dev_externe
+  password:  !secret mqtt_password_dev_externe
 
 
 # I2C conf
@@ -124,8 +124,7 @@ sensor:
 # Sensors text
 text_sensor:
   - platform: version
-    name: "balise_1 Version 1233"
-
+    name: "balise_1 Version 0934"
   - platform: wifi_info
     ip_address:
       name: balise_1 IP Address
