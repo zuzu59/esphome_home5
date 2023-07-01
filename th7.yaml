@@ -1,46 +1,22 @@
 #------------------------------
 #-- th7.yaml
-#-- Petit code mini manilste pour mesurer la température et l'humidité
-#-- Lit la tmpérature et l'humidité du capteur HTU21D
+#-- Petit code pour monitorer la température et l'humidité dans une pièce
 #-- location: hall rez
-#-- zf210720.1023, zf220302.1155, zf221106.1300
+#-- zf2300701.1527
 #--
-
-
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
 
-
 esphome:
   name: th7
-  platform: ESP8266
-  board: nodemcuv2
+
+esp8266:
+  board: d1_mini
 
 # Configuration WIFI
 wifi:
-  ssid: !secret wifi_ssid_apzuzu7
-  password: !secret wifi_pass_apzuzu7
-
-  # networks:
-  
-  #   - ssid: !secret wifi_ssid_apzuzu7
-  #   - password: !secret wifi_pass_apzuzu7
-    
-  #   - ssid: !secret wifi_ssid_apzuzu6
-  #   - password: !secret wifi_pass_apzuzu6
-
-  #   - ssid: !secret wifi_ssid_3G_zf
-  #   - password: !secret wifi_pass_3G_zf2
-    
-  #   - ssid: !secret wifi_ssid_3G_zf2
-  #   - password: !secret wifi_pass_3G_zf2
-    
-  #   - ssid: !secret wifi_ssid_3g_s7
-  #   - password: !secret wifi_pass_3g_s7
-    
-  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
-  #   - password: !secret wifi_pass_apzuzu6_EXT
-
+  ssid: !secret wifi_ssid_apzuzu8
+  password: !secret wifi_pass_apzuzu8
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
@@ -51,14 +27,47 @@ captive_portal:
 
 # Enable logging
 logger:
-    level: VERBOSE
+  level: DEBUG
+  logs:
+    logger: INFO
+    adc: INFO
+    captive_portal: INFO
+    deep_sleep: INFO
+    htu21d: INFO
+    i2c: INFO
+    ota: INFO
+    restart: INFO
+    sensor: INFO
+    switch: INFO
+    switch.gpio: INFO
+    uptime.sensor: INFO
+    web_server: INFO
+    wifi_signal.sensor: INFO
+    mqtt: INFO
+    mqtt.component: INFO
+    mqtt.client: INFO
+    mqtt.switch: INFO
+    mqtt.sensor: INFO
 
 # Enable Home Assistant API
 api:
-  password: !secret api_password
+#  password: !secret api_password
+  encryption:
+    key: !secret api_encryption_key
 
 ota:
   password: !secret ota_password
+
+# WEB Server
+web_server:
+  port: 80
+
+
+# I2C conf
+i2c:
+  sda: D2
+  scl: D1
+
 
 # Définition des Switch's
 switch:
@@ -71,30 +80,8 @@ switch:
   - platform: restart
     name: "th7 Restart"
 
-# Définition du bouton physique
-binary_sensor:
-  - platform: gpio
-    pin:
-      number: D3
-      mode: INPUT_PULLUP
-      inverted: True
-    name: "th7 button"
-    on_press:
-      - switch.toggle: led
 
-# WEB Server
-web_server:
-  port: 80
-
-
-
-
-# I2C conf
-i2c:
-  sda: D5
-  scl: D6
-
-# Sensors
+# Définition des Sensors
 sensor:
   - platform: wifi_signal
     name: "th7 Signal Wi-Fi"
@@ -109,12 +96,13 @@ sensor:
       name: "th7 Température"
     humidity:
       name: "th7 Humidité"
-    update_interval: 15s
+    update_interval: 2s
 
-# Sensors text
+
+# Définition des Sensors text
 text_sensor:
   - platform: version
-    name: "th7 Version"
+    name: "th7 Version 1518"
 
   - platform: wifi_info
     ip_address:
@@ -123,4 +111,5 @@ text_sensor:
     ssid:
       name: th7 Connected SSID
       id: wifi_ssid
+
 
