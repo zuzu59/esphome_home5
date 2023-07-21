@@ -5,7 +5,7 @@
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- calibration VCC diode: lambda: return id(th10_1_vcc_voltage).state + 1.258 ;
-#-- zf23071606
+#-- zf230721.1124
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -194,7 +194,7 @@ sensor:
               args: [ 'id(th10_1_temperature).state' , 'id(last_value_temp)' ]
           - if:
               condition:
-                lambda: 'return abs( id(th10_1_temperature).state - id(last_value_temp) ) > 0.30 ;'
+                lambda: 'return abs( id(th10_1_temperature).state - id(last_value_temp) ) > 0.10 ;'
               then:
                 - logger.log: "c'est plus grand je la change !"
                 - globals.set:
