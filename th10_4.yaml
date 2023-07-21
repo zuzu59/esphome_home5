@@ -5,7 +5,7 @@
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- calibration VCC diode: lambda: return id(th10_4_vcc_voltage).state + 1.258 ;
-#-- zf230721.1127
+#-- zf230721.1310
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -26,8 +26,8 @@ esp8266:
 # Configuration WIFI
 wifi:
   fast_connect: true
-  ssid: !secret wifi_ssid_apzuzu7
-  password: !secret wifi_pass_apzuzu7
+  ssid: !secret wifi_ssid_apzuzu8
+  password: !secret wifi_pass_apzuzu8
   # manual_ip:
   #   static_ip: 192.168.0.201
   #   gateway: 192.168.0.51
@@ -186,6 +186,8 @@ sensor:
     temperature:
       name: "th10_4 Température"
       id: th10_4_temperature
+      filters:
+        - offset: +0.1
 
       on_value:
         then:
