@@ -1,10 +1,13 @@
 #------------------------------
 #-- a_master_c3_oled.yaml
 #-- Petit code générique minimaliste pour des projets à base d'esp32-c3-oled
-#-- ATTENTION: je ne sais pas pourquoi mais il faut le flasher via web.esphome.io (maintenir la touche BOOT pendant le RESET), via le port USB en ESPHOME cela ne fonctionne pas !
-#-- REMARQUE: je ne sais pas pourquoi la luminosité du display OLED est très très faible !
+#-- ATTENTION: je ne sais pas pourquoi mais il faut le flasher via https://web.esphome.io (maintenir la touche BOOT pendant le RESET), via le port USB en ESPHOME cela ne fonctionne pas !
+#-- 
+#-- REMARQUE: au 29 décembre 2022, je ne sais pas pourquoi la luminosité du display OLED est très très faible !
+#-- REMARQUE2: au 28 juillet 2023, il n'y a plus le problème de luminosité, par contre on affiche en négatif !
+#-- 
 #-- location: xxx
-#-- zf221229.1836
+#-- zf221229.1836, zf230728.2256
 #--
 # sources: 
 # https://github.com/01Space/ESP32-C3-0.42LCD
@@ -32,29 +35,8 @@ esp32:
 
 # Configuration WIFI
 wifi:
-  ssid: !secret wifi_ssid_3g_s7
-  password: !secret wifi_pass_3g_s7
-
-  # networks:
-  
-  #   - ssid: !secret wifi_ssid_apzuzu7
-  #   - password: !secret wifi_pass_apzuzu7
-    
-  #   - ssid: !secret wifi_ssid_apzuzu6
-  #   - password: !secret wifi_pass_apzuzu6
-
-  #   - ssid: !secret wifi_ssid_3G_zf
-  #   - password: !secret wifi_pass_3G_zf2
-    
-  #   - ssid: !secret wifi_ssid_3G_zf2
-  #   - password: !secret wifi_pass_3G_zf2
-    
-  #   - ssid: !secret wifi_ssid_3g_s7
-  #   - password: !secret wifi_pass_3g_s7
-    
-  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
-  #   - password: !secret wifi_pass_apzuzu6_EXT
-
+  ssid: !secret wifi_ssid_3G_zf2
+  password: !secret wifi_pass_3G_zf2
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
@@ -168,10 +150,12 @@ i2c:
   frequency: 200kHz
 
 display:
+# https://github.com/01Space/ESP32-C3-0.42LCD
 # http://www.esp8266learning.com/wemos-oled-shield-example.php
 # https://esphome.io/api/namespaceesphome_1_1display.html
   - platform: ssd1306_i2c
-    model: "SSD1306 64x48"
+    #model: "SSD1306 64x48"
+    model: "SSD1306 72x40"
     address: 0x3C
     invert: true
     update_interval: 3s
@@ -183,11 +167,12 @@ display:
       //it.fill(COLOR_OFF);
 
       // For example, draw a line from [x=0,y=0] to [x=50,y=50]
-      it.line(0, 0, 50, 50);
+      it.line(0, 0, 72, 40);
 
       
       // Print "Hello Zuzu" for fonts tests in top center.
-      it.print(32, 20, id(font2), TextAlign::TOP_CENTER, "Hello 3400");
+      it.print(36, 5, id(font2), TextAlign::TOP_CENTER, "Hello Zuzu");
+      it.print(36, 20, id(font2), TextAlign::TOP_CENTER, "Ca marche !");
 
 
 
