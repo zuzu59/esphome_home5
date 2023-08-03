@@ -5,7 +5,7 @@
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- calibration VCC diode: lambda: return id(th10_vcc_voltage).state + 1.258 ;
-#-- zf230721.1310
+#-- zf230721.1310, zf230803.1209
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -14,11 +14,8 @@
 esphome:
   name: th10
   on_boot:
-   - switch.turn_on: led
-   - switch.turn_on: th10_power_htu21d
-   - delay: 0.5s
-#   - switch.turn_off: led
-
+#   - switch.turn_on: led
+   - switch.turn_off: led
 
 esp8266:
   board: d1_mini
@@ -26,16 +23,14 @@ esp8266:
 # Configuration WIFI
 wifi:
   fast_connect: true
-  ssid: !secret wifi_ssid_apzuzu8
-  password: !secret wifi_pass_apzuzu8
-  # manual_ip:
-  #   static_ip: 192.168.0.201
-  #   gateway: 192.168.0.51
-  #   dns1: 192.168.0.51
-  #   dns2: 8.8.8.8
-  #   subnet: 255.255.255.0
-
-
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
+  manual_ip:
+    static_ip: 192.168.0.201
+    gateway: 192.168.0.51
+    dns1: 192.168.0.51
+    dns2: 8.8.8.8
+    subnet: 255.255.255.0
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
@@ -93,16 +88,7 @@ mqtt:
 i2c:
   sda: D2
   scl: D1
-  scan: false
 #  frequency: 10khz
-
-
-# Définition des Globals variables
-globals:
-   - id: last_value_temp
-     type: float
-     restore_value: yes
-     initial_value: '20.0'
 
 
 # Définition des Switch's
@@ -112,12 +98,6 @@ switch:
     inverted: True
     id: led
     pin: D4
-
-  - platform: gpio
-    name: "th10 power htu21d"
-#    inverted: True
-    id: th10_power_htu21d
-    pin: D5
 
   - platform: restart
     name: "th10 Restart"
@@ -158,13 +138,12 @@ sensor:
           mqtt.connected:
         then:
           - logger.log: Je suis connecté sur le mqtt et j'envoie la sauce !
-          #- delay: 1s
+          - delay: 0.1s
           - if:
               condition:
                 lambda: 'return id(th10_sleep_mode).state == 1;'
               then:
                 - logger.log: On me demande de dormir !
-                - delay: 1s
                 - deep_sleep.enter: deep_sleep_1
         else:
           - logger.log: Erreur 007 *********************************************************
@@ -177,55 +156,18 @@ sensor:
 
   - platform: uptime
     name: "th10 uptime"
-    update_interval: 2s
+    update_interval: 15s
 
 # température et humidité
   - platform: htu21d
-    update_interval: 12s
-
     temperature:
       name: "th10 Température"
-      id: th10_temperature
       filters:
         - offset: -0.0
-
-      on_value:
-        then:
-          - logger.log:
-              format: "La température est à %.1f et la globale variable est à %.1f"
-              args: [ 'id(th10_temperature).state' , 'id(last_value_temp)' ]
-          - if:
-              condition:
-                lambda: 'return abs( id(th10_temperature).state - id(last_value_temp) ) > 0.10 ;'
-              then:
-                - logger.log: "c'est plus grand je la change !"
-                - globals.set:
-                    id: last_value_temp
-                    value: !lambda 'return id(th10_temperature).state;'
-              else:
-                # - logger.log: c'est plus petit je ne fais rien !
-                # - delay: 0.3s
-                - if:
-                    condition:
-                      lambda: 'return id(th10_sleep_mode).state == 1;'
-                    then:
-                      # - logger.log: On me demande de dormir !
-                      # - delay: 0.3s
-                      - deep_sleep.enter: deep_sleep_1
-
-
-
-
-
-
-
-
-
-
-
     humidity:
       name: "th10 Humidité"
 #      accuracy_decimals: 0
+    update_interval: 15s
 
 # tension VCC à l'intérieur de l'ESP
   - platform: adc
@@ -247,7 +189,7 @@ sensor:
     on_value:
       then:
         - script.execute: my_bms
-    lambda: return id(th10_vcc_voltage).state + 1.352 ;
+    lambda: return id(th10_vcc_voltage).state + 1.375 ;
  
 # capacité de la batterie
   - platform: template
@@ -259,7 +201,7 @@ sensor:
     filters:
       - calibrate_linear:
           - 3.4 -> 0.0
-          - 4.0 -> 100.0
+          - 4.1 -> 100.0
       # filtre la valeur minimale
       - lambda: |-
           if (x >= 0) 
@@ -302,6 +244,5 @@ text_sensor:
 # Deep Sleep
 deep_sleep:
 #  run_duration: 5s
-  sleep_duration: 60s
-#  sleep_duration: 5s
+  sleep_duration: 300s
   id: deep_sleep_1

@@ -4,7 +4,8 @@
 #-- location: salon
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- zf221207.0919
+#-- calibration VCC diode: lambda: return id(th10_vcc_voltage).state + 1.285 -0.032 ;
+#-- zf221207.0919, zf230803.1422
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -16,42 +17,20 @@ esphome:
 #   - switch.turn_on: led
    - switch.turn_off: led
 
-
 esp8266:
   board: d1_mini
 
 # Configuration WIFI
 wifi:
   fast_connect: true
-  ssid: !secret wifi_ssid_apzuzu6
-  password: !secret wifi_pass_apzuzu6
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
   manual_ip:
     static_ip: 192.168.0.202
     gateway: 192.168.0.51
     dns1: 192.168.0.51
     dns2: 8.8.8.8
     subnet: 255.255.255.0
-
-  # networks:
-  
-  #   - ssid: !secret wifi_ssid_apzuzu7
-  #   - password: !secret wifi_pass_apzuzu7
-    
-  #   - ssid: !secret wifi_ssid_apzuzu6
-  #   - password: !secret wifi_pass_apzuzu6
-
-  #   - ssid: !secret wifi_ssid_3G_zf
-  #   - password: !secret wifi_pass_3G_zf2
-    
-  #   - ssid: !secret wifi_ssid_3G_zf2
-  #   - password: !secret wifi_pass_3G_zf2
-    
-  #   - ssid: !secret wifi_ssid_3g_s7
-  #   - password: !secret wifi_pass_3g_s7
-    
-  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
-  #   - password: !secret wifi_pass_apzuzu6_EXT
-
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
@@ -183,6 +162,8 @@ sensor:
   - platform: htu21d
     temperature:
       name: "th3 Température"
+      filters:
+        - offset: -0.4
     humidity:
       name: "th3 Humidité"
 #      accuracy_decimals: 0
@@ -208,7 +189,7 @@ sensor:
     on_value:
       then:
         - script.execute: my_bms
-    lambda: return id(th3_vcc_voltage).state + 1.285 -0.032 ;
+    lambda: return id(th3_vcc_voltage).state + 1.401 ;
  
 # capacité de la batterie
   - platform: template
@@ -263,5 +244,5 @@ text_sensor:
 # Deep Sleep
 deep_sleep:
 #  run_duration: 5s
-  sleep_duration: 120s
+  sleep_duration: 300s
   id: deep_sleep_1
