@@ -4,8 +4,8 @@
 #-- location: salle de douche
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- calibration VCC diode: lambda: return id(th10_vcc_voltage).state + 1.258 ;
-#-- zf230721.1310, zf230803.1209
+#-- calibration VCC diode: 192     lambda: return id(th10_vcc_voltage).state + 1.375 ;
+#-- zf230721.1310, zf230803.1446
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
