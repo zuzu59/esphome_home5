@@ -2,10 +2,17 @@
 #-- switch_12v_1.yaml
 #-- Petit code pour piloter un petit relais 12V depuis ha à base de mini d1
 #-- le relais est branché sur D1 !
+#-- ATTENTION, avec un relais 5V sans optocoupleur, il faut mettre 3x diodes en série sur la 
+#-- commande du relais pour adapter le 3.3V de l'ESP au 5V du relais !
+#-- Lit le port ADC0 afin d'avoir l'état de la batterie en temps réel sur home assistant
+#-- Afin de pouvoir lire des tensions >3.3V, il y a un diviseur résistif R1/R2 de 10kR/1kR !
+#-- Il y a donc un facteur de correction de 11 environ avec une plage de mesure de 0V à 36V
 #-- location: dehors pour la fontaine virtuelle pour le bruit de l'eau de fontaine
-#-- zf230820.1423
+#-- zf230821.1442
 #--
 # sources: 
+# https://www.digikey.fr/fr/resources/conversion-calculators/conversion-calculator-voltage-divider
+
 # ...
 
 esphome:
@@ -16,8 +23,8 @@ esp8266:
 
 # Configuration WIFI
 wifi:
-  ssid: !secret wifi_ssid_apzuzu8
-  password: !secret wifi_pass_apzuzu8
+  ssid: !secret wifi_ssid_apzuzu6
+  password: !secret wifi_pass_apzuzu6
 
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
@@ -62,7 +69,6 @@ switch:
     pin: D1
 
 
-
 # Définition des Sensors
 sensor:
   - platform: wifi_signal
@@ -72,6 +78,51 @@ sensor:
   - platform: uptime
     name: "switch_12v_1 uptime"
     update_interval: 60s
+
+# valeur brute en volts de l'ADC
+  - platform: adc
+    pin: A0
+    name: "switch_12v_1 ADC brut"
+    id: switch_12v_1_adc_brut
+    update_interval: 10s
+    unit_of_measurement: "V"
+    accuracy_decimals: 3
+
+# valeur corrigée en volts de l'ADC
+  - platform: template
+    name: "switch_12v_1 ADC Voltage"
+    id: switch_12v_1_adc_voltage
+    update_interval: 10s
+    unit_of_measurement: "V"
+    accuracy_decimals: 2
+    lambda: return id(switch_12v_1_adc_brut).state ;
+    filters:
+    - multiply: 34.077
+    - offset: -0
+
+# capacité de la batterie
+  - platform: template
+    name: "switch_12v_1 BAT capacity"
+    update_interval: 10s
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    lambda: return id(switch_12v_1_adc_voltage).state ;
+    filters:
+      - calibrate_linear:
+          - 13.3 -> 0.0
+          - 14.5 -> 100.0
+      # filtre la valeur minimale
+      - lambda: |-
+          if (x >= 0) 
+            return x;
+          else 
+            return 0;
+      # filtre la valeur maximale
+      - lambda: |-
+          if (x <= 100) 
+            return x;
+          else 
+            return 100;
 
 
 # Définition des Sensors text
