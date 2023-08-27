@@ -6,7 +6,7 @@
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- calibration VCC diode: 193     lambda: return id(th10_vcc_voltage).state + 1.339 ;
 #-- calibration VCC diode: 167     - offset: -0.3
-#-- zf230721.1310, zf230822.1655
+#-- zf230721.1310, zf230827.2138
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -24,14 +24,14 @@ esp8266:
 # Configuration WIFI
 wifi:
   fast_connect: true
-  ssid: !secret wifi_ssid_apzuzu8
-  password: !secret wifi_pass_apzuzu8
-  manual_ip:
-    static_ip: 192.168.0.201
-    gateway: 192.168.0.51
-    dns1: 192.168.0.51
-    dns2: 8.8.8.8
-    subnet: 255.255.255.0
+  ssid: !secret wifi_ssid_apzuzu_domo1
+  password: !secret wifi_pass_apzuzu_domo1
+  # manual_ip:
+  #   static_ip: 192.168.0.201
+  #   gateway: 192.168.0.51
+  #   dns1: 192.168.0.51
+  #   dns2: 8.8.8.8
+  #   subnet: 255.255.255.0
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
