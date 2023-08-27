@@ -1,0 +1,175 @@
+#------------------------------
+#-- a_master_mqtt_ota.yaml
+#-- Petit code pour tester la possibilité de faire un 'pull' OTA via un serveur http depuis une requête mqtt
+#-- Cela serait très utile de pouvoir flasher via OTA des ESPhome qui ne se trouvent plus dans le réseau de ESPhome
+#-- Il faut publier sur mqtt 'a_master_mqtt_ota/switch/a_master_mqtt_ota_led/command' = ON/OFF pour allumer/éteindre la LED !
+#-- Il faut publier sur mqtt 'a_master_mqtt_ota/switch/firmware_update/command' = ON pour lancer l'OTA !
+#
+#-- location: bureau Chloé pour l'instant
+#-- zf230827.2342
+#--
+# sources: 
+# https://github.com/oarcher/piotech/tree/main/components/ota_http
+#
+# micro serveur python:
+#   python -m SimpleHTTPServer 8080 , pour python 2.x, mini serveur http web de ./
+#   python3 -m http.server 8080 , pour python 3.x, mini serveur http web de ./
+
+esphome:
+  name: a_master_mqtt_ota
+  on_boot:
+#  - switch.turn_off: led
+  - switch.turn_on: led
+
+esp8266:
+  board: d1_mini
+
+# Configuration WIFI
+wifi:
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
+
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "a_master_mqtt_ota Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+  level: DEBUG
+  logs:
+    logger: INFO
+    adc: INFO
+    captive_portal: INFO
+    deep_sleep: INFO
+    htu21d: INFO
+    i2c: INFO
+    ota: INFO
+    restart: INFO
+    sensor: INFO
+    switch: INFO
+    switch.gpio: INFO
+    uptime.sensor: INFO
+    web_server: INFO
+    wifi_signal.sensor: INFO
+    mqtt: INFO
+    mqtt.component: INFO
+    mqtt.client: INFO
+    mqtt.switch: INFO
+    mqtt.sensor: INFO
+
+
+# Enable Home Assistant API
+#api:
+#  password: !secret api_password
+
+ota:
+  password: !secret ota_password
+
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "a_master_mqtt_ota LED"
+    inverted: True
+    id: led
+    pin: D4
+
+  - platform: restart
+    name: "a_master_mqtt_ota Restart"
+
+
+
+  - platform: template
+    name: "Firmware update"
+    turn_on_action:
+      then:
+        - ota_http.flash:
+            url: http://192.168.0.138:8080/firmware.bin
+        - logger.log: "This message should be not displayed(reboot)"
+
+
+
+
+
+
+# WEB Server
+web_server:
+  port: 80
+
+
+# MQTT server
+mqtt:
+  broker:  !secret mqtt_server_dev_interne
+  port:  !secret mqtt_port_dev_interne
+  username:  !secret mqtt_user_dev_interne
+  password:  !secret mqtt_password_dev_interne
+
+
+# I2C conf
+i2c:
+  sda: D2
+  scl: D1
+#  frequency: 10khz
+
+
+# Sensors
+sensor:
+  - platform: wifi_signal
+    name: "a_master_mqtt_ota Signal Wi-Fi"
+    update_interval: 60s
+  - platform: uptime
+    name: "a_master_mqtt_ota uptime"
+    update_interval: 15s
+# température et humidité
+  - platform: htu21d
+    temperature:
+      name: "a_master_mqtt_ota Température"
+    humidity:
+      name: "a_master_mqtt_ota Humidité"
+#      accuracy_decimals: 0
+    update_interval: 15s
+# valeur brute en volts de l'ADC
+  - platform: adc
+    pin: VCC
+    name: "a_master_mqtt_ota brut en volts"
+    id: a_master_mqtt_ota_brut_en_volts
+    update_interval: 15s
+    unit_of_measurement: "V"
+
+
+# Sensors text
+text_sensor:
+  - platform: version
+    name: "a_master_mqtt_ota Version 235438"
+  - platform: wifi_info
+    ip_address:
+      name: a_master_mqtt_ota IP Address
+      id: wifi_ip
+    ssid:
+      name: a_master_mqtt_ota Connected SSID
+      id: wifi_ssid
+    scan_results:
+      name: a_master_mqtt_ota Latest Scan Results
+
+
+
+external_components:
+  - source: github://oarcher/piotech/
+
+
+ota_http:
+
+
+# button:
+#   - platform: template
+#     name: "Firmware update"
+#     on_press:
+#       then:
+#         - ota_http.flash:
+#             url: http://example.com/firmware.bin
+#         - logger.log: "This message should be not displayed(reboot)"
+
