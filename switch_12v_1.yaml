@@ -8,7 +8,7 @@
 #-- Afin de pouvoir lire des tensions >3.3V, il y a un diviseur résistif R1/R2 de 10kR/1kR !
 #-- Il y a donc un facteur de correction de 11 environ avec une plage de mesure de 0V à 36V
 #-- location: dehors pour la fontaine virtuelle pour le bruit de l'eau de fontaine
-#-- zf230821.1442
+#-- zf230822.0856
 #--
 # sources: 
 # https://www.digikey.fr/fr/resources/conversion-calculators/conversion-calculator-voltage-divider
@@ -109,8 +109,8 @@ sensor:
     lambda: return id(switch_12v_1_adc_voltage).state ;
     filters:
       - calibrate_linear:
-          - 13.3 -> 0.0
-          - 14.5 -> 100.0
+          - 9.9 -> 0.0
+          - 12.0 -> 100.0
       # filtre la valeur minimale
       - lambda: |-
           if (x >= 0) 
