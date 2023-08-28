@@ -1,0 +1,207 @@
+#------------------------------
+#-- batrec_d1_2.yaml
+#-- Petit code pour monitorer une batterie
+#-- Lit le port ADC0 et l'envoie sur un mqtt broker
+#-- Afin de pouvoir lire des tensions >3.3V, il y a un diviseur résistif R1/R2 de 150kR/8.2kR !
+#-- Il y a donc un facteur de correction de 62 environ avec une plage de mesure de 0V à 60V
+#-- location: garage
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
+#-- ATTENTION, comme il n'y a qu'un seul convertisseur ADC sur l'ESP8266, il n'y a plus la fonction BMS et indicateur de capacité !
+#-- zf230828.2253
+#--
+# sources: 
+# https://esphome.io/components/sensor/adc.html
+# https://www.digikey.fr/fr/resources/conversion-calculators/conversion-calculator-voltage-divider
+# Calcul de la durée sur une batterie: https://docs.google.com/spreadsheets/d/1I6s_R04LjGxCB0hrcvogGHNeITDwfXjM05hJhuqGkoU/edit#gid=1470557238
+
+esphome:
+  name: batrec_d1_2
+  on_boot:
+#  - switch.turn_off: led
+  - switch.turn_on: led
+
+esp8266:
+  board: d1_mini
+
+# Configuration WIFI
+wifi:
+  reboot_timeout: 5min
+  ssid: !secret wifi_ssid_apzuzu8
+  password: !secret wifi_pass_apzuzu8
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "batrec_d1_2 Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+  level: DEBUG
+  logs:
+    logger: INFO
+    adc: INFO
+    captive_portal: INFO
+    deep_sleep: INFO
+    htu21d: INFO
+    i2c: INFO
+    ota: INFO
+    restart: INFO
+    sensor: INFO
+    switch: INFO
+    switch.gpio: INFO
+    uptime.sensor: INFO
+    web_server: INFO
+    wifi_signal.sensor: INFO
+    mqtt: INFO
+    mqtt.component: INFO
+    mqtt.client: INFO
+    mqtt.switch: INFO
+    mqtt.sensor: INFO
+
+# # Enable Home Assistant API
+# api:
+#  key: !secret api_encryption_key
+
+ota:
+  password: !secret ota_password
+
+
+
+external_components:
+  - source: github://oarcher/piotech/
+
+ota_http:
+
+
+
+
+# WEB Server
+web_server:
+  port: 80
+
+# MQTT server
+mqtt:
+  broker:  !secret mqtt_server_dev_interne
+  port:  !secret mqtt_port_dev_interne
+  username:  !secret mqtt_user_dev_interne
+  password:  !secret mqtt_password_dev_interne
+  birth_message:
+  will_message:
+
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "batrec_d1_2 LED"
+    inverted: True
+    id: led
+    pin: D4
+
+  - platform: restart
+    name: "batrec_d1_2 Restart"
+
+  - platform: shutdown
+    name: "batrec_d1_2 Shutdown"
+    id: batrec_d1_2_shutdown
+    internal: true
+
+  - platform: template
+    name: "Firmware update"
+    turn_on_action:
+      then:
+        - ota_http.flash:
+            url: http://192.168.0.138:8080/batrec_d1_2.bin
+        - logger.log: "This message should be not displayed(reboot)"
+
+# Définition des Sensors
+sensor:
+  - platform: wifi_signal
+    name: "batrec_d1_2 Signal Wi-Fi"
+    update_interval: 15s
+    on_value:
+      if:
+        condition:
+          mqtt.connected:
+        then:
+          - logger.log: Je suis connected sur le mqtt et j'envoie la sauce !
+          - switch.turn_off: led
+          - delay: 1s
+          - switch.turn_on: led
+          - if:
+              condition:
+                lambda: 'return id(batrec_d1_2_sleep_mode).state == 1;'
+              then:
+                - delay: 1s
+                - logger.log: On me demande de dormir !
+                - deep_sleep.enter: deep_sleep_1
+        else:
+          - logger.log: Erreur 007 *********************************************************
+          - if:
+              condition:
+                lambda: 'return id(batrec_d1_2_sleep_mode).state == 1;'
+              then:
+                - delay: 1s
+                - logger.log: On me demande de dormir !
+                # - deep_sleep.enter: deep_sleep_1
+
+  - platform: uptime
+    name: "batrec_d1_2 uptime"
+    update_interval: 1s
+
+# valeur brute en volts de l'ADC
+  - platform: adc
+    pin: A0
+    name: "batrec_d1_2 ADC brut"
+    id: batrec_d1_2_adc_brut
+    update_interval: 1s
+    unit_of_measurement: "V"
+    accuracy_decimals: 3
+
+# valeur corrigée en volts de l'ADC
+  - platform: template
+    name: "batrec_d1_2 ADC Voltage"
+    id: batrec_d1_2_adc_voltage
+    update_interval: 1s
+    unit_of_measurement: "V"
+    accuracy_decimals: 2
+    lambda: return id(batrec_d1_2_adc_brut).state ;
+    filters:
+    - multiply: 62.03
+    - offset: -0.0
+
+
+# Définition des binary sensor
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D7
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "batrec_d1_2 sleep mode"
+    id: batrec_d1_2_sleep_mode
+
+
+# Définition des Sensors text
+text_sensor:
+  - platform: version
+    name: "batrec_d1_2 Version 1352"
+
+  - platform: wifi_info
+    ip_address:
+      name: batrec_d1_2 IP Address
+      id: wifi_ip
+    ssid:
+      name: batrec_d1_2 Connected SSID
+      id: wifi_ssid
+
+
+# Deep Sleep
+deep_sleep:
+#  run_duration: 5s
+  sleep_duration: 10s
+  id: deep_sleep_1
+
+
