@@ -8,7 +8,7 @@
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- ATTENTION, comme il n'y a qu'un seul convertisseur ADC sur l'ESP8266, il n'y a plus la fonction BMS et indicateur de capacité !
-#-- zf230828.2253
+#-- zf230828.2309
 #--
 # sources: 
 # https://esphome.io/components/sensor/adc.html
@@ -120,21 +120,20 @@ switch:
 sensor:
   - platform: wifi_signal
     name: "batrec_d1_2 Signal Wi-Fi"
-    update_interval: 15s
+    update_interval: 10s
     on_value:
       if:
         condition:
           mqtt.connected:
         then:
-          - logger.log: Je suis connected sur le mqtt et j'envoie la sauce !
+          - logger.log: Je suis connecté sur le mqtt et j'envoie la sauce !
           - switch.turn_off: led
-          - delay: 1s
+          - delay: 0.1s
           - switch.turn_on: led
           - if:
               condition:
                 lambda: 'return id(batrec_d1_2_sleep_mode).state == 1;'
               then:
-                - delay: 1s
                 - logger.log: On me demande de dormir !
                 - deep_sleep.enter: deep_sleep_1
         else:
@@ -143,9 +142,8 @@ sensor:
               condition:
                 lambda: 'return id(batrec_d1_2_sleep_mode).state == 1;'
               then:
-                - delay: 1s
                 - logger.log: On me demande de dormir !
-                # - deep_sleep.enter: deep_sleep_1
+                - deep_sleep.enter: deep_sleep_1
 
   - platform: uptime
     name: "batrec_d1_2 uptime"
