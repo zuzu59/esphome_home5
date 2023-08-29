@@ -2,23 +2,29 @@
 #-- th10_1.yaml
 #-- Petit code pour monitorer la température et l'humidité dans une pièce
 #-- location: salle de douche
-#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-
-#-- calibration VCC diode: lambda: return id(th10_1_vcc_voltage).state + 1.258 ;
-#-- calibration température: - offset: -0.1
-
-#-- zf230827.2144
+#-- calibration VCC diode: 233     lambda: return id(th10_1_vcc_voltage).state + 1.258 ;
+#-- calibration température: 207    - offset: -0.1
+#-- Il faut publier sur mqtt 'th10_1/switch/th10_1_led/command' = ON/OFF pour allumer/éteindre la LED
+#-- Il faut publier sur mqtt 'th10_1/switch/th10_1_firmware_update/command' = ON pour lancer l'OTA
+#-- ATTENTION, ne pas oublier après le flash de remettre à OFF !
+#-- zf230721.1310, zf230829.1642
+#--
+#-- Procédure à faire sur mon iMAC pour le flash OTA HTTP
+#-- cd ~/ota_www/
+#-- python -m SimpleHTTPServer 8080
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
+# https://github.com/oarcher/piotech/tree/main/components/ota_http
 # Calcul de la durée sur une batterie: https://docs.google.com/spreadsheets/d/1I6s_R04LjGxCB0hrcvogGHNeITDwfXjM05hJhuqGkoU/edit#gid=1470557238
 
 esphome:
   name: th10_1
   on_boot:
-#   - switch.turn_on: led
-   - switch.turn_off: led
+#  - switch.turn_off: led
+  - switch.turn_on: led
 
 esp8266:
   board: d1_mini
@@ -26,10 +32,10 @@ esp8266:
 # Configuration WIFI
 wifi:
   fast_connect: true
-  ssid: !secret wifi_ssid_apzuzu_domo1
-  password: !secret wifi_pass_apzuzu_domo1
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
   # manual_ip:
-  #   static_ip: 192.168.0.203
+  #   static_ip: 192.168.0.201
   #   gateway: 192.168.0.51
   #   dns1: 192.168.0.51
   #   dns2: 8.8.8.8
@@ -74,6 +80,15 @@ logger:
 ota:
   password: !secret ota_password
 
+
+
+external_components:
+  - source: github://oarcher/piotech/
+
+ota_http:
+
+
+
 # WEB Server
 web_server:
   port: 80
@@ -110,6 +125,18 @@ switch:
     id: th10_1_shutdown
     internal: true
 
+  - platform: template
+    name: "th10_1 Firmware update"
+    id: th10_1_firmware_update
+    turn_on_action:
+      then:
+        # - ota_http.flash:
+        #     url: http://192.168.0.138:8080/th10_1.bin
+        - binary_sensor.template.publish:
+            id: th10_1_ota_mode
+            state: ON
+        - logger.log: "On me demande un firmware update"
+
 
 # Définition des Scripts
 script:
@@ -134,20 +161,33 @@ script:
 sensor:
   - platform: wifi_signal
     name: "th10_1 Signal Wi-Fi"
-    update_interval: 5s
+    update_interval: 10s
     on_value:
       if:
         condition:
           mqtt.connected:
         then:
           - logger.log: Je suis connecté sur le mqtt et j'envoie la sauce !
-          - delay: 0.1s
+          - switch.turn_off: led
+          - delay: 1s
+          - switch.turn_on: led
           - if:
               condition:
-                lambda: 'return id(th10_1_sleep_mode).state == 1;'
+                lambda: 'return id(th10_1_ota_mode).state == 0;'
               then:
-                - logger.log: On me demande de dormir !
-                - deep_sleep.enter: deep_sleep_1
+                - if:
+                    condition:
+                      lambda: 'return id(th10_1_sleep_mode).state == 1;'
+                    then:
+                      - logger.log: On me demande de dormir !
+                      - deep_sleep.enter: deep_sleep_1
+              else:
+                - binary_sensor.template.publish:
+                    id: th10_1_ota_mode
+                    state: OFF
+                - ota_http.flash:
+                    url: http://192.168.0.138:8080/th10_1.bin
+                - logger.log: "This message should be not displayed(reboot)"
         else:
           - logger.log: Erreur 007 *********************************************************
           - if:
@@ -156,10 +196,9 @@ sensor:
               then:
                 - logger.log: On me demande de dormir !
                 - deep_sleep.enter: deep_sleep_1
-
   - platform: uptime
     name: "th10_1 uptime"
-    update_interval: 15s
+    update_interval: 1s
 
 # température et humidité
   - platform: htu21d
@@ -170,14 +209,14 @@ sensor:
     humidity:
       name: "th10_1 Humidité"
 #      accuracy_decimals: 0
-    update_interval: 15s
+    update_interval: 1s
 
 # tension VCC à l'intérieur de l'ESP
   - platform: adc
     pin: VCC
     name: "th10_1 VCC Voltage"
     id: th10_1_vcc_voltage
-    update_interval: 2s
+    update_interval: 1s
     unit_of_measurement: "V"
     accuracy_decimals: 3
     internal: true
@@ -186,7 +225,7 @@ sensor:
   - platform: template
     name: "th10_1 BAT Voltage"
     id: th10_1_bat_voltage
-    update_interval: 2s
+    update_interval: 1s
     unit_of_measurement: "V"
     accuracy_decimals: 3
     on_value:
@@ -197,7 +236,7 @@ sensor:
 # capacité de la batterie
   - platform: template
     name: "th10_1 BAT capacity"
-    update_interval: 2s
+    update_interval: 1s
     unit_of_measurement: "%"
     accuracy_decimals: 0
     lambda: return id(th10_1_bat_voltage).state ;
@@ -230,10 +269,20 @@ binary_sensor:
     id: th10_1_sleep_mode
 
 
+
+
+  - platform: template
+    name: "th10_1 ota mode"
+    id: th10_1_ota_mode
+
+
+
+
+
 # Définition des Sensors text
 text_sensor:
   - platform: version
-    name: "th10_1 Version 1415"
+    name: "th10_1 Version 164434"
 
   - platform: wifi_info
     ip_address:
@@ -247,5 +296,6 @@ text_sensor:
 # Deep Sleep
 deep_sleep:
 #  run_duration: 5s
-  sleep_duration: 900s
+#  sleep_duration: 600s
+  sleep_duration: 10s
   id: deep_sleep_1
