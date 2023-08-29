@@ -8,7 +8,13 @@
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- ATTENTION, comme il n'y a qu'un seul convertisseur ADC sur l'ESP8266, il n'y a plus la fonction BMS et indicateur de capacité !
-#-- zf230828.2309
+#-- Il faut publier sur mqtt 'batrec_d1_2/switch/batrec_d1_2_led/command' = ON/OFF pour allumer/éteindre la LED !
+#-- Il faut publier sur mqtt 'batrec_d1_2/switch/batrec_d1_2_firmware_update/command' = ON pour lancer l'OTA !
+#-- zf230829.1032
+#--
+#-- Procédure à faire sur mon iMAC pour le flash OTA HTTP
+#-- cd ~/ota_www/
+#-- python -m SimpleHTTPServer 8080
 #--
 # sources: 
 # https://esphome.io/components/sensor/adc.html
@@ -109,7 +115,7 @@ switch:
     internal: true
 
   - platform: template
-    name: "Firmware update"
+    name: "batrec_d1_2 Firmware update"
     turn_on_action:
       then:
         - ota_http.flash:
