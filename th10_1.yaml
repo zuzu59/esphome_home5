@@ -4,12 +4,12 @@
 #-- location: salle de douche
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- calibration VCC diode: 233     lambda: return id(th10_1_vcc_voltage).state + 1.258 ;
-#-- calibration température: 207    - offset: -0.1
+#-- calibration VCC diode: 239     lambda: return id(th10_1_vcc_voltage).state + 1.258 ;
+#-- calibration température: 213    - offset: -0.1
 #-- Il faut publier sur mqtt 'th10_1/switch/th10_1_led/command' = ON/OFF pour allumer/éteindre la LED
 #-- Il faut publier sur mqtt 'th10_1/switch/th10_1_firmware_update/command' = ON pour lancer l'OTA
 #-- ATTENTION, ne pas oublier après le flash de remettre à OFF !
-#-- zf230721.1310, zf230829.1722
+#-- zf230721.1310, zf230829.2227
 #--
 #-- Procédure à faire sur mon iMAC pour le flash OTA HTTP
 #-- cd ~/ota_www/
@@ -32,6 +32,8 @@ esp8266:
 # Configuration WIFI
 wifi:
   fast_connect: true
+  reboot_timeout: 15s
+
   ssid: !secret wifi_ssid_apzuzu7
   password: !secret wifi_pass_apzuzu7
   # manual_ip:
@@ -97,7 +99,7 @@ mqtt:
   password:  !secret mqtt_password_dev
   birth_message:
   will_message:
-  reboot_timeout: 30s
+  reboot_timeout: 15s
 
 # I2C conf
 i2c:
@@ -190,7 +192,6 @@ sensor:
                 - delay: 2s
                 - ota_http.flash:
                     url: http://192.168.0.138:8080/th10_1.bin
-                    timeout: 100000
                 - logger.log: "This message should be not displayed(reboot)"
         else:
           - logger.log: Erreur 007 *********************************************************
