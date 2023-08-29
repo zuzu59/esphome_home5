@@ -10,7 +10,7 @@
 #-- ATTENTION, comme il n'y a qu'un seul convertisseur ADC sur l'ESP8266, il n'y a plus la fonction BMS et indicateur de capacité !
 #-- Il faut publier sur mqtt 'batrec_d1_2/switch/batrec_d1_2_led/command' = ON/OFF pour allumer/éteindre la LED !
 #-- Il faut publier sur mqtt 'batrec_d1_2/switch/batrec_d1_2_firmware_update/command' = ON pour lancer l'OTA !
-#-- zf230829.1117
+#-- zf230829.2300
 #--
 #-- Procédure à faire sur mon iMAC pour le flash OTA HTTP
 #-- cd ~/ota_www/
@@ -33,7 +33,9 @@ esp8266:
 
 # Configuration WIFI
 wifi:
-  reboot_timeout: 5min
+  fast_connect: true
+  reboot_timeout: 15s
+
   ssid: !secret wifi_ssid_apzuzu8
   password: !secret wifi_pass_apzuzu8
 
@@ -47,6 +49,7 @@ captive_portal:
 # Enable logging
 logger:
   level: DEBUG
+#  level: INFO
   logs:
     logger: INFO
     adc: INFO
@@ -75,15 +78,10 @@ logger:
 ota:
   password: !secret ota_password
 
-
-
 external_components:
   - source: github://oarcher/piotech/
 
 ota_http:
-
-
-
 
 # WEB Server
 web_server:
@@ -91,12 +89,13 @@ web_server:
 
 # MQTT server
 mqtt:
-  broker:  !secret mqtt_server_dev_interne
-  port:  !secret mqtt_port_dev_interne
-  username:  !secret mqtt_user_dev_interne
-  password:  !secret mqtt_password_dev_interne
+  broker:  !secret mqtt_server_dev
+  port:  !secret mqtt_port_dev
+  username:  !secret mqtt_user_dev
+  password:  !secret mqtt_password_dev
   birth_message:
   will_message:
+  reboot_timeout: 15s
 
 
 # Définition des Switch's
@@ -117,11 +116,20 @@ switch:
 
   - platform: template
     name: "batrec_d1_2 Firmware update"
+    id: batrec_d1_2_firmware_update
     turn_on_action:
       then:
-        - ota_http.flash:
-            url: http://192.168.0.138:8080/batrec_d1_2.bin
-        - logger.log: "This message should be not displayed(reboot)"
+        - binary_sensor.template.publish:
+            id: batrec_d1_2_ota_mode
+            state: ON
+        - logger.log: "On me demande un firmware update"
+    turn_off_action:
+      then:
+        - binary_sensor.template.publish:
+            id: batrec_d1_2_ota_mode
+            state: OFF
+        - logger.log: "On ne me demande plus un firmware update"
+
 
 # Définition des Sensors
 sensor:
@@ -135,14 +143,27 @@ sensor:
         then:
           - logger.log: Je suis connecté sur le mqtt et j'envoie la sauce !
           - switch.turn_off: led
-          - delay: 0.1s
+          - delay: 0.5s
           - switch.turn_on: led
           - if:
               condition:
-                lambda: 'return id(batrec_d1_2_sleep_mode).state == 1;'
+                lambda: 'return id(batrec_d1_2_ota_mode).state == 0;'
               then:
-                - logger.log: On me demande de dormir !
-                - deep_sleep.enter: deep_sleep_1
+                - if:
+                    condition:
+                      lambda: 'return id(batrec_d1_2_sleep_mode).state == 1;'
+                    then:
+                      - logger.log: On me demande de dormir !
+                      - deep_sleep.enter: deep_sleep_1
+              else:
+                - mqtt.publish:
+                    topic: batrec_d1_2/switch/batrec_d1_2_firmware_update/command
+                    payload: "OFF"
+                    retain: True
+                - delay: 2s
+                - ota_http.flash:
+                    url: http://192.168.0.138:8080/batrec_d1_2.bin
+                - logger.log: "This message should be not displayed(reboot)"
         else:
           - logger.log: Erreur 007 *********************************************************
           - if:
@@ -188,6 +209,10 @@ binary_sensor:
     name: "batrec_d1_2 sleep mode"
     id: batrec_d1_2_sleep_mode
 
+  - platform: template
+    name: "batrec_d1_2 ota mode"
+    id: batrec_d1_2_ota_mode
+
 
 # Définition des Sensors text
 text_sensor:
@@ -205,7 +230,7 @@ text_sensor:
 
 # Deep Sleep
 deep_sleep:
-#  run_duration: 5s
+  run_duration: 15s
   sleep_duration: 10s
   id: deep_sleep_1
 
