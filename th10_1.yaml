@@ -9,7 +9,7 @@
 #-- Il faut publier sur mqtt 'th10_1/switch/th10_1_led/command' = ON/OFF pour allumer/éteindre la LED
 #-- Il faut publier sur mqtt 'th10_1/switch/th10_1_firmware_update/command' = ON pour lancer l'OTA
 #-- ATTENTION, ne pas oublier après le flash de remettre à OFF !
-#-- zf230721.1310, zf230829.1642
+#-- zf230721.1310, zf230829.1722
 #--
 #-- Procédure à faire sur mon iMAC pour le flash OTA HTTP
 #-- cd ~/ota_www/
@@ -80,14 +80,10 @@ logger:
 ota:
   password: !secret ota_password
 
-
-
 external_components:
   - source: github://oarcher/piotech/
 
 ota_http:
-
-
 
 # WEB Server
 web_server:
@@ -101,6 +97,7 @@ mqtt:
   password:  !secret mqtt_password_dev
   birth_message:
   will_message:
+  reboot_timeout: 30s
 
 # I2C conf
 i2c:
@@ -130,12 +127,16 @@ switch:
     id: th10_1_firmware_update
     turn_on_action:
       then:
-        # - ota_http.flash:
-        #     url: http://192.168.0.138:8080/th10_1.bin
         - binary_sensor.template.publish:
             id: th10_1_ota_mode
             state: ON
         - logger.log: "On me demande un firmware update"
+    turn_off_action:
+      then:
+        - binary_sensor.template.publish:
+            id: th10_1_ota_mode
+            state: OFF
+        - logger.log: "On ne me demande plus un firmware update"
 
 
 # Définition des Scripts
@@ -169,7 +170,7 @@ sensor:
         then:
           - logger.log: Je suis connecté sur le mqtt et j'envoie la sauce !
           - switch.turn_off: led
-          - delay: 1s
+          - delay: 0.5s
           - switch.turn_on: led
           - if:
               condition:
@@ -182,11 +183,14 @@ sensor:
                       - logger.log: On me demande de dormir !
                       - deep_sleep.enter: deep_sleep_1
               else:
-                - binary_sensor.template.publish:
-                    id: th10_1_ota_mode
-                    state: OFF
+                - mqtt.publish:
+                    topic: th10_1/switch/th10_1_firmware_update/command
+                    payload: "OFF"
+                    retain: True
+                - delay: 2s
                 - ota_http.flash:
                     url: http://192.168.0.138:8080/th10_1.bin
+                    timeout: 100000
                 - logger.log: "This message should be not displayed(reboot)"
         else:
           - logger.log: Erreur 007 *********************************************************
@@ -267,16 +271,9 @@ binary_sensor:
       inverted: True
     name: "th10_1 sleep mode"
     id: th10_1_sleep_mode
-
-
-
-
   - platform: template
     name: "th10_1 ota mode"
     id: th10_1_ota_mode
-
-
-
 
 
 # Définition des Sensors text
@@ -295,7 +292,7 @@ text_sensor:
 
 # Deep Sleep
 deep_sleep:
-#  run_duration: 5s
+  run_duration: 15s
 #  sleep_duration: 600s
   sleep_duration: 10s
   id: deep_sleep_1
