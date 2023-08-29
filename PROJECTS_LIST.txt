@@ -1,14 +1,45 @@
 #------------------------------
-#-- 1w_th_ext_sud.yaml
-#-- Mesure de la température extérieure à l'aide d'une sonde 1-wire DS18B20
-#-- ATTENTION, avec les nouveaux DS18B20 chinois, il faut ABSOLUMENT le câbler en mode 3 fils !
-#-- zf210804.1113, zf220219.1438
+#-- a_master_c3_mini.yaml
+#-- Petit code générique minimaliste pour des projets à base d'esp32-c3 mini lolin
+#-- ATTENTION: je ne sais pas pourquoi mais il faut le flasher via web.esphome.io (maintenir la touche BOOT pendant le RESET), via le port USB en ESPHOME cela ne fonctionne pas !
+#-- REMARQUE: xxx
+#-- location: xxx
+#-- zf230302.1844, zf230502.1132
 #--
 #------------------------------
-#-- 1w_th_solar.yaml
-#-- Mesures de températures de mon installation solaire thermique SEBASOL à l'aide de sondes 1-wire DS18B20
-#-- ATTENTION, avec les nouveaux DS18B20 chinois, il faut ABSOLUMENT les câbler en mode 3 fils !
-#-- zf210804.1042, zf220220.1211
+#-- a_master_c3_oled.yaml
+#-- Petit code générique minimaliste pour des projets à base d'esp32-c3-oled
+#-- ATTENTION: je ne sais pas pourquoi mais il faut le flasher via https://web.esphome.io (maintenir la touche BOOT pendant le RESET), via le port USB en ESPHOME cela ne fonctionne pas !
+#-- 
+#-- REMARQUE: au 29 décembre 2022, je ne sais pas pourquoi la luminosité du display OLED est très très faible !
+#-- REMARQUE2: au 28 juillet 2023, il n'y a plus le problème de luminosité, par contre on affiche en négatif !
+#-- 
+#-- location: xxx
+#-- zf221229.1836, zf230728.2256
+#--
+#------------------------------
+#-- a_master_mini_d1.yaml
+#-- Petit code générique minimaliste pour des projets à base d'esp mini d1
+#-- blablabla
+#-- location: xxx
+#-- zf230820.1423
+#--
+    id: a_master_mini_d1_consigne_alarme_low#------------------------------
+#-- a_master_mini_d1_dsleep.yaml
+#-- Petit code générique pour mini d1 avec dsleep à dupliquer
+#-- location: ...
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
+#-- zf221023.1152
+#--
+#------------------------------
+#-- a_master_mqtt_ota.yaml
+#-- Petit code pour tester la possibilité de faire un 'pull' OTA via un serveur http depuis une requête mqtt
+#-- Cela serait très utile de pouvoir flasher via OTA des ESPhome qui ne se trouvent plus dans le réseau de ESPhome
+#-- Il faut publier sur mqtt 'a_master_mqtt_ota/switch/a_master_mqtt_ota_led/command' = ON/OFF pour allumer/éteindre la LED !
+#-- Il faut publier sur mqtt 'a_master_mqtt_ota/switch/firmware_update/command' = ON pour lancer l'OTA !
+#-- location: bureau Chloé pour l'instant
+#-- zf230827.2342
 #--
 #------------------------------
 #-- a_tst_mqtt_bridge1.yaml
@@ -17,25 +48,101 @@
 #-- zf210622.0022
 #--
 #------------------------------
+#-- balise_1.yaml
+#-- Petit code pour faire juste une petite balise indiquant le bon fonctionnement du WIFI pour St-Luc
+#-- et d'indiquer la température/hunidité dans la douche
+#-- C'est aussi pour tester la possibilité d'avoir des ESPhome à St-Luc et de travailler avec mon brocker MQTT de Crissier
+#-- Il faut publier sur mqtt 'balise_1/switch/balise_1_led/command' = ON/OFF pour allumer/éteindre la LED !
+#-- location: St-Luc douche tout à gauche en entrant
+#-- zf221010.1016, zf230515.0931
+#--
+#------------------------------
+#-- batrec_c3_1.yaml
+#-- Petit code pour monitorer plusieurs batteries branchées en série
+#-- Lit les ports ADC du mini c3 et l'envoie sur un mqtt broker
+#-- Afin de pouvoir lire des tensions >3.3V, il y a un diviseur résistif R1/R2 de 270kR/12kR !
+#-- Il y a donc un facteur de correction de xx environ avec une plage de mesure de 0V à 56V
+#-- location: garage
+#-- zf230503.1350
+#--
+#------------------------------
+#-- batrec_d1_1.yaml
+#-- Petit code pour monitorer une batterie
+#-- Lit le port ADC0 et l'envoie sur un mqtt broker
+#-- Afin de pouvoir lire des tensions >3.3V, il y a un diviseur résistif R1/R2 de 150kR/10kR !
+#-- Il y a donc un facteur de correction de 50 environ avec une plage de mesure de 0V à 48V
+#-- location: garage
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
+#-- ATTENTION, comme il n'y a qu'un seul convertisseur ADC sur l'ESP8266, il n'y a plus la fonction BMS et indicateur de capacité !
+#-- zf230209.1443
+#--
+#------------------------------
+#-- batrec_d1_2.yaml
+#-- Petit code pour monitorer une batterie
+#-- Lit le port ADC0 et l'envoie sur un mqtt broker
+#-- Afin de pouvoir lire des tensions >3.3V, il y a un diviseur résistif R1/R2 de 150kR/8.2kR !
+#-- Il y a donc un facteur de correction de 62 environ avec une plage de mesure de 0V à 60V
+#-- location: garage
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
+#-- ATTENTION, comme il n'y a qu'un seul convertisseur ADC sur l'ESP8266, il n'y a plus la fonction BMS et indicateur de capacité !
+#-- zf230828.2309
+#--
+#------------------------------
+#-- batrec_nodemcu_1.yaml
+#-- Petit code pour monitorer plusieurs batteries branchées en série
+#-- La mesure se fait avec un ADC/i2C et NodeMCU blindé
+#-- Afin de pouvoir lire des tensions >2.048V, il y a un diviseur résistif R1/R2 de 270kR/12kR pour arriver à 42V -> 1.78V !
+#-- Il y a donc un facteur de correction de 24x environ avec une plage de mesure de 0V à 42V
+#-- location: garage
+#-- zf230506.1152
+#--
+#------------------------------
+#-- boiler_pwm1.yaml
+#-- Petit code pour faire un PWM pour piloter le chauffe eau à base d'esp mini d1
+#-- blablabla
+#-- location: buanderie
+#-- zf221120.1444
+#--
+    #------------------------------
+#-- boot_mini_d1.yaml
+#-- Petit code pour tester l'envoi de quelque chose sur le ha au moment du boot
+#-- Ici, c'est l'état de la LED
+#-- location: xxx
+#-- zf221219.1130
+#--
+#------------------------------
 #-- co2_66.yaml
-#-- Petit code mini minilste pour mesurer le TVOC et eCO2
-#-- Lit TVOC et eCO2 du capteur ccs811
-#-- location: chambre des parents petit meuble à droite en entrant
-#-- zf210720.1026
+#-- Petit code mini pour mesurer le COV et eCO2
+#-- Lit COV et eCO2 du capteur ccs811
+#-- location: chambre parents table de nuit zf
+#-- zf210720.1033, zf230219.2331
 #--
 #------------------------------
 #-- co2_72.yaml
-#-- Petit code mini minilste pour mesurer le COV et eCO2
+#-- Petit code mini minimaliste pour mesurer le COV et eCO2
 #-- Lit COV et eCO2 du capteur ccs811
-#-- location: chambre à Chloé carton vers mur
-#-- zf210720.1033
+#-- location: hall rez sous le meuble
+#-- zf210720.1033, zf230511.2244
 #--
 #------------------------------
 #-- demo-darby1.yaml
-#-- Petit code une démo de ESPhome à Darby
-#-- allume juste la petite LED
+#-- Petite démo ESPhome sur un ESP mini-d1 à Darby
+#-- Cherche des consignes sur le Home Assistant
+#-- et fait une petite détection de dépassement avec alarme sur Telegram
 #-- 
-#-- zf2205.1220
+#-- zf220523.0942, zf221106.1300
+#--
+    #------------------------------
+#-- dsleep_2_0_test.yaml
+#-- Petit code tester mon nouveau dsleep 2.0 intelligent basé sur les deltas de mesures et non sur le temps
+#-- Pour simuler les deltas, j'utilise un diviseur résistif sur l'entrée ADC constitué d'un potientiomètre de 100k
+#-- location: ...
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
+#-- ATTENTION, comme il n'y a qu'un seul convertisseur ADC sur l'ESP8266, il n'y a plus la fonction BMS et indicateur de capacité !
+#-- zf221210.2238
 #--
 #------------------------------
 #-- elink_1.yaml
@@ -47,7 +154,14 @@
 #-- energy-meter-1.yaml
 #-- Mesures de puissance de mes grands consommateurs (cuisinière et charge voiture)
 #-- La mesure se fait simplement avec 3x transfos de courant clips avec un ADC i2C et un mini d1
-#-- zf220222.0807
+#-- zf220712.1438
+#--
+#------------------------------
+#-- energy_meter_ldr_1.yaml
+#-- Petit code générique minimaliste pour des projets à base d'esp mini d1
+#-- ATTENTION, la LED builting et le sensor pulse sont 'cachés' (internal: true) à cause que cela rempli l'history pour rien
+#-- location: tableau électrique
+#-- zf221106.1300
 #--
 #------------------------------
 #-- esp32-ble-hub1.yaml
@@ -86,16 +200,52 @@
 #-- zf210804.1001
 #--
   #------------------------------
+#-- factory-reset.yaml
+#-- Petit code pour faire un factory reset de l'ESP
+#-- zf221018.0034
+#--
+#------------------------------
+#-- ow-th-ext-sud.yaml
+#-- Petite sonde de température 1-wire DS18B20 pour mesurer la température au sud sous le balcon
+#-- zf220627.1116
+#--
+#------------------------------
+#-- ow-th-solar.yaml
+#-- Mesures de températures de mon installation solaire thermique SEBASOL à l'aide de sondes 1-wire DS18B20
+#-- ATTENTION, avec les nouveaux DS18B20 chinois, il faut ABSOLUMENT les câbler en mode 3 fils !
+#-- zf210804.1042, zf220705.0731, zf230604.1751
+#--
+#------------------------------
+#-- partcl_fines_1.yaml
+#-- Petit code pour mesurer des particules fines
+#-- Envoie sur le résultat sur un mqtt broker
+#-- location: démo mobile pour l'instant
+#-- zf221022.1701
+#--
+#------------------------------
 #-- pzem-3x-test-1.yaml
 #-- Petits tests d2 3x modules power-meter PZEM-004T V3
 #-- ATTENTION: il faut leur changer l'adresse AVANT et tous les brancher en // !
-#-- zf210817.0804, zf220509.1035
+#-- zf210817.0804, zf220627.1124, zf221202.1426
 #--
 #------------------------------
 #-- pzem-test-1.yaml
 #-- Petits tests d'un module power-meter PZEM-004T V3
 #-- 
-#-- zf210815.1638
+#-- zf21081, zf220627.1123
+#--
+#------------------------------
+#-- rfbridge1.yaml
+#-- Tests du bridge RF de SonOff
+#-- J'essaie d'apprendre un code de la remote de mon store banne et de le rejouer
+#-- zf220815.2127
+#--
+#------------------------------
+#-- robot_0.yaml
+#-- Code pour piloter un petit robot NodeMCU à 20 balles au moyen d'un brocker MQTT
+#-- Les commandes sont expressément très simplistes
+#-- location: Hôtel du Cervin à St-Luc ;-)
+#-- zf230122.1510
 #--
 #------------------------------
 #-- solar_debit.yaml
@@ -103,18 +253,96 @@
 #-- Il compte les impulsions d'une ampoule REED collée sur un débimètre mécanique conventionnel
 #-- zf210713.1114, zf220302.1149
 #--
+    #------------------------------
+#-- switch_12v_1.yaml
+#-- Petit code pour piloter un petit relais 12V depuis ha à base de mini d1
+#-- le relais est branché sur D1 !
+#-- ATTENTION, avec un relais 5V sans optocoupleur, il faut mettre 3x diodes en série sur la 
+#-- commande du relais pour adapter le 3.3V de l'ESP au 5V du relais !
+#-- Lit le port ADC0 afin d'avoir l'état de la batterie en temps réel sur home assistant
+#-- Afin de pouvoir lire des tensions >3.3V, il y a un diviseur résistif R1/R2 de 10kR/1kR !
+#-- Il y a donc un facteur de correction de 11 environ avec une plage de mesure de 0V à 36V
+#-- location: dehors pour la fontaine virtuelle pour le bruit de l'eau de fontaine
+#-- zf230822.0856
+#--
+    id: switch_12v_1_consigne_alarme_low#------------------------------
+#-- test-pompe1.yaml
+#-- Petit code pour tester la régulation de la pompe pour chauffer la piscine d'Antoine
+#-- si la T aller - T retour est > que T consigne, alors allume la bonne pompe
+#-- tous les paramètres de configuration se trouvent en input number directement sur l'ESPhome !
+#-- pour l'instant ce n'est qu'une maquette de démo !
+#--
+#-- pinout mini-d1: https://docs.google.com/document/d/1GOp2zN0aFk80cv2Hz6DmlEwY84OPwVK38da-KSO77zw/edit#heading=h.ohz2baooedzi
+#-- zf220621.1614
+#--
 #------------------------------
 #-- th-fsd58.yaml
 #-- Petit code pour la formation IoT de la FSD de mars 2021
 #-- Lit la tmpérature et l'humidité du capteur HTU21D et se connecte sur le broker MQTT
-#-- zf210611.0720, zf220503.0940
+#-- zf210611.0720, zf220503.0940, zf221018.0031
 #--
 #------------------------------
 #-- th0.yaml
 #-- Petit code mini manilste pour mesurer la température et l'humidité
 #-- Lit la tmpérature et l'humidité du capteur HTU21D
 #-- location: chambre à Chloé bureau zf
-#-- zf210720.1021, zf220328.0954
+#-- zf210720.1021, zf230219.2321, zf230307.0832
+#--
+  #------------------------------
+#-- th10.yaml
+#-- Petit code pour monitorer la température et l'humidité dans une pièce
+#-- location: salle de douche
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
+#-- calibration VCC diode: 193     lambda: return id(th10_vcc_voltage).state + 1.339 ;
+#-- calibration VCC diode: 167     - offset: -0.3
+#-- zf230721.1310, zf230827.2138
+#--
+#------------------------------
+#-- th10_1.yaml
+#-- Petit code pour monitorer la température et l'humidité dans une pièce
+#-- location: salle de douche
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
+#-- calibration VCC diode: lambda: return id(th10_1_vcc_voltage).state + 1.258 ;
+#-- calibration température: - offset: -0.1
+#-- zf230827.2144
+#--
+#------------------------------
+#-- th10_2.yaml
+#-- Petit code pour monitorer la température et l'humidité dans une pièce
+#-- location: salle de douche
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
+#-- calibration VCC diode: lambda: return id(th10_2_vcc_voltage).state + 1.258 ;
+#-- zf230721.1310
+#--
+#------------------------------
+#-- th10_3.yaml
+#-- Petit code pour monitorer la température et l'humidité dans une pièce
+#-- location: salle de douche
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
+#-- calibration VCC diode: lambda: return id(th10_3_vcc_voltage).state + 1.258 ;
+#-- zf230721.1310
+#--
+#------------------------------
+#-- th10_4.yaml
+#-- Petit code pour monitorer la température et l'humidité dans une pièce
+#-- location: salle de douche
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
+#-- calibration VCC diode: lambda: return id(th10_4_vcc_voltage).state + 1.258 ;
+#-- zf230721.1310
+#--
+#------------------------------
+#-- th11.yaml
+#-- Petit code pour monitorer la température et l'humidité dans une pièce
+#-- location: bureau Vreni
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
+#-- calibration VCC diode: 192     lambda: return id(th11_vcc_voltage).state + 1.151 ;
+#-- zf221207.0939, zf230803.1446
 #--
 #------------------------------
 #-- th1_8285.yaml
@@ -123,37 +351,73 @@
 #-- zf210611.0720
 #--
 #------------------------------
+#-- th2.yaml
+#-- Petit code pour monitorer la température et l'humidité dans une pièce ainsi que la luminosité
+#-- location: garage porte nord
+#-- zf230219.2334, zf230512.1909
+#--
+#------------------------------
+#-- th3.yaml
+#-- Petit code pour monitorer la température et l'humidité dans une pièce
+#-- location: salon
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
+#-- calibration VCC diode: 192     lambda: return id(th3_vcc_voltage).state + 1.401 ;
+#-- zf221207.0919, zf230803.1447
+#--
+#------------------------------
+#-- th4.yaml
+#-- Petit code pour monitorer la température et l'humidité dans une pièce
+#-- location: chambre Heïda
+#-- zf230220.0001
+#--
+#------------------------------
 #-- th5.yaml
 #-- Petit code mini manilste pour mesurer la température et l'humidité
 #-- Lit la tmpérature et l'humidité du capteur HTU21D
 #-- location: chambre à Chloé poutre mur
-#-- zf210720.1021, zf220302.1155
+#-- zf210720.1023, zf221106.1252
 #--
 #------------------------------
 #-- th6.yaml
 #-- Petit code mini manilste pour mesurer la température et l'humidité
 #-- Lit la tmpérature et l'humidité du capteur HTU21D
 #-- location: cave vers interrupteur lumière
-#-- zf210720.1023, zf220302.1155
+#-- zf210720.1023, zf221106.1252
 #--
 #------------------------------
 #-- th7.yaml
-#-- Petit code mini manilste pour mesurer la température et l'humidité
-#-- Lit la tmpérature et l'humidité du capteur HTU21D
-#-- location: salon sur HP basse
-#-- zf210720.1023, zf220302.1155
+#-- Petit code pour monitorer la température et l'humidité dans une pièce
+#-- location: hall rez
+#-- zf2300701.1527
 #--
 #------------------------------
 #-- th8.yaml
-#-- Petit code mini manilste pour mesurer la température et l'humidité
-#-- Lit la tmpérature et l'humidité du capteur HTU21D
+#-- Petit code pour monitorer la température et l'humidité dans une pièce
 #-- location: chambre à coucher parents table de nuit zf
-#-- zf210723.0800, zf220302.1155
+#-- zf2300701.1532
+#--
+#------------------------------
+#-- th9.yaml
+#-- Petit code pour monitorer la température et l'humidité dans une pièce
+#-- location: salle de bain
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
+#-- calibration VCC diode: 192     lambda: return id(th9_vcc_voltage).state + 1.392 ;
+#-- zf221207.0927, zf23803.1447
+#--
+#------------------------------
+#-- th9_8285.yaml
+#-- Petit code pour monitorer la température et l'humidité dans une pièce
+#-- location: salle de bain
+#-- Si la pin GPIO13 (D7) est à GND, alors part en dsleep pour une certaine durée
+#-- ATTENTION, il faut relier la pin GPIO16 (D0) à RST pour qu'il puisse sortir du dsleep mode !
+#-- zf221017.1131
 #--
 #------------------------------
 #-- tst_d1_disp1.yaml
 #-- Petit code pour une démo d'un display mini OLED de mini-d1
 #-- va chercher le COV sur un autre capteur ESPhome et l'affiche
 #-- source: https://esphome.io/cookbook/display_time_temp_oled.html
-#-- zf210208.1701, zf2209.1129
+#-- zf210208.1701, zf221106.1300
 #--
