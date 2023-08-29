@@ -2,13 +2,14 @@
 #-- th10.yaml
 #-- Petit code pour monitorer la température et l'humidité dans une pièce
 #-- location: salle de douche
-#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- calibration VCC diode: 193     lambda: return id(th10_vcc_voltage).state + 1.339 ;
-#-- calibration VCC diode: 167     - offset: -0.3
-#-- Il faut publier sur mqtt 'th10/switch/th10_led/command' = ON/OFF pour allumer/éteindre la LED !
-#-- Il faut publier sur mqtt 'th10/switch/th10_firmware_update/command' = ON pour lancer l'OTA !
-#-- zf230721.1310, zf230829.1123
+#-- calibration VCC diode: 239     lambda: return id(th10_vcc_voltage).state + 1.339 ;
+#-- calibration température: 213    - offset: -0.3
+#-- Il faut publier sur mqtt 'th10/switch/th10_led/command' = ON/OFF pour allumer/éteindre la LED
+#-- Il faut publier sur mqtt 'th10/switch/th10_firmware_update/command' = ON pour lancer l'OTA
+#-- ATTENTION, ne pas oublier après le flash de remettre à OFF !
+#-- zf230721.1310, zf230829.2227
 #--
 #-- Procédure à faire sur mon iMAC pour le flash OTA HTTP
 #-- cd ~/ota_www/
@@ -31,8 +32,10 @@ esp8266:
 # Configuration WIFI
 wifi:
   fast_connect: true
-  ssid: !secret wifi_ssid_apzuzu_domo1
-  password: !secret wifi_pass_apzuzu_domo1
+  reboot_timeout: 15s
+
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
   # manual_ip:
   #   static_ip: 192.168.0.201
   #   gateway: 192.168.0.51
@@ -79,14 +82,10 @@ logger:
 ota:
   password: !secret ota_password
 
-
-
 external_components:
   - source: github://oarcher/piotech/
 
 ota_http:
-
-
 
 # WEB Server
 web_server:
@@ -100,6 +99,7 @@ mqtt:
   password:  !secret mqtt_password_dev
   birth_message:
   will_message:
+  reboot_timeout: 15s
 
 # I2C conf
 i2c:
@@ -126,11 +126,19 @@ switch:
 
   - platform: template
     name: "th10 Firmware update"
+    id: th10_firmware_update
     turn_on_action:
       then:
-        - ota_http.flash:
-            url: http://192.168.0.138:8080/th10.bin
-        - logger.log: "This message should be not displayed(reboot)"
+        - binary_sensor.template.publish:
+            id: th10_ota_mode
+            state: ON
+        - logger.log: "On me demande un firmware update"
+    turn_off_action:
+      then:
+        - binary_sensor.template.publish:
+            id: th10_ota_mode
+            state: OFF
+        - logger.log: "On ne me demande plus un firmware update"
 
 
 # Définition des Scripts
@@ -164,14 +172,27 @@ sensor:
         then:
           - logger.log: Je suis connecté sur le mqtt et j'envoie la sauce !
           - switch.turn_off: led
-          - delay: 0.1s
+          - delay: 0.5s
           - switch.turn_on: led
           - if:
               condition:
-                lambda: 'return id(th10_sleep_mode).state == 1;'
+                lambda: 'return id(th10_ota_mode).state == 0;'
               then:
-                - logger.log: On me demande de dormir !
-                - deep_sleep.enter: deep_sleep_1
+                - if:
+                    condition:
+                      lambda: 'return id(th10_sleep_mode).state == 1;'
+                    then:
+                      - logger.log: On me demande de dormir !
+                      - deep_sleep.enter: deep_sleep_1
+              else:
+                - mqtt.publish:
+                    topic: th10/switch/th10_firmware_update/command
+                    payload: "OFF"
+                    retain: True
+                - delay: 2s
+                - ota_http.flash:
+                    url: http://192.168.0.138:8080/th10.bin
+                - logger.log: "This message should be not displayed(reboot)"
         else:
           - logger.log: Erreur 007 *********************************************************
           - if:
@@ -180,7 +201,6 @@ sensor:
               then:
                 - logger.log: On me demande de dormir !
                 - deep_sleep.enter: deep_sleep_1
-
   - platform: uptime
     name: "th10 uptime"
     update_interval: 1s
@@ -252,12 +272,15 @@ binary_sensor:
       inverted: True
     name: "th10 sleep mode"
     id: th10_sleep_mode
+  - platform: template
+    name: "th10 ota mode"
+    id: th10_ota_mode
 
 
 # Définition des Sensors text
 text_sensor:
   - platform: version
-    name: "th10 Version 113528"
+    name: "th10 Version 164434"
 
   - platform: wifi_info
     ip_address:
@@ -270,7 +293,7 @@ text_sensor:
 
 # Deep Sleep
 deep_sleep:
-#  run_duration: 5s
+  run_duration: 15s
 #  sleep_duration: 600s
   sleep_duration: 10s
   id: deep_sleep_1
