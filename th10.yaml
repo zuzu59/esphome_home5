@@ -6,17 +6,24 @@
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- calibration VCC diode: 193     lambda: return id(th10_vcc_voltage).state + 1.339 ;
 #-- calibration VCC diode: 167     - offset: -0.3
-#-- zf230721.1310, zf230827.2138
+#-- Il faut publier sur mqtt 'th10/switch/th10_led/command' = ON/OFF pour allumer/éteindre la LED !
+#-- Il faut publier sur mqtt 'th10/switch/th10_firmware_update/command' = ON pour lancer l'OTA !
+#-- zf230721.1310, zf230829.1123
+#--
+#-- Procédure à faire sur mon iMAC pour le flash OTA HTTP
+#-- cd ~/ota_www/
+#-- python -m SimpleHTTPServer 8080
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
+# https://github.com/oarcher/piotech/tree/main/components/ota_http
 # Calcul de la durée sur une batterie: https://docs.google.com/spreadsheets/d/1I6s_R04LjGxCB0hrcvogGHNeITDwfXjM05hJhuqGkoU/edit#gid=1470557238
 
 esphome:
   name: th10
   on_boot:
-#   - switch.turn_on: led
-   - switch.turn_off: led
+#  - switch.turn_off: led
+  - switch.turn_on: led
 
 esp8266:
   board: d1_mini
@@ -72,6 +79,15 @@ logger:
 ota:
   password: !secret ota_password
 
+
+
+external_components:
+  - source: github://oarcher/piotech/
+
+ota_http:
+
+
+
 # WEB Server
 web_server:
   port: 80
@@ -108,6 +124,14 @@ switch:
     id: th10_shutdown
     internal: true
 
+  - platform: template
+    name: "th10 Firmware update"
+    turn_on_action:
+      then:
+        - ota_http.flash:
+            url: http://192.168.0.138:8080/th10.bin
+        - logger.log: "This message should be not displayed(reboot)"
+
 
 # Définition des Scripts
 script:
@@ -132,14 +156,16 @@ script:
 sensor:
   - platform: wifi_signal
     name: "th10 Signal Wi-Fi"
-    update_interval: 5s
+    update_interval: 10s
     on_value:
       if:
         condition:
           mqtt.connected:
         then:
           - logger.log: Je suis connecté sur le mqtt et j'envoie la sauce !
+          - switch.turn_off: led
           - delay: 0.1s
+          - switch.turn_on: led
           - if:
               condition:
                 lambda: 'return id(th10_sleep_mode).state == 1;'
@@ -157,7 +183,7 @@ sensor:
 
   - platform: uptime
     name: "th10 uptime"
-    update_interval: 15s
+    update_interval: 1s
 
 # température et humidité
   - platform: htu21d
@@ -168,14 +194,14 @@ sensor:
     humidity:
       name: "th10 Humidité"
 #      accuracy_decimals: 0
-    update_interval: 15s
+    update_interval: 1s
 
 # tension VCC à l'intérieur de l'ESP
   - platform: adc
     pin: VCC
     name: "th10 VCC Voltage"
     id: th10_vcc_voltage
-    update_interval: 2s
+    update_interval: 1s
     unit_of_measurement: "V"
     accuracy_decimals: 3
     internal: true
@@ -184,7 +210,7 @@ sensor:
   - platform: template
     name: "th10 BAT Voltage"
     id: th10_bat_voltage
-    update_interval: 2s
+    update_interval: 1s
     unit_of_measurement: "V"
     accuracy_decimals: 3
     on_value:
@@ -195,7 +221,7 @@ sensor:
 # capacité de la batterie
   - platform: template
     name: "th10 BAT capacity"
-    update_interval: 2s
+    update_interval: 1s
     unit_of_measurement: "%"
     accuracy_decimals: 0
     lambda: return id(th10_bat_voltage).state ;
@@ -231,7 +257,7 @@ binary_sensor:
 # Définition des Sensors text
 text_sensor:
   - platform: version
-    name: "th10 Version 1352"
+    name: "th10 Version 113528"
 
   - platform: wifi_info
     ip_address:
@@ -245,5 +271,6 @@ text_sensor:
 # Deep Sleep
 deep_sleep:
 #  run_duration: 5s
-  sleep_duration: 600s
+#  sleep_duration: 600s
+  sleep_duration: 10s
   id: deep_sleep_1
