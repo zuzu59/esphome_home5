@@ -8,7 +8,7 @@
 #-- calibration température: 213    - offset: -0.1
 #-- Il faut publier sur mqtt 'th10_1/switch/th10_1_led/command' = ON/OFF pour allumer/éteindre la LED
 #-- Il faut publier sur mqtt 'th10_1/switch/th10_1_firmware_update/command' = ON pour lancer l'OTA
-#-- zf230721.1310, zf230830.0912
+#-- zf230721.1310, zf2300901.2332
 #--
 #-- Procédure à faire sur mon iMAC pour le flash OTA HTTP
 #-- cd ~/ota_www/
@@ -225,7 +225,7 @@ sensor:
     update_interval: 1s
     unit_of_measurement: "V"
     accuracy_decimals: 3
-    internal: true
+#    internal: true
 
 # tension de la batterie
   - platform: template
@@ -295,7 +295,7 @@ text_sensor:
 
 # Deep Sleep
 deep_sleep:
-  run_duration: 15s
+#  run_duration: 25s
   sleep_duration: 600s
 #  sleep_duration: 10s
   id: deep_sleep_1
