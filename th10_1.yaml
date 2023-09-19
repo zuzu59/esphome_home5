@@ -4,11 +4,11 @@
 #-- location: salle de douche
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- calibration VCC diode: 239     lambda: return id(th10_1_vcc_voltage).state + 1.258 ;
+#-- calibration VCC diode: 239     lambda: return id(th10_1_vcc_voltage).state + 0.844 ;
 #-- calibration température: 213    - offset: -0.1
 #-- Il faut publier sur mqtt 'th10_1/switch/th10_1_led/command' = ON/OFF pour allumer/éteindre la LED
 #-- Il faut publier sur mqtt 'th10_1/switch/th10_1_firmware_update/command' = ON pour lancer l'OTA
-#-- zf230721.1310, zf2300901.2332
+#-- zf230721.1310, zf2300919.1455
 #--
 #-- Procédure à faire sur mon iMAC pour le flash OTA HTTP
 #-- cd ~/ota_www/
@@ -151,9 +151,9 @@ script:
           args: [ 'id(th10_1_bat_voltage).state' ]
       - if:
           condition:
-            lambda: 'return id(th10_1_bat_voltage).state < 3.2 ;'
+            lambda: 'return id(th10_1_bat_voltage).state < 3.1 ;'
           then:
-            - logger.log: "La batterie est en dessous de 3.2 Volts !"
+            - logger.log: "La batterie est en dessous de 3.1 Volts !"
             - delay: 0.5s
             - switch.turn_on: th10_1_shutdown
           else:
@@ -237,7 +237,7 @@ sensor:
     on_value:
       then:
         - script.execute: my_bms
-    lambda: return id(th10_1_vcc_voltage).state + 1.258 ;
+    lambda: return id(th10_1_vcc_voltage).state + 0.844 ;
  
 # capacité de la batterie
   - platform: template
@@ -248,8 +248,8 @@ sensor:
     lambda: return id(th10_1_bat_voltage).state ;
     filters:
       - calibrate_linear:
-          - 3.4 -> 0.0
-          - 4.1 -> 100.0
+          - 3.3 -> 0.0
+          - 4.0 -> 100.0
       # filtre la valeur minimale
       - lambda: |-
           if (x >= 0) 
