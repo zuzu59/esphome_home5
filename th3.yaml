@@ -5,7 +5,7 @@
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- calibration VCC diode: 192     lambda: return id(th3_vcc_voltage).state + 1.401 ;
-#-- zf221207.0919, zf230803.1447
+#-- zf221207.0919, zf230919.1623
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -23,8 +23,8 @@ esp8266:
 # Configuration WIFI
 wifi:
   fast_connect: true
-  ssid: !secret wifi_ssid_apzuzu7
-  password: !secret wifi_pass_apzuzu7
+  ssid: !secret wifi_ssid_apzuzu6
+  password: !secret wifi_pass_apzuzu6
   manual_ip:
     static_ip: 192.168.0.202
     gateway: 192.168.0.51
@@ -110,7 +110,7 @@ switch:
 
 # Définition des Scripts
 script:
-  # fonction BMS, shutdown si < 3.3 Volts !
+  # fonction BMS, shutdown si < 3.1 Volts !
   - id: my_bms
     then:
       - logger.log:
@@ -118,9 +118,9 @@ script:
           args: [ 'id(th3_bat_voltage).state' ]
       - if:
           condition:
-            lambda: 'return id(th3_bat_voltage).state < 3.2 ;'
+            lambda: 'return id(th3_bat_voltage).state < 3.1 ;'
           then:
-            - logger.log: "La batterie est en dessous de 3.2 Volts !"
+            - logger.log: "La batterie est en dessous de 3.1 Volts !"
             - delay: 0.5s
             - switch.turn_on: th3_shutdown
           else:
@@ -131,7 +131,7 @@ script:
 sensor:
   - platform: wifi_signal
     name: "th3 Signal Wi-Fi"
-    update_interval: 5s
+    update_interval: 2s
     on_value:
       if:
         condition:
@@ -156,7 +156,7 @@ sensor:
 
   - platform: uptime
     name: "th3 uptime"
-    update_interval: 15s
+    update_interval: 2s
 
 # température et humidité
   - platform: htu21d
@@ -167,7 +167,7 @@ sensor:
     humidity:
       name: "th3 Humidité"
 #      accuracy_decimals: 0
-    update_interval: 15s
+    update_interval: 2s
 
 # tension VCC à l'intérieur de l'ESP
   - platform: adc
@@ -189,7 +189,7 @@ sensor:
     on_value:
       then:
         - script.execute: my_bms
-    lambda: return id(th3_vcc_voltage).state + 1.401 ;
+    lambda: return id(th3_vcc_voltage).state + 1.469 ;
  
 # capacité de la batterie
   - platform: template
@@ -200,8 +200,8 @@ sensor:
     lambda: return id(th3_bat_voltage).state ;
     filters:
       - calibrate_linear:
-          - 3.4 -> 0.0
-          - 4.1 -> 100.0
+          - 3.3 -> 0.0
+          - 4.0 -> 100.0
       # filtre la valeur minimale
       - lambda: |-
           if (x >= 0) 
