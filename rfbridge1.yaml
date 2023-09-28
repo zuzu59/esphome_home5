@@ -2,7 +2,7 @@
 #-- rfbridge1.yaml
 #-- Tests du bridge RF de SonOff
 #-- J'essaie d'apprendre un code de la remote de mon store banne et de le rejouer
-#-- zf220815.2127
+#-- zf230928.1908
 #--
 # sources: 
 # Hardware utilisé pour ce projet (mais attention en version V2 R2.2 !): https://sonoff.tech/product/smart-home-security/rf-bridge/
@@ -23,8 +23,8 @@ esp8266:
 # Configuration WIFI
 # On le force sur apzuzu7, plus stable
 wifi:
-  ssid: !secret wifi_ssid_apzuzu7
-  password: !secret wifi_pass_apzuzu7
+  ssid: !secret wifi_ssid_apzuzu6
+  password: !secret wifi_pass_apzuzu6
 
   # networks:
   
@@ -60,7 +60,9 @@ logger:
 
 # Enable Home Assistant API
 api:
-  password: !secret api_password
+#  password: !secret api_password
+  encryption:
+    key: !secret api_encryption_key
 
 # Enable OTA
 ota:

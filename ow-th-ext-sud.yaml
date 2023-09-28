@@ -1,7 +1,7 @@
 #------------------------------
 #-- ow-th-ext-sud.yaml
 #-- Petite sonde de température 1-wire DS18B20 pour mesurer la température au sud sous le balcon
-#-- zf220627.1116
+#-- zf230928.1849
 #--
 
 # sources: 
@@ -57,7 +57,9 @@ logger:
 
 # Enable Home Assistant API
 api:
-  password: !secret api_password
+#  password: !secret api_password
+  encryption:
+    key: !secret api_encryption_key
 
 # Enable OTA
 ota:

@@ -2,7 +2,7 @@
 #-- energy-meter-1.yaml
 #-- Mesures de puissance de mes grands consommateurs (cuisinière et charge voiture)
 #-- La mesure se fait simplement avec 3x transfos de courant clips avec un ADC i2C et un mini d1
-#-- zf220712.1438
+#-- zf230928.1931
 #--
 
 
@@ -60,7 +60,9 @@ logger:
 
 # Enable Home Assistant API
 api:
-  password: !secret api_password
+#  password: !secret api_password
+  encryption:
+    key: !secret api_encryption_key
 
 # Enable OTA
 ota:

@@ -2,7 +2,7 @@
 #-- pzem-3x-test-1.yaml
 #-- Petits tests d2 3x modules power-meter PZEM-004T V3
 #-- ATTENTION: il faut leur changer l'adresse AVANT et tous les brancher en // !
-#-- zf210817.0804, zf220627.1124, zf221202.1426
+#-- zf210817.0804, zf220627.1124, zf230928.1858
 #--
 
 # sources: 
@@ -22,7 +22,9 @@ logger:
 
 # Enable Home Assistant API
 api:
-  password: !secret api_password
+#  password: !secret api_password
+  encryption:
+    key: !secret api_encryption_key
   reboot_timeout: 10min
 
 ota:

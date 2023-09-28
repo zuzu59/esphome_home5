@@ -2,7 +2,7 @@
 #-- ow-th-solar.yaml
 #-- Mesures de températures de mon installation solaire thermique SEBASOL à l'aide de sondes 1-wire DS18B20
 #-- ATTENTION, avec les nouveaux DS18B20 chinois, il faut ABSOLUMENT les câbler en mode 3 fils !
-#-- zf210804.1042, zf220705.0731, zf230604.1751
+#-- zf210804.1042, zf220705.0731, zf230928.1813
 #--
 
 
@@ -57,7 +57,9 @@ logger:
 
 # Enable Home Assistant API
 api:
-  password: !secret api_password
+#  password: !secret api_password
+  encryption:
+    key: !secret api_encryption_key
   reboot_timeout: 60min
 
 # Enable OTA

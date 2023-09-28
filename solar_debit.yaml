@@ -2,7 +2,7 @@
 #-- solar_debit.yaml
 #-- Petit débimètre pour mon installation solaire thermique SEBASOL
 #-- Il compte les impulsions d'une ampoule REED collée sur un débimètre mécanique conventionnel
-#-- zf210713.1114, zf220302.1149
+#-- zf210713.1114, zf230928.1842
 #--
 
 # sources: 
@@ -53,7 +53,10 @@ logger:
 
 # Enable Home Assistant API
 api:
-  password: !secret api_password
+#  password: !secret api_password
+  encryption:
+    key: !secret api_encryption_key
+  reboot_timeout: 60min
 
 # Enable OTA
 ota:

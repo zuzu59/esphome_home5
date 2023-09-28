@@ -3,7 +3,7 @@
 #-- Petit code générique minimaliste pour des projets à base d'esp mini d1
 #-- ATTENTION, la LED builting et le sensor pulse sont 'cachés' (internal: true) à cause que cela rempli l'history pour rien
 #-- location: tableau électrique
-#-- zf221106.1300
+#-- zf230928.1938
 #--
 # sources: 
 # https://esphome.io/components/sensor/pulse_meter.html#converting-units  
@@ -56,7 +56,9 @@ logger:
 
 # Enable Home Assistant API
 api:
-  password: !secret api_password
+#  password: !secret api_password
+  encryption:
+    key: !secret api_encryption_key
 
 ota:
   password: !secret ota_password
