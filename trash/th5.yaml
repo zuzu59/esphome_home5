@@ -1,0 +1,126 @@
+#------------------------------
+#-- th5.yaml
+#-- Petit code mini manilste pour mesurer la température et l'humidité
+#-- Lit la tmpérature et l'humidité du capteur HTU21D
+#-- location: chambre à Chloé poutre mur
+#-- zf210720.1023, zf221106.1252
+#--
+
+
+# sources: 
+# https://esphome.io/components/sensor/htu21d.html
+
+
+esphome:
+  name: th5
+  platform: ESP8266
+  board: nodemcuv2
+
+# Configuration WIFI
+wifi:
+  ssid: !secret wifi_ssid_apzuzu7
+  password: !secret wifi_pass_apzuzu7
+
+  # networks:
+  
+  #   - ssid: !secret wifi_ssid_apzuzu7
+  #   - password: !secret wifi_pass_apzuzu7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6
+  #   - password: !secret wifi_pass_apzuzu6
+
+  #   - ssid: !secret wifi_ssid_3G_zf
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3G_zf2
+  #   - password: !secret wifi_pass_3G_zf2
+    
+  #   - ssid: !secret wifi_ssid_3g_s7
+  #   - password: !secret wifi_pass_3g_s7
+    
+  #   - ssid: !secret wifi_ssid_apzuzu6_EXT
+  #   - password: !secret wifi_pass_apzuzu6_EXT
+
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "th5 Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+    level: VERBOSE
+
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+ota:
+  password: !secret ota_password
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "th5 LED"
+    inverted: True
+    id: led
+    pin: D4
+
+  - platform: restart
+    name: "th5 Restart"
+
+# Définition du bouton physique
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D3
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "th5 button"
+    on_press:
+      - switch.toggle: led
+
+# WEB Server
+web_server:
+  port: 80
+
+
+
+
+# I2C conf
+i2c:
+  sda: D5
+  scl: D6
+
+# Sensors
+sensor:
+  - platform: wifi_signal
+    name: "th5 Signal Wi-Fi"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "th5 uptime"
+    update_interval: 60s
+
+  - platform: htu21d
+    temperature:
+      name: "th5 Température"
+    humidity:
+      name: "th5 Humidité"
+    update_interval: 15s
+
+# Sensors text
+text_sensor:
+  - platform: version
+    name: "th5 Version"
+
+  - platform: wifi_info
+    ip_address:
+      name: th5 IP Address
+      id: wifi_ip
+    ssid:
+      name: th5 Connected SSID
+      id: wifi_ssid
+
