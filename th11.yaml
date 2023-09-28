@@ -5,7 +5,7 @@
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- calibration VCC diode: 192     lambda: return id(th11_vcc_voltage).state + 1.151 ;
-#-- zf221207.0939, zf230926.0845
+#-- zf221207.0939, zf230928.1420
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -88,6 +88,7 @@ mqtt:
   password:  !secret mqtt_password_dev
   birth_message:
   will_message:
+  reboot_timeout: 15s
 
 # I2C conf
 i2c:
@@ -202,7 +203,7 @@ sensor:
         - offset: +0.3
     humidity:
       name: "th11 Humidité"
-#      accuracy_decimals: 0
+      accuracy_decimals: 0
     update_interval: 2s
 
 # tension VCC à l'intérieur de l'ESP
@@ -232,7 +233,7 @@ sensor:
     name: "th11 BAT capacity"
     update_interval: 2s
     unit_of_measurement: "%"
-    accuracy_decimals: 0
+    accuracy_decimals: 1
     lambda: return id(th11_bat_voltage).state ;
     filters:
       - calibrate_linear:
