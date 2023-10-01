@@ -10,7 +10,7 @@
 #-- ATTENTION, comme il n'y a qu'un seul convertisseur ADC sur l'ESP8266, il n'y a plus la fonction BMS et indicateur de capacité !
 #-- Il faut publier sur mqtt 'batrec_d1_2/switch/batrec_d1_2_led/command' = ON/OFF pour allumer/éteindre la LED !
 #-- Il faut publier sur mqtt 'batrec_d1_2/switch/batrec_d1_2_firmware_update/command' = ON pour lancer l'OTA !
-#-- zf230829.2300
+#-- zf231001.1930
 #--
 #-- Procédure à faire sur mon iMAC pour le flash OTA HTTP
 #-- cd ~/ota_www/
@@ -135,7 +135,7 @@ switch:
 sensor:
   - platform: wifi_signal
     name: "batrec_d1_2 Signal Wi-Fi"
-    update_interval: 10s
+    update_interval: 20s
     on_value:
       if:
         condition:
@@ -143,7 +143,7 @@ sensor:
         then:
           - logger.log: Je suis connecté sur le mqtt et j'envoie la sauce !
           - switch.turn_off: led
-          - delay: 0.5s
+          - delay: 2s
           - switch.turn_on: led
           - if:
               condition:
@@ -153,6 +153,7 @@ sensor:
                     condition:
                       lambda: 'return id(batrec_d1_2_sleep_mode).state == 1;'
                     then:
+                      - delay: 0.1s
                       - logger.log: On me demande de dormir !
                       - deep_sleep.enter: deep_sleep_1
               else:
@@ -175,14 +176,14 @@ sensor:
 
   - platform: uptime
     name: "batrec_d1_2 uptime"
-    update_interval: 1s
+    update_interval: 2s
 
 # valeur brute en volts de l'ADC
   - platform: adc
     pin: A0
     name: "batrec_d1_2 ADC brut"
     id: batrec_d1_2_adc_brut
-    update_interval: 1s
+    update_interval: 2s
     unit_of_measurement: "V"
     accuracy_decimals: 3
 
@@ -190,12 +191,12 @@ sensor:
   - platform: template
     name: "batrec_d1_2 ADC Voltage"
     id: batrec_d1_2_adc_voltage
-    update_interval: 1s
+    update_interval: 2s
     unit_of_measurement: "V"
     accuracy_decimals: 2
     lambda: return id(batrec_d1_2_adc_brut).state ;
     filters:
-    - multiply: 62.03
+    - multiply: 60.7
     - offset: -0.0
 
 
@@ -230,7 +231,7 @@ text_sensor:
 
 # Deep Sleep
 deep_sleep:
-  run_duration: 15s
+#  run_duration: 15s
   sleep_duration: 10s
   id: deep_sleep_1
 
