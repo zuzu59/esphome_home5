@@ -3,26 +3,28 @@
 #-- Petit code pour monitorer la température et l'humidité dans une pièce
 #-- location: hall rez
 #-- 
-#-- Bien que la sonde soit alimentée sur le secteur, on utilise quand même le 
+#-- Bien que la sonde soit alimentée en permanence sur le secteur, on utilise quand même le 
 #-- mode dsleep afin que l'esp ne perturbe pas la sonde de température en chauffant
-#-- La partie mesure de la batterie est donc commentée !
 #-- 
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- calibration VCC diode: 239     lambda: return id(th10_vcc_voltage).state + 1.339 ;
-#-- calibration température: 219    - offset: -0.0
+#-- calibration température: 200    - offset: -0.0
+#-- zf231019.1818
+#--
+#-- Procédure à faire sur mon iMAC pour le flash OTA HTTP (voir les secrets de ESPhome !)
+#-- sshfs -o defer_permissions -p 22 admin@192.168.0.34:/ ~/mnt/leo3/
+#-- Il faut sauvegarder le binaire à flasher dans le dossier ~/mnt/leo3/
 #-- Il faut publier sur mqtt 'th10/switch/th10_led/command' = ON/OFF pour allumer/éteindre la LED
 #-- Il faut publier sur mqtt 'th10/switch/th10_firmware_update/command' = ON en RAW avec Retain pour lancer l'OTA
-#-- zf231019.1556
-#--
-#-- Procédure à faire sur mon iMAC pour le flash OTA HTTP
-#-- cd ~/ota_www/
-#-- python -m SimpleHTTPServer 8080
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
 # https://github.com/oarcher/piotech/tree/main/components/ota_http
 # Calcul de la durée sur une batterie: https://docs.google.com/spreadsheets/d/1I6s_R04LjGxCB0hrcvogGHNeITDwfXjM05hJhuqGkoU/edit#gid=1470557238
+
+substitutions:
+  ota_server: !secret ota_server
+  temperature_calibration: "-0.0"
 
 esphome:
   name: th7
@@ -37,7 +39,6 @@ esp8266:
 wifi:
   fast_connect: true
   reboot_timeout: 15s
-
   ssid: !secret wifi_ssid_apzuzu8
   password: !secret wifi_pass_apzuzu8
 
@@ -146,25 +147,6 @@ switch:
         - logger.log: "On ne me demande plus un firmware update"
 
 
-# Définition des Scripts
-# script:
-#   # fonction BMS, shutdown si < 3.3 Volts !
-#   - id: my_bms
-#     then:
-#       - logger.log:
-#           format: "La batterie est à %.1f"
-#           args: [ 'id(th7_bat_voltage).state' ]
-#       - if:
-#           condition:
-#             lambda: 'return id(th7_bat_voltage).state < 3.1 ;'
-#           then:
-#             - logger.log: "La batterie est en dessous de 3.1 Volts !"
-#             - delay: 0.5s
-#             - switch.turn_on: th7_shutdown
-#           else:
-#             - logger.log: "La batterie est encore bonne !"
-
-
 # Définition des Sensors
 sensor:
   - platform: wifi_signal
@@ -196,7 +178,7 @@ sensor:
                     retain: True
                 - delay: 2s
                 - ota_http.flash:
-                    url: http://192.168.0.138:8080/th7.bin
+                    url: http://${ota_server}/th7.bin
                 - logger.log: "This message should be not displayed(reboot)"
         else:
           - logger.log: Erreur 007 *********************************************************
@@ -216,58 +198,11 @@ sensor:
     temperature:
       name: "th7 Température"
       filters:
-        - offset: -0.0
+        - offset: ${temperature_calibration}
     humidity:
       name: "th7 Humidité"
 #      accuracy_decimals: 0
     update_interval: 2s
-
-# tension VCC à l'intérieur de l'ESP
-#   - platform: adc
-#     pin: VCC
-#     name: "th7 VCC Voltage"
-#     id: th7_vcc_voltage
-#     update_interval: 2s
-#     unit_of_measurement: "V"
-#     accuracy_decimals: 3
-# #    internal: true
-
-# tension de la batterie
-  # - platform: template
-  #   name: "th7 BAT Voltage"
-  #   id: th7_bat_voltage
-  #   update_interval: 2s
-  #   unit_of_measurement: "V"
-  #   accuracy_decimals: 3
-  #   on_value:
-  #     then:
-  #       - script.execute: my_bms
-  #   lambda: return id(th7_vcc_voltage).state + 0.844 ;
- 
-# capacité de la batterie
-  # - platform: template
-  #   name: "th7 BAT capacityzz"
-  #   id: th7_bat_capacityzz
-  #   update_interval: 2s
-  #   unit_of_measurement: "%"
-  #   accuracy_decimals: 0
-  #   lambda: return id(th7_bat_voltage).state ;
-  #   filters:
-  #     - calibrate_linear:
-  #         - 3.3 -> 0.0
-  #         - 4.0 -> 100.0
-  #     # filtre la valeur minimale
-  #     - lambda: |-
-  #         if (x >= 0) 
-  #           return x;
-  #         else 
-  #           return 0;
-  #     # filtre la valeur maximale
-  #     - lambda: |-
-  #         if (x <= 100) 
-  #           return x;
-  #         else 
-  #           return 100;
 
 
 # Définition des binary sensor
