@@ -1,22 +1,52 @@
 #------------------------------
 #-- th8.yaml
 #-- Petit code pour monitorer la température et l'humidité dans une pièce
-#-- location: chambre à coucher parents table de nuit zf
-#-- zf2300701.1532
+#-- location: hall rez
+#-- 
+#-- Bien que la sonde soit alimentée en permanence sur le secteur, on utilise quand même le 
+#-- mode dsleep afin que l'esp ne perturbe pas la sonde de température en chauffant
+#-- 
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal
+#-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
+#-- zf231019.1852
+#--
+#-- Procédure à faire sur mon iMAC pour le flash OTA HTTP (voir les secrets de ESPhome !)
+#-- sshfs -o defer_permissions -p 22 admin@192.168.0.34:/ ~/mnt/leo3/
+#-- Il faut sauvegarder le binaire à flasher dans le dossier ~/mnt/leo3/
+#-- Il faut publier sur mqtt 'th10/switch/th10_led/command' = ON/OFF pour allumer/éteindre la LED
+#-- Il faut publier sur mqtt 'th10/switch/th10_firmware_update/command' = ON en RAW avec Retain pour lancer l'OTA
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
+# https://github.com/oarcher/piotech/tree/main/components/ota_http
+# Calcul de la durée sur une batterie: https://docs.google.com/spreadsheets/d/1I6s_R04LjGxCB0hrcvogGHNeITDwfXjM05hJhuqGkoU/edit#gid=1470557238
+
+substitutions:
+  ota_server: !secret ota_server
+  temperature_calibration: "-0.0"
 
 esphome:
   name: th8
+  on_boot:
+  - switch.turn_off: led
+#  - switch.turn_on: led
 
 esp8266:
   board: d1_mini
 
 # Configuration WIFI
 wifi:
+  fast_connect: true
+  reboot_timeout: 15s
   ssid: !secret wifi_ssid_apzuzu7
   password: !secret wifi_pass_apzuzu7
+
+  # manual_ip:
+  #   static_ip: 192.168.0.201
+  #   gateway: 192.168.0.51
+  #   dns1: 192.168.0.51
+  #   dns2: 8.8.8.8
+  #   subnet: 255.255.255.0
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
@@ -28,6 +58,7 @@ captive_portal:
 # Enable logging
 logger:
   level: DEBUG
+#  level: INFO
   logs:
     logger: INFO
     adc: INFO
@@ -49,24 +80,37 @@ logger:
     mqtt.switch: INFO
     mqtt.sensor: INFO
 
-# Enable Home Assistant API
-api:
+# # Enable Home Assistant API
+# api:
 #  password: !secret api_password
-  encryption:
-    key: !secret api_encryption_key
 
 ota:
   password: !secret ota_password
+
+external_components:
+  - source: github://oarcher/piotech/
+
+ota_http:
 
 # WEB Server
 web_server:
   port: 80
 
+# MQTT server
+mqtt:
+  broker:  !secret mqtt_server_dev
+  port:  !secret mqtt_port_dev
+  username:  !secret mqtt_user_dev
+  password:  !secret mqtt_password_dev
+  birth_message:
+  will_message:
+  reboot_timeout: 15s
 
 # I2C conf
 i2c:
   sda: D2
   scl: D1
+#  frequency: 10khz
 
 
 # Définition des Switch's
@@ -80,29 +124,105 @@ switch:
   - platform: restart
     name: "th8 Restart"
 
+  - platform: shutdown
+    name: "th8 Shutdown"
+    id: th8_shutdown
+    internal: true
+
+  - platform: template
+    name: "th8 Firmware update"
+    id: th8_firmware_update
+    turn_on_action:
+      then:
+        - binary_sensor.template.publish:
+            id: th8_ota_mode
+            state: ON
+        - logger.log: "On me demande un firmware update"
+    turn_off_action:
+      then:
+        - binary_sensor.template.publish:
+            id: th8_ota_mode
+            state: OFF
+        - logger.log: "On ne me demande plus un firmware update"
+
 
 # Définition des Sensors
 sensor:
   - platform: wifi_signal
     name: "th8 Signal Wi-Fi"
-    update_interval: 60s
+    update_interval: 10s
+    on_value:
+      if:
+        condition:
+          mqtt.connected:
+        then:
+          - logger.log: Je suis connecté sur le mqtt et j'envoie la sauce !
+          - switch.turn_off: led
+          - delay: 1.0s
+          - switch.turn_on: led
+          - if:
+              condition:
+                lambda: 'return id(th8_ota_mode).state == 0;'
+              then:
+                - if:
+                    condition:
+                      lambda: 'return id(th8_sleep_mode).state == 1;'
+                    then:
+                      - logger.log: On me demande de dormir !
+                      - deep_sleep.enter: deep_sleep_1
+              else:
+                - mqtt.publish:
+                    topic: th8/switch/th8_firmware_update/command
+                    payload: "OFF"
+                    retain: True
+                - delay: 2s
+                - ota_http.flash:
+                    url: http://${ota_server}/th8.bin
+                - logger.log: "This message should be not displayed(reboot)"
+        else:
+          - logger.log: Erreur 007 *********************************************************
+          - if:
+              condition:
+                lambda: 'return id(th8_sleep_mode).state == 1;'
+              then:
+                - logger.log: On me demande de dormir !
+                - deep_sleep.enter: deep_sleep_1
 
   - platform: uptime
     name: "th8 uptime"
-    update_interval: 60s
+    update_interval: 2s
 
+# température et humidité
   - platform: htu21d
     temperature:
       name: "th8 Température"
+      filters:
+        - offset: ${temperature_calibration}
     humidity:
       name: "th8 Humidité"
+#      accuracy_decimals: 0
     update_interval: 2s
+
+
+# Définition des binary sensor
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D7
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "th8 sleep mode"
+    id: th8_sleep_mode
+
+  - platform: template
+    name: "th8 ota mode"
+    id: th8_ota_mode
 
 
 # Définition des Sensors text
 text_sensor:
   - platform: version
-    name: "th8 Version 1518"
+    name: "th8 Version 164434"
 
   - platform: wifi_info
     ip_address:
@@ -113,3 +233,8 @@ text_sensor:
       id: wifi_ssid
 
 
+# Deep Sleep
+deep_sleep:
+#  run_duration: 25s
+  sleep_duration: 60s
+  id: deep_sleep_1
