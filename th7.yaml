@@ -2,21 +2,51 @@
 #-- th7.yaml
 #-- Petit code pour monitorer la température et l'humidité dans une pièce
 #-- location: hall rez
-#-- zf2300701.1527
+#-- 
+#-- Bien que la sonde soit alimentée sur le secteur, on utilise quand même le 
+#-- mode dsleep afin que l'esp ne perturbe pas la sonde de température en chauffant
+#-- La partie mesure de la batterie est donc commentée !
+#-- 
+#-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal
+#-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
+#-- calibration VCC diode: 239     lambda: return id(th10_vcc_voltage).state + 1.339 ;
+#-- calibration température: 219    - offset: -0.0
+#-- Il faut publier sur mqtt 'th10/switch/th10_led/command' = ON/OFF pour allumer/éteindre la LED
+#-- Il faut publier sur mqtt 'th10/switch/th10_firmware_update/command' = ON en RAW avec Retain pour lancer l'OTA
+#-- zf231019.1556
+#--
+#-- Procédure à faire sur mon iMAC pour le flash OTA HTTP
+#-- cd ~/ota_www/
+#-- python -m SimpleHTTPServer 8080
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
+# https://github.com/oarcher/piotech/tree/main/components/ota_http
+# Calcul de la durée sur une batterie: https://docs.google.com/spreadsheets/d/1I6s_R04LjGxCB0hrcvogGHNeITDwfXjM05hJhuqGkoU/edit#gid=1470557238
 
 esphome:
   name: th7
+  on_boot:
+  - switch.turn_off: led
+#  - switch.turn_on: led
 
 esp8266:
   board: d1_mini
 
 # Configuration WIFI
 wifi:
+  fast_connect: true
+  reboot_timeout: 15s
+
   ssid: !secret wifi_ssid_apzuzu8
   password: !secret wifi_pass_apzuzu8
+
+  # manual_ip:
+  #   static_ip: 192.168.0.201
+  #   gateway: 192.168.0.51
+  #   dns1: 192.168.0.51
+  #   dns2: 8.8.8.8
+  #   subnet: 255.255.255.0
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
@@ -28,6 +58,7 @@ captive_portal:
 # Enable logging
 logger:
   level: DEBUG
+#  level: INFO
   logs:
     logger: INFO
     adc: INFO
@@ -49,24 +80,37 @@ logger:
     mqtt.switch: INFO
     mqtt.sensor: INFO
 
-# Enable Home Assistant API
-api:
+# # Enable Home Assistant API
+# api:
 #  password: !secret api_password
-  encryption:
-    key: !secret api_encryption_key
 
 ota:
   password: !secret ota_password
+
+external_components:
+  - source: github://oarcher/piotech/
+
+ota_http:
 
 # WEB Server
 web_server:
   port: 80
 
+# MQTT server
+mqtt:
+  broker:  !secret mqtt_server_dev
+  port:  !secret mqtt_port_dev
+  username:  !secret mqtt_user_dev
+  password:  !secret mqtt_password_dev
+  birth_message:
+  will_message:
+  reboot_timeout: 15s
 
 # I2C conf
 i2c:
   sda: D2
   scl: D1
+#  frequency: 10khz
 
 
 # Définition des Switch's
@@ -80,29 +124,171 @@ switch:
   - platform: restart
     name: "th7 Restart"
 
+  - platform: shutdown
+    name: "th7 Shutdown"
+    id: th7_shutdown
+    internal: true
+
+  - platform: template
+    name: "th7 Firmware update"
+    id: th7_firmware_update
+    turn_on_action:
+      then:
+        - binary_sensor.template.publish:
+            id: th7_ota_mode
+            state: ON
+        - logger.log: "On me demande un firmware update"
+    turn_off_action:
+      then:
+        - binary_sensor.template.publish:
+            id: th7_ota_mode
+            state: OFF
+        - logger.log: "On ne me demande plus un firmware update"
+
+
+# Définition des Scripts
+# script:
+#   # fonction BMS, shutdown si < 3.3 Volts !
+#   - id: my_bms
+#     then:
+#       - logger.log:
+#           format: "La batterie est à %.1f"
+#           args: [ 'id(th7_bat_voltage).state' ]
+#       - if:
+#           condition:
+#             lambda: 'return id(th7_bat_voltage).state < 3.1 ;'
+#           then:
+#             - logger.log: "La batterie est en dessous de 3.1 Volts !"
+#             - delay: 0.5s
+#             - switch.turn_on: th7_shutdown
+#           else:
+#             - logger.log: "La batterie est encore bonne !"
+
 
 # Définition des Sensors
 sensor:
   - platform: wifi_signal
     name: "th7 Signal Wi-Fi"
-    update_interval: 60s
+    update_interval: 10s
+    on_value:
+      if:
+        condition:
+          mqtt.connected:
+        then:
+          - logger.log: Je suis connecté sur le mqtt et j'envoie la sauce !
+          - switch.turn_off: led
+          - delay: 1.0s
+          - switch.turn_on: led
+          - if:
+              condition:
+                lambda: 'return id(th7_ota_mode).state == 0;'
+              then:
+                - if:
+                    condition:
+                      lambda: 'return id(th7_sleep_mode).state == 1;'
+                    then:
+                      - logger.log: On me demande de dormir !
+                      - deep_sleep.enter: deep_sleep_1
+              else:
+                - mqtt.publish:
+                    topic: th7/switch/th7_firmware_update/command
+                    payload: "OFF"
+                    retain: True
+                - delay: 2s
+                - ota_http.flash:
+                    url: http://192.168.0.138:8080/th7.bin
+                - logger.log: "This message should be not displayed(reboot)"
+        else:
+          - logger.log: Erreur 007 *********************************************************
+          - if:
+              condition:
+                lambda: 'return id(th7_sleep_mode).state == 1;'
+              then:
+                - logger.log: On me demande de dormir !
+                - deep_sleep.enter: deep_sleep_1
 
   - platform: uptime
     name: "th7 uptime"
-    update_interval: 60s
+    update_interval: 2s
 
+# température et humidité
   - platform: htu21d
     temperature:
       name: "th7 Température"
+      filters:
+        - offset: -0.0
     humidity:
       name: "th7 Humidité"
+#      accuracy_decimals: 0
     update_interval: 2s
+
+# tension VCC à l'intérieur de l'ESP
+#   - platform: adc
+#     pin: VCC
+#     name: "th7 VCC Voltage"
+#     id: th7_vcc_voltage
+#     update_interval: 2s
+#     unit_of_measurement: "V"
+#     accuracy_decimals: 3
+# #    internal: true
+
+# tension de la batterie
+  # - platform: template
+  #   name: "th7 BAT Voltage"
+  #   id: th7_bat_voltage
+  #   update_interval: 2s
+  #   unit_of_measurement: "V"
+  #   accuracy_decimals: 3
+  #   on_value:
+  #     then:
+  #       - script.execute: my_bms
+  #   lambda: return id(th7_vcc_voltage).state + 0.844 ;
+ 
+# capacité de la batterie
+  # - platform: template
+  #   name: "th7 BAT capacityzz"
+  #   id: th7_bat_capacityzz
+  #   update_interval: 2s
+  #   unit_of_measurement: "%"
+  #   accuracy_decimals: 0
+  #   lambda: return id(th7_bat_voltage).state ;
+  #   filters:
+  #     - calibrate_linear:
+  #         - 3.3 -> 0.0
+  #         - 4.0 -> 100.0
+  #     # filtre la valeur minimale
+  #     - lambda: |-
+  #         if (x >= 0) 
+  #           return x;
+  #         else 
+  #           return 0;
+  #     # filtre la valeur maximale
+  #     - lambda: |-
+  #         if (x <= 100) 
+  #           return x;
+  #         else 
+  #           return 100;
+
+
+# Définition des binary sensor
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D7
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "th7 sleep mode"
+    id: th7_sleep_mode
+
+  - platform: template
+    name: "th7 ota mode"
+    id: th7_ota_mode
 
 
 # Définition des Sensors text
 text_sensor:
   - platform: version
-    name: "th7 Version 1518"
+    name: "th7 Version 164434"
 
   - platform: wifi_info
     ip_address:
@@ -113,3 +299,9 @@ text_sensor:
       id: wifi_ssid
 
 
+# Deep Sleep
+deep_sleep:
+#  run_duration: 25s
+#  sleep_duration: 300s
+  sleep_duration: 10s
+  id: deep_sleep_1
