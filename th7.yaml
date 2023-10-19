@@ -8,8 +8,7 @@
 #-- 
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
-#-- calibration température: 200    - offset: -0.0
-#-- zf231019.1818
+#-- zf231019.1824
 #--
 #-- Procédure à faire sur mon iMAC pour le flash OTA HTTP (voir les secrets de ESPhome !)
 #-- sshfs -o defer_permissions -p 22 admin@192.168.0.34:/ ~/mnt/leo3/
@@ -237,6 +236,5 @@ text_sensor:
 # Deep Sleep
 deep_sleep:
 #  run_duration: 25s
-#  sleep_duration: 300s
-  sleep_duration: 10s
+  sleep_duration: 60s
   id: deep_sleep_1
