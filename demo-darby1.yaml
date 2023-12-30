@@ -4,7 +4,7 @@
 #-- Cherche des consignes sur le Home Assistant
 #-- et fait une petite détection de dépassement avec alarme sur Telegram
 #-- 
-#-- zf220523.0942, zf221106.1300
+#-- zf220523.0942, zf221106.1300, zf231230.1757
 #--
 
 esphome:
@@ -12,7 +12,7 @@ esphome:
 
 esp8266:
   board: esp01_1m
-  restore_from_flash: false
+#  restore_from_flash: false
   
 preferences:
   flash_write_interval: 10min
@@ -23,8 +23,8 @@ wifi:
 #  password: !secret wifi_pass_apzuzu7
 
   networks:
-  - ssid: !secret wifi_ssid_apzuzu7
-  - password: !secret wifi_pass_apzuzu7
+  - ssid: !secret wifi_ssid_3g_s7
+  - password: !secret wifi_pass_3g_s7
   
   #   - ssid: !secret wifi_ssid_apzuzu6
   #   - password: !secret wifi_pass_apzuzu6
@@ -56,7 +56,8 @@ logger:
 
 # Enable Home Assistant API
 api:
-  password: !secret api_password
+  encryption:
+    key: !secret api_encryption_key
 
 # Enable OTA updates
 ota:
@@ -81,7 +82,7 @@ switch:
 
   - platform: template
     name: "demo-darby1 quittance alarme"
-    restore_state: true
+#    restore_state: true
     optimistic: true
     id: demo_darby1_quittance_alarme
 
