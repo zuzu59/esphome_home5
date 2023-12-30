@@ -7,13 +7,10 @@ esphome:
   name: ${name}
   name_add_mac_suffix: false
   friendly_name: ${friendly_name}
+
 api:
   encryption:
-<<<<<<< HEAD
-    key: DJjPQUFEZ0aHErezhcvtwTV3QPQuYj41bJENAGWOrac=
-=======
-    key: nURfoIxy251dMZYD2IjXg2Fv1Eveq0y93s7wN0cW5HA=
->>>>>>> c0026a4 (new: toujours des tests avec mon mini M5 Atome Echo)
+    key: !secret api_encryption_key
 
 
 wifi:
