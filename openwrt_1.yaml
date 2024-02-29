@@ -1,0 +1,97 @@
+#------------------------------
+#-- openwrt_1.yaml
+#-- Petit test de mDNS à travers un subnet routé avec un mini Mango Openwrt
+#-- Le subnet du ha est le 192.168.0.x et celui de cet esp8266 mini d1 est le 192.168.2.x
+#-- C'est la 1ère fois que j'arrive à mettre des ESPhome sur d'autres subnets que celui du ha \o/
+#-- location: bureau Chloé pour l'instant
+#-- zf240222.1742
+#--
+# sources: 
+# https://blog.christophersmart.com/2020/03/30/resolving-mdns-across-vlans-with-avahi-on-openwrt/
+
+esphome:
+  name: openwrt_1
+
+esp8266:
+  board: d1_mini
+
+# Configuration WIFI
+wifi:
+  ssid: !secret wifi_ssid_apzuzu9
+  password: !secret wifi_pass_apzuzu9
+
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "openwrt_1 Fallback"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+# Enable logging
+logger:
+    level: VERBOSE
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  password: !secret ota_password
+
+# WEB Server
+web_server:
+  port: 80
+
+
+# Définition des Switch's
+switch:
+  - platform: gpio
+    name: "openwrt_1 LED"
+    inverted: True
+    id: led
+    pin: D4
+
+  - platform: restart
+    name: "openwrt_1 Restart"
+
+
+# Définition des Sensors
+sensor:
+  - platform: wifi_signal
+    name: "openwrt_1 Signal Wi-Fi"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "openwrt_1 uptime"
+    update_interval: 60s
+
+
+# Définition des Sensors text
+text_sensor:
+  - platform: version
+    name: "openwrt_1 Version 1150"
+
+  - platform: wifi_info
+    ip_address:
+      name: openwrt_1 IP Address
+      id: wifi_ip
+    ssid:
+      name: openwrt_1 Connected SSID
+      id: wifi_ssid
+
+
+# Définition des inputs numbers
+number:
+  - platform: template
+    name: "openwrt_1 consigne alarme low"
+    restore_value: true
+    optimistic: true
+    mode: box
+    min_value: 0.0
+    max_value: 0.8
+    step: 0.01
+    initial_value: 0.4
+    unit_of_measurement: "V"
+    id: openwrt_1_consigne_alarme_low
