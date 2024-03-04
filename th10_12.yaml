@@ -8,7 +8,7 @@
 #-- calibration température: 213    - offset: -0.1
 #-- Il faut publier sur mqtt 'th10_12/switch/th10_12_led/command' = ON/OFF pour allumer/éteindre la LED
 #-- Il faut publier sur mqtt 'th10_12/switch/th10_12_firmware_update/command' = ON pour lancer l'OTA
-#-- zf230721.1310, zf2300926.0742
+#-- zf230721.1310, zf2300926.0742, zf240302.2029
 #--
 #-- Procédure à faire sur mon iMAC pour le flash OTA HTTP
 #-- cd ~/ota_www/
@@ -250,7 +250,7 @@ sensor:
     filters:
       - calibrate_linear:
           - 3.3 -> 0.0
-          - 4.0 -> 100.0
+          - 4.1 -> 100.0
       # filtre la valeur minimale
       - lambda: |-
           if (x >= 0) 
@@ -283,7 +283,7 @@ binary_sensor:
 # Définition des Sensors text
 text_sensor:
   - platform: version
-    name: "th10_12 Version 164434"
+    name: "th10_12 Version 2030"
 
   - platform: wifi_info
     ip_address:

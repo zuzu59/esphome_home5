@@ -5,7 +5,7 @@
 #-- Si la pin D7 est à GND, alors part en dsleep pour une certaine durée autrement on tourne en mode normal !
 #-- ATTENTION, il faut relier la pin D0 à RST pour qu'il puisse sortir du dsleep mode !
 #-- calibration VCC diode: 192     lambda: return id(th3_vcc_voltage).state + 1.401 ;
-#-- zf221207.0919, zf230928.1417
+#-- zf221207.0919, zf230928.1417, zf240302.1902
 #--
 # sources: 
 # https://esphome.io/components/sensor/htu21d.html
@@ -25,12 +25,12 @@ wifi:
   fast_connect: true
   ssid: !secret wifi_ssid_apzuzu6
   password: !secret wifi_pass_apzuzu6
-  manual_ip:
-    static_ip: 192.168.0.202
-    gateway: 192.168.0.51
-    dns1: 192.168.0.51
-    dns2: 8.8.8.8
-    subnet: 255.255.255.0
+  # manual_ip:
+  #   static_ip: 192.168.0.202
+  #   gateway: 192.168.0.51
+  #   dns1: 192.168.0.51
+  #   dns2: 8.8.8.8
+  #   subnet: 255.255.255.0
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
@@ -136,7 +136,7 @@ script:
   - id: my_bms
     then:
       - logger.log:
-          format: "La batterie est à %.1f"
+          format: "La batterie est à %.2f"
           args: [ 'id(th3_bat_voltage).state' ]
       - if:
           condition:
@@ -226,7 +226,7 @@ sensor:
     on_value:
       then:
         - script.execute: my_bms
-    lambda: return id(th3_vcc_voltage).state + 1.469 ;
+    lambda: return id(th3_vcc_voltage).state + 1.524 ;
  
 # capacité de la batterie
   - platform: template
@@ -238,7 +238,7 @@ sensor:
     filters:
       - calibrate_linear:
           - 3.3 -> 0.0
-          - 4.2 -> 100.0
+          - 4.1 -> 100.0
       # filtre la valeur minimale
       - lambda: |-
           if (x >= 0) 
@@ -271,7 +271,7 @@ binary_sensor:
 # Définition des Sensors text
 text_sensor:
   - platform: version
-    name: "th3 Version 1352"
+    name: "th3 Version 2006"
 
   - platform: wifi_info
     ip_address:
