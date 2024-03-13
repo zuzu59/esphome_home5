@@ -2,12 +2,21 @@
 #-- co2_66.yaml
 #-- Petit code mini pour mesurer le COV et eCO2
 #-- Lit COV et eCO2 du capteur ccs811
-#-- location: chambre parents table de nuit zf
-#-- zf210720.1033, zf230219.2331
+#-- Mesure la concentration d'eCO2  (équivalent calculé en dioxyde de carbone)
+#-- dans une plage de 400 à 8 192 parties par million (ppm) et la concentration de COVT
+#-- (composé organique volatil total) dans une plage de 0 à 1 187 parties par milliard (ppb). 
+#-- Il peut détecter les alcools, les aldéhydes, les cétones, 
+#-- les acides organiques, les amines, les hydrocarbures aliphatiques et aromatiques.
+#--
+#-- location: chambre parents à coté table de nuit zf
+#-- zf210720.1033, zf230219.2331, zf240313.1024
 #--
 
 # sources: 
 # https://esphome.io/components/sensor/ccs811.html
+# https://www.adafruit.com/product/3566
+
+
 
 
 esphome:
