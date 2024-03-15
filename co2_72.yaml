@@ -9,7 +9,7 @@
 #-- les acides organiques, les amines, les hydrocarbures aliphatiques et aromatiques.
 #--
 #-- location: hall rez sous le meuble
-#-- zf210720.1033, zf230511.2244, zf240313.1024
+#-- zf210720.1033, zf230511.2244, zf240315.1854
 #--
 
 # sources: 
@@ -25,8 +25,8 @@ esp8266:
 
 # Configuration WIFI
 wifi:
-  ssid: !secret wifi_ssid_apzuzu7
-  password: !secret wifi_pass_apzuzu7
+  ssid: !secret wifi_ssid_apzuzu8
+  password: !secret wifi_pass_apzuzu8
 
   # networks:
   
@@ -121,6 +121,8 @@ sensor:
 
   - platform: ccs811
     # baseline: 0x5BB8
+    baseline: 0x6FB7
+
     # temperature: co2_72_th0_th
     # humidity: co2_72_th0_hu
     update_interval: 5s
