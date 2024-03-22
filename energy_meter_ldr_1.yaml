@@ -3,7 +3,7 @@
 #-- Petit code générique minimaliste pour des projets à base d'esp mini d1
 #-- ATTENTION, la LED builting et le sensor pulse sont 'cachés' (internal: true) à cause que cela rempli l'history pour rien
 #-- location: tableau électrique
-#-- zf230928.1938
+#-- zf230928.1938, zf240322.1153
 #--
 # sources: 
 # https://esphome.io/components/sensor/pulse_meter.html#converting-units  
@@ -19,8 +19,8 @@ esp8266:
 # Configuration WIFI
 wifi:
   fast_connect: true
-  ssid: !secret wifi_ssid_apzuzu7
-  password: !secret wifi_pass_apzuzu7
+  ssid: !secret wifi_ssid_apzuzu6
+  password: !secret wifi_pass_apzuzu6
 
   # networks:
   

@@ -121,7 +121,7 @@ sensor:
 
   - platform: ccs811
     # baseline: 0x5BB8
-    baseline: 0x6FB7
+    #baseline: 0x6FB7
 
     # temperature: co2_72_th0_th
     # humidity: co2_72_th0_hu
