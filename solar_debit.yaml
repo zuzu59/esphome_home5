@@ -2,7 +2,7 @@
 #-- solar_debit.yaml
 #-- Petit débimètre pour mon installation solaire thermique SEBASOL
 #-- Il compte les impulsions d'une ampoule REED collée sur un débimètre mécanique conventionnel
-#-- zf210713.1114, zf230928.1842
+#-- zf210713.1114, zf230928.1842, zf240322.1159
 #--
 
 # sources: 
@@ -17,8 +17,8 @@ esphome:
 
 # Configuration WIFI
 wifi:
-  ssid: !secret wifi_ssid_apzuzu7
-  password: !secret wifi_pass_apzuzu7
+  ssid: !secret wifi_ssid_apzuzu8
+  password: !secret wifi_pass_apzuzu8
 
   # networks:
   
