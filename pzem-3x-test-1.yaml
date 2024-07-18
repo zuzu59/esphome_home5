@@ -2,7 +2,7 @@
 #-- pzem-3x-test-1.yaml
 #-- Petits tests d2 3x modules power-meter PZEM-004T V3
 #-- ATTENTION: il faut leur changer l'adresse AVANT et tous les brancher en // !
-#-- zf210817.0804, zf220627.1124, zf230928.1858
+#-- zf210817.0804, zf220627.1124, zf230928.1858, zf240718.1137
 #--
 
 # sources: 
@@ -15,27 +15,13 @@ esphome:
   platform: ESP8266
   board: d1_mini
 
-# Enable logging
-logger:
-  level: INFO
-  esp8266_store_log_strings_in_flash: false
-
-# Enable Home Assistant API
-api:
-#  password: !secret api_password
-  encryption:
-    key: !secret api_encryption_key
-  reboot_timeout: 10min
-
-ota:
-  password: !secret ota_password
-
 # Configuration WIFI
 wifi:
-  fast_connect: true
-  ssid: !secret wifi_ssid_apzuzu6
-  password: !secret wifi_pass_apzuzu6
-  reboot_timeout: 10min
+  ssid: !secret wifi_ssid_apzuzu1
+  password: !secret wifi_pass_apzuzu1
+  reboot_timeout: 30min
+
+#  use_address: 1w_th_solar.local
 
   # networks:
   
@@ -57,12 +43,30 @@ wifi:
   #   - ssid: !secret wifi_ssid_apzuzu6_EXT
   #   - password: !secret wifi_pass_apzuzu6_EXT
 
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
+
+# Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "pzem-3x-test-1 Fallback Hotspot"
+    ssid: "ow-th-solar Fallback Hotspot"
     password: !secret ap_wifi_password
 
 captive_portal:
+
+# Enable logging
+logger:
+  level: INFO
+  esp8266_store_log_strings_in_flash: false
+
+# Enable Home Assistant API
+api:
+#  password: !secret api_password
+  encryption:
+    key: !secret api_encryption_key
+  reboot_timeout: 60min
+
+# Enable OTA
+ota:
+  - platform: esphome
+    password: !secret ota_password
 
 # WEB Server
 web_server:
