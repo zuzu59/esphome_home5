@@ -2,7 +2,7 @@
 #-- ow-th-solar.yaml
 #-- Mesures de températures de mon installation solaire thermique SEBASOL à l'aide de sondes 1-wire DS18B20
 #-- ATTENTION, avec les nouveaux DS18B20 chinois, il faut ABSOLUMENT les câbler en mode 3 fils !
-#-- zf210804.1042, zf220705.0731, zf230928.1813, zf240229.1110
+#-- zf210804.1042, zf220705.0731, zf230928.1813, zf240229.1110, zf240718.0936
 #--
 
 
@@ -16,8 +16,8 @@ esphome:
 
 # Configuration WIFI
 wifi:
-  ssid: !secret wifi_ssid_apzuzu7
-  password: !secret wifi_pass_apzuzu7
+  ssid: !secret wifi_ssid_apzuzu6
+  password: !secret wifi_pass_apzuzu6
   reboot_timeout: 30min
 
 #  use_address: 1w_th_solar.local
@@ -64,7 +64,8 @@ api:
 
 # Enable OTA
 ota:
-  password: !secret ota_password
+  - platform: esphome
+    password: !secret ota_password
 
 # WEB Server
 web_server:
@@ -73,9 +74,9 @@ web_server:
 
 
 # Configuration du 1-wire
-dallas:
-  - pin: D2
-    update_interval: 60s
+one_wire:
+  - platform: gpio
+    pin: D2
 
 
 # Définition des Switch's
@@ -126,32 +127,38 @@ sensor:
     name: "ow-th-solar uptime"
     update_interval: 60s
 
-  - platform: dallas
+  - platform: dallas_temp
     address: 0x7E0300A279AFA028
     name: "ow-th-solar aller"
+    update_interval: 60s
 
-  - platform: dallas
+  - platform: dallas_temp
     address: 0x860301A279FFE428
     name: "ow-th-solar retour"
+    update_interval: 60s
 
-  - platform: dallas
+  - platform: dallas_temp
     address: 0x710301A279230C28
     name: "ow-th-solar boiler2"
+    update_interval: 60s
 
-  - platform: dallas
+  - platform: dallas_temp
     address: 0xD80301A279E37228
     name: "ow-th-solar boiler1"
+    update_interval: 60s
 
-  - platform: dallas
+  - platform: dallas_temp
     address: 0xCC0301A2793FD328
     name: "ow-th-solar consigne"
+    update_interval: 60s
 
-  - platform: dallas
+  - platform: dallas_temp
     address: 0xEE0301A27920E728
     name: "ow-th-solar froid"
+    update_interval: 60s
 
-  - platform: dallas
+  - platform: dallas_temp
     address: 0xA40301A279F37228
     name: "ow-th-solar ext nord"
-
+    update_interval: 60s
 
